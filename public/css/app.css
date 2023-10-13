@@ -1,0 +1,72 @@
+:root {
+    --dashboard-background-color: #232227;
+    --text-primary-color: black;
+    --text-secondary-color: white;
+}
+
+.text-black-cerv {
+    color: var(--text-primary-color);
+}
+
+.text-white-cerv {
+    color: var(--text-secondary-color);
+}
+
+.bg-black {
+    background-color: var(--dashboard-background-color) !important;
+}
+
+@media (min-width: 992px) {
+
+
+    .sidebar-icon-only .sidebar {
+        background-color: var(--dashboard-background-color);
+    }
+
+    .sidebar-icon-only .navbar .navbar-brand-wrapper {
+        width: 70px;
+        padding-left: 1.625rem;
+        background: var(--dashboard-background-color);
+    }
+
+    .sidebar-dark.sidebar-icon-only .sidebar .nav .nav-item .nav-link i.menu-icon {
+        color: rgb(255 255 255 / 70%);
+    }
+
+    .sidebar-icon-only .sidebar .nav .nav-item.active .nav-link i.menu-icon {
+        color: #ffffff;
+    }
+
+}
+
+.btn-custom {
+    height: 30px;
+    line-height: 30px;
+    /* Alinear el contenido verticalmente */
+    padding: 0 10px;
+    margin-top: 10px;
+    /* Añadir espaciado horizontal */
+}
+
+#myTable_filter {
+    display: none;
+}
+
+#myTable_length {
+    display: none;
+}
+
+.form-control-custom {
+    border-radius: 25px;
+    border: none !important;
+
+}
+
+.small {
+    font-size: 10px;
+}
+
+.form-control {
+    color: black !important;
+}
+
