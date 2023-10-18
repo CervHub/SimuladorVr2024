@@ -67,6 +67,9 @@ Route::middleware(['admin'])->group(function () {
     Route::post('administrador/editarentrenador', [AdminController::class, 'editarentrenador'])->name('administrador.editarentrenador');
     Route::post('administrador/deletearentrenador', [AdminController::class, 'deletearentrenador'])->name('administrador.deletearentrenador');
     Route::post('administrador/detalle', [AdminController::class, 'detalle'])->name('administrador.detalle');
+    Route::post('administrador/updatecompany', [AdminController::class, 'updateCompany'])->name('administrador.updatecompany');
+    Route::post('administrador/updatecolormobile', [AdminController::class, 'updatecolormobile'])->name('updatecolormobile');
+    Route::post('administrador/updatecolordesktop', [AdminController::class, 'updatecolordesktop'])->name('updatecolordesktop');
 });
 
 //BEGIN Rutas para Entrenador
@@ -80,6 +83,8 @@ Route::middleware(['entrenador'])->group(function () {
     Route::post('entrenador/eliminarservicio', [SupervisorController::class, 'eliminararservicio'])->name('entrenador.eliminarservicio');
     Route::get('matricula/{id_service}', [SupervisorController::class, 'matricula'])->name('entrenador.matricula');
     Route::post('matricula/crearuser', [SupervisorController::class, 'crearuser'])->name('matricula.crearuser');
+    Route::post('matricula/edituser', [SupervisorController::class, 'edituser'])->name('matricula.edituser');
+    Route::post('matricula/eliminaruser', [SupervisorController::class, 'eliminaruser'])->name('matricula.eliminaruser');
     Route::post('matricula/cargamasiva', [SupervisorController::class, 'cargamasiva'])->name('matricula.cargamasiva');
     Route::get('induccion', [SupervisorController::class, 'induccion'])->name('entrenador.induccion');
     Route::post('induccion/eliminar', [SupervisorController::class, 'induccioneliminar'])->name('entrenador.induccion.eliminar');
@@ -88,8 +93,12 @@ Route::middleware(['entrenador'])->group(function () {
     Route::post('induction/update', [SupervisorController::class, 'induccionupdate'])->name('entrenador.update.induction');
     Route::get('evaluacion/{id_induction}', [SupervisorController::class, 'evaluacion'])->name('entrenador.evaluacion');
     Route::post('evaluacion/searchworker', [SupervisorController::class, 'searchworker'])->name('entrenador.search.worker');
+    Route::post('evaluacion/searchworkerservice', [SupervisorController::class, 'searchworkerservice'])->name('entrenador.search.worker.service');
+    Route::post('evaluacion/searchworkerdoi', [SupervisorController::class, 'searchworkerdoi'])->name('entrenador.search.workerdoi');
+    Route::post('evaluacion/searchworkerdoiid', [SupervisorController::class, 'searchworkerdoiid'])->name('entrenador.search.worker.doi');
     Route::post('inscribir', [SupervisorController::class, 'inscribir'])->name('entrenador.inscribir');
     Route::get('formatomasivoinduction', [SupervisorController::class, 'descargarinductionformato'])->name('induction.formato');
+    Route::get('formatomasivomatricula', [SupervisorController::class, 'descargarmasivoformato'])->name('induction.formato.masivo');
     Route::post('induction/cargamasiva', [SupervisorController::class, 'cargamasivainduction'])->name('induction.cargamasiva');
     Route::post('induction/eliminar', [SupervisorController::class, 'eliminarinductionworker'])->name('entrenador.eliminar.induction.worker');
     // Ruta para descargar asistencia

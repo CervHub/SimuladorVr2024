@@ -6,13 +6,14 @@ require("conexion.php");
 
 $query_params_login = array(
     ':dni' => $_POST['dni'],
+    ':id_company' => $_POST['id_company'],
 );
 
 $queryLogin = "
 SELECT *
 FROM workers
 WHERE code_worker LIKE '%-' || :dni
-  AND id_company = 2
+  AND id_company = :id_company
 LIMIT 1;
 ";
 

@@ -11,6 +11,17 @@ use App\Http\Controllers\Models\WorshopCompanyController;
 use Illuminate\Support\Facades\Session;
 use App\Models\Workshop;
 use App\Models\WorkshopCompany;
+use Illuminate\Support\Facades\Validator;
+
+Validator::extend('max_file_size', function ($attribute, $value, $parameters, $validator) {
+    $maxSize = $parameters[0] * 1024; // Tamaño máximo en kilobytes (1 MB = 1024 KB)
+
+    if ($value instanceof UploadedFile) {
+        return $value->getSize() <= $maxSize;
+    }
+
+    return false;
+});
 
 class SuperAdminController extends Controller
 {
@@ -71,6 +82,7 @@ class SuperAdminController extends Controller
             'name' => $requestData->name,
             'description' => $requestData->description,
             'status' => $requestData->status,
+            'photo' => $requestData->photo,
         ];
 
         // Responder con el arreglo en formato JSON
@@ -97,10 +109,25 @@ class SuperAdminController extends Controller
 
     public function editartaller(Request $request)
     {
+
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $maxSize = 1024; // Tamaño máximo en kilobytes (1 MB = 1024 KB)
+
+            if ($image->getSize() > $maxSize * 1024) {
+                // La imagen supera el tamaño máximo permitido
+                Session::flash('error', 'La imagen debe ser menos de 1MB.');
+                return redirect()->back();
+            }
+        }
+        if ($request->file('image')->getError()) {
+            Session::flash('error', 'Ha ocurrido un error en la carga de la imagen.');
+            return redirect()->back();
+        }
         $estado = $this->workshopController->edit($request);
         if ($estado) {
             // Creación exitosa
-            Session::flash('success', 'La actualizacion se ha realizado exitosamente.');
+            Session::flash('success', 'La actualización se ha realizado exitosamente.');
         }
 
         return redirect()->back();

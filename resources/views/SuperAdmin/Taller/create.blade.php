@@ -20,8 +20,11 @@
                         <input type="text" class="form-control" name="description" placeholder="Ingrese Descripción">
                     </div>
                     <div class="form-group">
-                        <label>Subir Imagen:</label>
-                        <input type="file" class="form-control-file" name="image" accept="image/*">
+                        <label>Subir Imagen (Relación de aspecto 16:9, máximo 1MB):</label><br>
+                        <input type="file" class="form-control-file" name="image" accept="image/*" id="imageInput">
+                    </div>
+                    <div class="form-group text-center">
+                        <img src="{{asset('sin-imagen.jpg')}}" alt="Preview" id="imagePreview" class="mt-3 text-center" style="border-radius:25px; max-width: 100%; max-height: 200px;">
                     </div>
                 </div>
 
@@ -33,3 +36,11 @@
         </div>
     </div>
 </div>
+
+<script>
+    // JavaScript para mostrar la vista previa de la imagen seleccionada
+    document.getElementById('imageInput').addEventListener('change', function(e) {
+        var imagePreview = document.getElementById('imagePreview');
+        imagePreview.src = URL.createObjectURL(e.target.files[0]);
+    });
+</script>

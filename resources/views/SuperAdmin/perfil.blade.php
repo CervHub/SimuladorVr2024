@@ -11,14 +11,10 @@
     <div class="col-md-8 col-lg-8 grid-margin stretch-card">
         <div class="card card-rounded">
             <div class="card-body">
-                <div class="profile-header d-flex align-items-center justify-content-between mb-3">
-                    <div>
-                        <img src="{{Auth::user()->photo}}" width="52px" alt="Profile Picture" class="profile-picture rounded-circle">
-                    </div>
-                </div>
+                
 
                 <div class="profile-form">
-                    <h5 class="mb-3">Editar Perfil</h5>
+                    <h5 class="mb-3 fw-bold">Editar Perfil</h5>
                     @if(session('success'))
                     <div class="alert alert-success">
                         {{ session('success') }}

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Company;
 use App\Models\Worker;
 use App\Models\User;
 use Illuminate\Support\Facades\Session;
@@ -20,6 +21,7 @@ class ProfileController extends Controller
         $role = Session::get('id_role');
         $foundWorker = null;
 
+        $company = Company::find($desiredCompanyId);
 
         foreach (Auth::user()->workers as $worker) {
             if ($worker->id_company === $desiredCompanyId) {
@@ -28,10 +30,9 @@ class ProfileController extends Controller
             }
         }
         if ($role == 1) {
-
             return view('SuperAdmin.perfil', compact('foundWorker'));
         } elseif ($role == 2) {
-            return view('Administrator.perfil', compact('foundWorker'));
+            return view('Administrator.perfil', compact('foundWorker','company'));
         } elseif ($role == 3) {
             return view('Supervisor.perfil', compact('foundWorker'));
         }

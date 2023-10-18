@@ -8,6 +8,7 @@ use App\Models\Worker;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Models\UserController;
 use Illuminate\Support\Facades\Session;
+use App\Models\Company;
 
 class AdminController extends Controller
 {
@@ -31,19 +32,18 @@ class AdminController extends Controller
     {
         return view('Administrator.reporte');
     }
-    
+
     public function entrenador()
     {
-        $id_company = Auth::user()->workers[0]->id_company;
+        $id_company = session('id_company');
         $workers = Worker::where('id_company', $id_company)->where('id_role', 3)->get();
         return view('Administrator.entrenador', compact('workers'));
     }
     public function crearentrenador(Request $request)
     {
-        $id_company = Auth::user()->workers[0]->id_company;
-        $id_service = Auth::user()->workers[0]->id_service;
-
-        $estado = $this->userController->create($request, $id_company, $id_service);
+        $id_company = session('id_company');
+        $id_service = session('id_service');
+        $estado = $this->userController->createInstructor($request, $id_company, $id_service);
         if ($estado) {
             // Creación exitosa
             Session::flash('success', 'La Creacion se ha realizado exitosamente.');
@@ -86,5 +86,67 @@ class AdminController extends Controller
             Session::flash('success', 'Se ha eliminado al entrenador exitosamente.');
         }
         return redirect()->back();
+    }
+
+    public function updateCompany(Request $request)
+    {
+        $company = Company::find(session('id_company'));
+
+        $this->updateImage($request, 'desktopLogo', 'url_image_desktop', $company);
+        $this->updateImage($request, 'mobileLogo', 'url_image_mobile', $company);
+
+        $company->save();
+        Session::flash('success', 'Se ha cargado exitosamente.');
+
+        return redirect()->back();
+    }
+
+    private function updateImage($request, $inputName, $fieldName, $entity)
+    {
+        if ($request->hasFile($inputName)) {
+            $oldImage = $entity->$fieldName;
+
+            if ($oldImage) {
+                $oldImagePath = public_path($oldImage);
+                if (file_exists($oldImagePath)) {
+                    unlink($oldImagePath);
+                }
+            }
+
+            $newImage = $request->file($inputName);
+            $uniqueFileName = 'logo_photo/' . time() . '_' . $inputName . '_' . uniqid() . '.' . $newImage->getClientOriginalExtension();
+            $destinationPath = public_path('logo_photo');
+
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0755, true);
+            }
+
+            $newImage->move($destinationPath, $uniqueFileName);
+            $entity->$fieldName = $uniqueFileName;
+        }
+    }
+
+    public function updatecolormobile(Request $request)
+    {
+        // Valida y guarda el color para dispositivos móviles en la base de datos
+        $color = $request->color;
+        $company = Company::find(session('id_company'));
+        $company->mobile = $color;
+        $company->save();
+
+        // Puedes enviar una respuesta JSON si lo deseas
+        return response()->json(['message' => 'Color para dispositivos móviles actualizado correctamente']);
+    }
+
+    public function updatecolordesktop(Request $request)
+    {
+        // Valida y guarda el color para dispositivos de escritorio en la base de datos
+        $color = $request->color;
+        $company = Company::find(session('id_company'));
+        $company->desktop = $color;
+        $company->save();
+
+        // Puedes enviar una respuesta JSON si lo deseas
+        return response()->json(['message' => 'Color para dispositivos de escritorio actualizado correctamente']);
     }
 }

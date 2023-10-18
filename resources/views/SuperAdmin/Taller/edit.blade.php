@@ -8,7 +8,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form action="{{route('superadministrador.editar.taller')}}" method="POST">
+            <form action="{{route('superadministrador.editar.taller')}}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body">
                     <div class="form-group">
@@ -26,6 +26,13 @@
                             <option value="1">Activo</option>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label>Subir Imagen (Relación de aspecto 16:9, máximo 1MB):</label><br>
+                        <input type="file" class="form-control-file" name="image" accept="image/*" id="imageInputEdit">
+                    </div>
+                    <div class="form-group text-center">
+                        <img src="" alt="Preview" id="imagePreviewEdit" class="mt-3 text-center" style="border-radius:25px; max-width: 100%; max-height: 200px;">
+                    </div>
                     <input type="hidden" name="id_workshop" id="id_workshop_editar" value="">
                 </div>
                 <div class="modal-footer">
@@ -36,3 +43,11 @@
         </div>
     </div>
 </div>
+
+<script>
+    // JavaScript para mostrar la vista previa de la imagen seleccionada
+    document.getElementById('imageInputEdit').addEventListener('change', function(e) {
+        var imagePreview = document.getElementById('imagePreviewEdit');
+        imagePreview.src = URL.createObjectURL(e.target.files[0]);
+    });
+</script>

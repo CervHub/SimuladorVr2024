@@ -12,11 +12,16 @@
 <div class="row">
     <div class="col-sm-12">
         <div class="home-tab">
+
             <div class="d-sm-flex align-items-center justify-content-between border-bottom">
                 <div>
                     <div class="btn-wrapper">
-                        <a href="#" class="btn btn-primary text-white p-3" data-toggle="modal" data-target="#createModal"><i class="icon-plus"></i> Create New</a>
+                        <a href="#" class="btn btn-primary text-white p-3 btn-sm" data-toggle="modal" data-target="#createModal"><i class="icon-plus"></i> Create New</a>
                     </div>
+                </div>
+
+                <div class="">
+
                 </div>
             </div>
             @if (Session::has('success'))

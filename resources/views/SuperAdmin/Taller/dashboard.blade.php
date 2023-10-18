@@ -14,7 +14,7 @@
             <div class="d-sm-flex align-items-center justify-content-between border-bottom">
                 <div>
                     <div class="btn-wrapper">
-                        <a href="#" class="btn btn-primary text-white p-3" data-toggle="modal" data-target="#createModal"><i class="icon-plus"></i> Create New</a>
+                        <a href="#" class="btn btn-primary text-white p-3" data-toggle="modal" data-target="#createModal"><i class="icon-plus"></i> Crear Nuevo Taller</a>
                     </div>
                 </div>
             </div>
@@ -98,6 +98,10 @@
 @include('SuperAdmin.Taller.create')
 @include('SuperAdmin.Taller.edit')
 
+@php
+$imagePath = asset("");
+@endphp
+
 @endsection
 
 @section('js')
@@ -107,6 +111,7 @@
 
 
 <script>
+    var directorio = @json($imagePath);
     $(document).ready(function() {
         let table = $('#myTable').DataTable();
 
@@ -150,6 +155,11 @@
                 $('#description_editar').val(response.description);
                 $('#name_editar').val(response.name);
                 $('#status_editar').val(response.status);
+                if (response.photo == null || response.photo == 0) {
+                    $('#imagePreviewEdit').attr('src', directorio + 'sin-imagen.jpg');
+                } else {
+                    $('#imagePreviewEdit').attr('src', directorio + response.photo);
+                }
             },
             error: function(xhr, ajaxOptions, thrownError) {
                 console.log("Error en la conexión:", xhr.status, thrownError);

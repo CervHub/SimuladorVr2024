@@ -8,17 +8,11 @@
 @section('content')
 <div class="row flex-grow">
 
-    <div class="col-md-8 col-lg-8 grid-margin stretch-card">
+    <div class="col-md-4 col-lg-4 grid-margin stretch-card">
         <div class="card card-rounded">
             <div class="card-body">
-                <div class="profile-header d-flex align-items-center justify-content-between mb-3">
-                    <div>
-                        <img src="{{Auth::user()->photo}}" width="52px" alt="Profile Picture" class="profile-picture rounded-circle">
-                    </div>
-                </div>
-
                 <div class="profile-form">
-                    <h5 class="mb-3">Editar Perfil</h5>
+                    <h5 class="mb-3 fw-bold">Editar Perfil</h5>
                     @if(session('success'))
                     <div class="alert alert-success">
                         {{ session('success') }}
@@ -103,6 +97,57 @@
             </div>
         </div>
     </div>
+
+    <div class="col-md-4 col-lg-4 grid-margin stretch-card">
+        <div class="card card-rounded">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h4 class="card-title card-title-dash">Actualizar Logo de la Empresa</h4>
+                            </div>
+                        </div>
+                        <form action="{{route('administrador.updatecompany')}}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            <div class="mt-3">
+                                @php
+                                $url_image_desktop = $company->url_image_desktop;
+                                $url_image_mobile = $company->url_image_mobile;
+                                if ($url_image_desktop == null || $url_image_desktop == 0) {
+                                $url_image_desktop = '';
+                                }
+                                if ($url_image_mobile == null || $url_image_mobile == 0) {
+                                $url_image_mobile = '';
+                                }
+                                @endphp
+
+                                <div class="mb-3">
+                                    <label for="desktopLogo" class="form-label">Logo de Desktop (Tamaño: 128x64 píxeles, máximo 1MB)</label>
+                                    <input type="file" class="form-control" id="desktopLogo" name="desktopLogo" accept="image/*">
+                                    @if ($url_image_desktop)
+                                    <img class="mt-3" id="desktopLogoPreview" src="{{ asset($url_image_desktop) }}" alt="Vista previa del logo de Desktop" width="120" height="36">
+                                    @endif
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="mobileLogo" class="form-label">Logo de Mobile (Tamaño: 32x32 píxeles, máximo 1MB)</label>
+                                    <input type="file" class="form-control" id="mobileLogo" name="mobileLogo" accept="image/*">
+                                    @if ($url_image_mobile)
+                                    <img class="mt-3" id="mobileLogoPreview" src="{{ asset($url_image_mobile) }}" alt="Vista previa del logo de Mobile" width="32" height="32">
+                                    @endif
+                                </div>
+                                <input type="hidden" name="id_company" value="{{ Auth::user()->id }}">
+                                <button type="submit" class="btn btn-primary">Actualizar Logos</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 </div>
 
 @endsection
@@ -137,4 +182,35 @@
         }
     }
 </script>
+<script>
+    // JavaScript para previsualizar imágenes cuando se seleccionan archivos
+    document.getElementById('desktopLogo').addEventListener('change', function(e) {
+        var file = e.target.files[0];
+        var desktopLogoPreview = document.getElementById('desktopLogoPreview');
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                desktopLogoPreview.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        } else {
+            desktopLogoPreview.src = '';
+        }
+    });
+
+    document.getElementById('mobileLogo').addEventListener('change', function(e) {
+        var file = e.target.files[0];
+        var mobileLogoPreview = document.getElementById('mobileLogoPreview');
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                mobileLogoPreview.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        } else {
+            mobileLogoPreview.src = '';
+        }
+    });
+</script>
+
 @endsection

@@ -16,27 +16,8 @@
     background-color: var(--dashboard-background-color) !important;
 }
 
-@media (min-width: 992px) {
-
-
-    .sidebar-icon-only .sidebar {
-        background-color: var(--dashboard-background-color);
-    }
-
-    .sidebar-icon-only .navbar .navbar-brand-wrapper {
-        width: 70px;
-        padding-left: 1.625rem;
-        background: var(--dashboard-background-color);
-    }
-
-    .sidebar-dark.sidebar-icon-only .sidebar .nav .nav-item .nav-link i.menu-icon {
-        color: rgb(255 255 255 / 70%);
-    }
-
-    .sidebar-icon-only .sidebar .nav .nav-item.active .nav-link i.menu-icon {
-        color: #ffffff;
-    }
-
+body{
+    background-color: black !important;
 }
 
 .btn-custom {

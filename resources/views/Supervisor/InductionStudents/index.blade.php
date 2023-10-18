@@ -103,7 +103,7 @@
                                 <td>{{$inductionworker->worker->position}}</td>
                                 <td>{{$inductionworker->created_at}}</td>
                                 <td>
-                                    <button class="btn btn-custom btn-danger text-white me-0" data-toggle="modal" data-target="#eliminarModal" onclick="eliminar({{$inductionworker->worker->user->doi}},{{$inductionworker->id}})">
+                                    <button class="btn btn-custom btn-danger text-white me-0" data-toggle="modal" data-target="#eliminarModal" onclick="eliminar({{strval($inductionworker->worker->user->doi)}},{{$inductionworker->id}})">
                                         <span class="mdi mdi-delete-forever">Eliminar</span> <!-- Icono de eliminar aquí -->
                                     </button>
                                 </td>
@@ -175,11 +175,12 @@
         console.log($('#id_induction').val());
 
         $.ajax({
-            url: '{{ route("entrenador.search.worker") }}', // Cambia esto a la URL correcta de tu servidor de ping
+            url: '{{ route("entrenador.search.worker.service") }}', // Cambia esto a la URL correcta de tu servidor de ping
             type: 'POST',
             data: {
                 doi: $('#doi').val(),
                 id_induction: $('#id_induction').val(),
+                id_service: $('#service').val(),
             },
             success: function(response) {
                 console.log(response);
@@ -187,6 +188,11 @@
                 $('#last_name').val(response.last_name);
                 $('#position').val(response.position);
                 $('#id_worker').val(response.id);
+                if (response == 'Error') {
+                    $('#mensaje_error').text("Consulta Sin datos.");
+                }else{
+                    $('#mensaje_error').text("");
+                }
                 console.log("Aqui");
             },
             error: function(xhr, ajaxOptions, thrownError) {
@@ -198,21 +204,22 @@
 
 <!-- Eliminar Estudiante -->
 <script>
-    function eliminar(doi,id) {
+    function eliminar(doi, id) {
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': "{{ csrf_token() }}"
             }
         });
 
-        console.log($('#doi').val());
+        console.log(doi);
+        console.log(id);
         console.log($('#id_induction').val());
 
         $.ajax({
-            url: '{{ route("entrenador.search.worker") }}', // Cambia esto a la URL correcta de tu servidor de ping
+            url: '{{ route("entrenador.search.workerdoi") }}', // Cambia esto a la URL correcta de tu servidor de ping
             type: 'POST',
             data: {
-                doi: doi,
+                id: id,
                 id_induction: $('#id_induction').val(),
             },
             success: function(response) {

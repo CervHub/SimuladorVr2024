@@ -16,5 +16,8 @@ class Company extends Model
     {
         return $this->hasMany(WorkshopCompany::class, 'id_company');
     }
-
+    public function services()
+    {
+        return $this->hasMany(Service::class, 'id_company');
+    }
 }

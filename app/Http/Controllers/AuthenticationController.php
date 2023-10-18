@@ -32,6 +32,10 @@ class AuthenticationController extends Controller
                 Session::put('id_company', $worker->id_company);
                 Session::put('id_worker', $worker->id);
                 Session::put('id_role', $worker->id_role);
+                Session::put('logo_desktop', $worker->company->url_image_desktop);
+                Session::put('logo_mobile', $worker->company->url_image_mobile);
+                Session::put('sidebar', $worker->company->mobile);
+                Session::put('header', $worker->company->desktop);
                 $type_user = $worker->id_role;
                 if ($type_user == 1) {
                     return redirect()->route('superadministrador');
