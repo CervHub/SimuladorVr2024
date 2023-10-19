@@ -82,6 +82,12 @@ class UserController extends Controller
             //Validamos que no exista un trabajador asociado a ese usario en rol entrenador o supervisor
             $worker = Worker::where('id_role', 3)->where('id_user', $user->id)->where('id_company', $id_company)->first();
             if ($worker) {
+                if ($worker->status == '0') {
+                    $worker->status = '1';
+                    $worker->save();
+                    Session::flash('success', 'El Usuario ya existia y se activo.');
+                    return false;
+                }
                 Session::flash('error', 'El Usuario ya existe.');
                 return false;
             }
@@ -112,6 +118,8 @@ class UserController extends Controller
             $new_worker->id_role = 3;
             $new_worker->id_user = $user->id;
             $new_worker->id_company = $id_company;
+            $new_worker->nombre = $request->name;
+            $new_worker->apellido = $request->last_name;
             $new_worker->id_service = $id_service;
             $new_worker->position = $request->position;
             $new_worker->status = '1';
@@ -133,12 +141,10 @@ class UserController extends Controller
         try {
             $worker = Worker::find($request->id_worker);
             $worker->position = $request->position;
+            
+            $worker->nombre = $request->name;
+            $worker->apellido = $request->last_name;
             $worker->save();
-
-            $user = User::find($worker->id_user);
-            $user->name = $request->name;
-            $user->last_name = $request->last_name;
-            $user->save();
 
             return true;
         } catch (\Throwable $th) {
@@ -149,7 +155,6 @@ class UserController extends Controller
     }
     public function eliminar(Request $request)
     {
-        dd($request);
         try {
             $eliminar = Worker::find($request->id_worker);
             $eliminar->status = '0';

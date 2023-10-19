@@ -30,11 +30,11 @@
                         @csrf
                         <div class="mb-3">
                             <label for="firstName" class="form-label">Nombre</label>
-                            <input type="text" class="form-control" id="firstName" name="firstName" value="{{Auth::user()->name}}" required>
+                            <input type="text" class="form-control" id="firstName" name="firstName" value="{{$foundWorker->nombre}}" required>
                         </div>
                         <div class="mb-3">
                             <label for="lastName" class="form-label">Apellido</label>
-                            <input type="text" class="form-control" id="lastName" name="lastName" value="{{Auth::user()->last_name}}" required>
+                            <input type="text" class="form-control" id="lastName" name="lastName" value="{{$foundWorker->apellido}}" required>
                         </div>
                         <div class="mb-3">
                             <label for="jobTitle" class="form-label">Cargo</label>

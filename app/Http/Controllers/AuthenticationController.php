@@ -30,6 +30,7 @@ class AuthenticationController extends Controller
             if (Auth::attempt($credentials)) {
                 $request->session()->regenerate();
                 Session::put('id_company', $worker->id_company);
+                Session::put('id_service', $worker->id_service);
                 Session::put('id_worker', $worker->id);
                 Session::put('id_role', $worker->id_role);
                 Session::put('logo_desktop', $worker->company->url_image_desktop);

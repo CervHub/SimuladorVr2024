@@ -39,14 +39,14 @@
                 </div>
                 <div>
                     @php
-                    $sidebarColor = session('sidebar');
-                    $headerColor = session('header');
-                    $logo = session('logo_desktop');
+                    $sidebarColor = Auth::user()->getWorkerById(session('id_worker'))->company->mobile;
+                    $headerColor = Auth::user()->getWorkerById(session('id_worker'))->company->desktop;
+                    $logo = Auth::user()->getWorkerById(session('id_worker'))->company->url_image_desktop;
                     if ($logo == null || $logo == 0) {
                     $logo = 'logo/logo.png';
                     }
                     @endphp
-                    <a class="navbar-brand brand-logo" href="index.html">
+                    <a class="navbar-brand brand-logo" href="#">
                         <img src="{{ asset($logo) }}" alt="logo" />
                     </a>
                 </div>
@@ -121,7 +121,7 @@
             <p class="settings-heading">SIDEBAR SKINS</p>
             <div class="sidebar-bg-options">
                 <div class="img-ss rounded-circle bg-light border me-3 select" data-color="light"></div>
-                <div class="img-ss rounded-circle bg-dark border me-3" data-color="dark"></div>
+                <div class="img-ss rounded-circle bg-black border me-3" data-color="black"></div>
             </div>
             <p class="settings-heading mt-2">HEADER SKINS</p>
             <div class="color-tiles mx-0 px-4">
@@ -184,32 +184,27 @@
                     $('.navbar').css('background-color', 'white');
                     $('.welcome-text').css('color', 'black');
                     $('.welcome-sub-text').css('color', 'black');
-                    $('.icon-menu').css('color', 'black');
                     break;
                 case 'black':
                     $('.navbar').css('background-color', 'black');
                     $('.welcome-text').css('color', 'white');
                     $('.welcome-sub-text').css('color', 'white');
-                    $('.icon-menu').css('color', 'white');
                     break;
                     // Agrega más casos para otros colores si es necesario
                 case 'success':
                     $('.navbar').css('background-color', '#4CAF50'); // Verde para "success"
                     $('.welcome-text').css('color', 'white'); // Texto verde para "success"
                     $('.welcome-sub-text').css('color', 'white');
-                    $('.icon-menu').css('color', 'white');
                     break;
                 case 'warning':
                     $('.navbar').css('background-color', '#FFC107'); // Amarillo para "warning"
                     $('.welcome-text').css('color', 'black'); // Texto amarillo para "warning"
                     $('.welcome-sub-text').css('color', 'black');
-                    $('.icon-menu').css('color', 'black');
                     break;
                 default:
                     $('.navbar').css('background-color', 'white');
                     $('.welcome-text').css('color', 'black');
                     $('.welcome-sub-text').css('color', 'black');
-                    $('.icon-menu').css('color', 'black');
                     break;
             }
         }
@@ -226,8 +221,20 @@
                             $(this).css('color', 'black');
                         }
                     });
+                    $('.nav-item').hover(function() {
+                        // Verificar si el elemento .nav-item no tiene la clase 'active'
+                        if (!$(this).hasClass('active')) {
+                            // Cambiar el color de los .menu-icon dentro de él a negro
+                            $(this).find('.menu-icon').css('color', 'black');
+                        }
+                    }, function() {
+                        // Cuando se quita el hover, restaurar el color a blanco si no está activo
+                        if (!$(this).hasClass('active')) {
+                            $(this).find('.menu-icon').css('color', 'black');
+                        }
+                    });
                     break;
-                case 'dark':
+                case 'black':
                     $('#header-icon').css('background-color', 'black');
                     $('.icon-menu').css('color', 'white');
                     $('.sidebar').css('background-color', 'black');
@@ -237,6 +244,19 @@
                             $(this).css('color', 'white');
                         }
                     });
+                    $('.nav-item').hover(function() {
+                        // Verificar si el elemento .nav-item no tiene la clase 'active'
+                        if (!$(this).hasClass('active')) {
+                            // Cambiar el color de los .menu-icon dentro de él a negro
+                            $(this).find('.menu-icon').css('color', 'black');
+                        }
+                    }, function() {
+                        // Cuando se quita el hover, restaurar el color a blanco si no está activo
+                        if (!$(this).hasClass('active')) {
+                            $(this).find('.menu-icon').css('color', 'white');
+                        }
+                    });
+
                     break;
                 default:
 
@@ -340,7 +360,14 @@
             });
         }
     </script>
-
+    <script>
+        var rol = @json(Session('id_role'));
+        $(document).ready(function() {
+            if (rol == 3) {
+                $("#settings-trigger").hide();
+            }
+        });
+    </script>
 
 </body>
 

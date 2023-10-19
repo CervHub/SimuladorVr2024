@@ -13,20 +13,19 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="firstName">Nombres:</label>
-                        <input type="text" class="form-control" name="name" placeholder="Ingrese su nombre">
+                        <input type="text" class="form-control" name="name" placeholder="Ingrese su nombre" required>
                     </div>
                     <div class="form-group">
                         <label for="lastName">Apellidos:</label>
-                        <input type="text" class="form-control" name="last_name" placeholder="Ingrese su apellido">
+                        <input type="text" class="form-control" name="last_name" placeholder="Ingrese su apellido" required>
                     </div>
                     <div class="form-group">
                         <label for="ruc">Documento de Identidad:</label>
-                        <input type="text" class="form-control" name="doi" placeholder="Ingrese su Documento de Identidad" pattern="[0-9]*" inputmode="numeric">
-                        <small class="form-text text-muted small">*Solo números</small>
+                        <input type="text" class="form-control" name="doi" placeholder="Ingrese su Documento de Identidad" required>
                     </div>
                     <div class="form-group">
                         <label for="lastName">Cargo:</label>
-                        <input type="text" class="form-control" name="position" placeholder="Ingrese cargo del Entrenador">
+                        <input type="text" class="form-control" name="position" placeholder="Ingrese cargo del Entrenador" required>
                     </div>
                 </div>
                 <div class="modal-footer">

@@ -23,7 +23,7 @@
                     <div class="form-group">
                         <label for="ruc">Documento de Identidad:</label>
                         <div class="input-group">
-                            <input type="text" class="form-control" id="doi" name="doi" placeholder="Ingrese su Documento de Identidad" pattern="[0-9]*" inputmode="numeric">
+                            <input type="text" class="form-control" id="doi" name="doi" placeholder="Ingrese su Documento de Identidad" required>
                             <div class="input-group-append">
                                 <button class="btn btn-primary btn-sm rounded-2" type="button" onclick="search()">
                                     <i class="icon-search"></i> <!-- Icono de búsqueda aquí -->

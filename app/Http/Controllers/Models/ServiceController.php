@@ -13,14 +13,28 @@ class ServiceController extends Controller
     public function create(Request $request, $id)
     {
         try {
-            $new_service = new Service();
-            $new_service->name = $request->name;
-            $new_service->description = $request->description;
-            $new_service->ruc = $request->ruc;
-            $new_service->id_company = $id;
-            $new_service->status = '1';
-            $new_service->save();
-            return true;
+            // Verificar si ya existe un servicio con el mismo RUC
+            $existingService = Service::where('ruc', $request->ruc)->where('id_company', session('id_company'))->first();
+            if ($existingService) {
+                if ($existingService->status == '0') {
+                    $existingService->status = '1';
+                    $existingService->save();
+                    return true;
+                } else {
+                    Session::flash('error', 'Ya existe un servicio con el mismo RUC.');
+                    return false;
+                }
+            } else {
+                // Crear un nuevo servicio solo si no existe uno con el mismo RUC
+                $new_service = new Service();
+                $new_service->name = $request->name;
+                $new_service->description = $request->description;
+                $new_service->ruc = $request->ruc;
+                $new_service->id_company = $id;
+                $new_service->status = '1';
+                $new_service->save();
+                return true;
+            }
         } catch (\Illuminate\Database\QueryException $ex) {
             // Manejar la excepción específica de QueryException
             Session::flash('error', 'Hubo un error en la consulta de base de datos.');
@@ -31,6 +45,7 @@ class ServiceController extends Controller
             return false;
         }
     }
+
     public function edit(Request $request)
     {
         try {

@@ -16,4 +16,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Worker::class, 'id_user');
     }
+
+    // Método para obtener un trabajador por su ID
+    public function getWorkerById($workerId)
+    {
+        return $this->workers()->where('id', $workerId)->first();
+    }
 }

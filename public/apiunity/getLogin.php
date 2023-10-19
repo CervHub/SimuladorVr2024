@@ -38,7 +38,7 @@ JOIN
 	ON wc.id_workshop = w.id
 WHERE
     induction_workers.id_worker = :id_worker
-    AND wc.id_company = 2
+    AND wc.id_company = :id_company
     AND inductions.date_end >= CURRENT_DATE
     AND inductions.date_start <= CURRENT_DATE
 ;
@@ -58,7 +58,8 @@ try {
         $id_user = $results[0]['id'];
         
         $query_params_induction = array(
-            ':id_worker' => $id_user
+            ':id_worker' => $id_user,
+            ':id_company' => $query_params_login['id_company'];
         );
         
         $stmt1 = $db->prepare($queryInduction);

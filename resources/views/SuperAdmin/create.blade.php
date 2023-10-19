@@ -16,13 +16,12 @@
                         <input type="text" class="form-control" id="firstName" name="name" placeholder="Ingrese su nombre">
                     </div>
                     <div class="form-group">
-                        <label for="lastName">Descripcion:</label>
-                        <input type="text" class="form-control" id="lastName" name="description" placeholder="Ingrese su apellido">
+                        <label for="lastName">Descripción:</label>
+                        <input type="text" class="form-control" id="lastName" name="description" placeholder="Ingrese descripción de la empresa">
                     </div>
                     <div class="form-group">
-                        <label for="ruc">RUC:</label>
-                        <input type="text" class="form-control" id="ruc" name="ruc" placeholder="Ingrese su RUC" pattern="[0-9]*" inputmode="numeric">
-                        <small class="form-text text-muted small">*Solo números</small>
+                        <label for="ruc">Ingrese Identificador de Empresa:</label>
+                        <input type="text" class="form-control" id="ruc" name="ruc" placeholder="Ingrese Identificador de Empresa">
                     </div>
                 </div>
                 <div class="modal-footer">

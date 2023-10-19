@@ -32,7 +32,7 @@ class ProfileController extends Controller
         if ($role == 1) {
             return view('SuperAdmin.perfil', compact('foundWorker'));
         } elseif ($role == 2) {
-            return view('Administrator.perfil', compact('foundWorker','company'));
+            return view('Administrator.perfil', compact('foundWorker', 'company'));
         } elseif ($role == 3) {
             return view('Supervisor.perfil', compact('foundWorker'));
         }
@@ -50,18 +50,16 @@ class ProfileController extends Controller
 
         // Actualizar los campos del usuario y el trabajador si están presentes en la solicitud
         if ($request->filled('firstName')) {
-            $user->name = $request->firstName;
+            $worker->nombre = $request->firstName;
         }
         if ($request->filled('lastName')) {
-            $user->last_name = $request->lastName;
+            $worker->apellido = $request->lastName;
         }
         if ($request->filled('jobTitle')) {
             $worker->position = $request->jobTitle;
         }
-
         // Guardar cambios en el trabajador
         $worker->save();
-
         // Guardar la imagen de perfil si se ha cargado
         if ($request->hasFile('profilePicture')) {
             $profilePicture = $request->file('profilePicture');

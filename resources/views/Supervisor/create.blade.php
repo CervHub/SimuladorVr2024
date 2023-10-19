@@ -13,15 +13,15 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="firstName">Nombre:</label>
-                        <input type="text" class="form-control" id="firstName" name="name" placeholder="Ingrese su nombre">
+                        <input type="text" class="form-control" id="firstName" name="name" placeholder="Ingrese su nombre" required>
                     </div>
                     <div class="form-group">
                         <label for="lastName">Descripcion:</label>
-                        <input type="text" class="form-control" id="lastName" name="description" placeholder="Ingrese su apellido">
+                        <input type="text" class="form-control" id="lastName" name="description" placeholder="Ingrese su apellido" required>
                     </div>
                     <div class="form-group">
                         <label for="ruc">RUC:</label>
-                        <input type="text" class="form-control" id="ruc" name="ruc" placeholder="Ingrese su RUC" pattern="[0-9]*" inputmode="numeric">
+                        <input type="text" class="form-control" id="ruc" name="ruc" placeholder="Ingrese su RUC" required>
                         <small class="form-text text-muted small">*Solo números</small>
                     </div>
                 </div>

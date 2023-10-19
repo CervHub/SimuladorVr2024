@@ -36,13 +36,14 @@ class AdminController extends Controller
     public function entrenador()
     {
         $id_company = session('id_company');
-        $workers = Worker::where('id_company', $id_company)->where('id_role', 3)->get();
+        $workers = Worker::where('id_company', $id_company)->where('id_role', 3)->where('status', '1')->get();
         return view('Administrator.entrenador', compact('workers'));
     }
     public function crearentrenador(Request $request)
     {
         $id_company = session('id_company');
         $id_service = session('id_service');
+
         $estado = $this->userController->createInstructor($request, $id_company, $id_service);
         if ($estado) {
             // Creación exitosa
@@ -66,8 +67,8 @@ class AdminController extends Controller
 
         $responseData = [
             'id' => $requestData->id,
-            'last_name' => $requestData->user->last_name,
-            'name' => $requestData->user->name,
+            'last_name' => $requestData->apellido,
+            'name' => $requestData->nombre,
             'position' => $requestData->position,
             'doi' => $requestData->user->doi,
             'worker' => $requestData,

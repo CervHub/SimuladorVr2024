@@ -58,7 +58,7 @@ Route::middleware(['superadmin', 'auth'])->group(function () {
 });
 
 // BEGIN Rutas para Administrador
-Route::middleware(['admin'])->group(function () {
+Route::middleware(['admin', 'auth'])->group(function () {
     Route::get('administrador/dashboard', [AdminController::class, 'index'])->name('administrador');
     Route::get('administrador/servicio', [AdminController::class, 'servicio'])->name('administrador.servicio');
     Route::get('administrador/reporte', [AdminController::class, 'reporte'])->name('administrador.reporte');

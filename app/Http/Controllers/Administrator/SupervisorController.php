@@ -578,10 +578,17 @@ class SupervisorController extends Controller
         }
 
         $induction = Induction::find($id_induction);
+        $result = InductionWorker::join('workers', 'workers.id', '=', 'induction_workers.id_worker')
+            ->join('services as s', 's.id', '=', 'workers.id_service')
+            ->join('users as u', 'u.id', '=', 'workers.id_user')
+            ->where('induction_workers.id_induction', $id_induction)
+            ->select('workers.position', 's.name as servicio', 'workers.nombre', 'u.doi', 'workers.apellido')
+            ->get();
         $logo = Company::find($induction->id_company)->url_image_desktop;
         $data = [
             'induction_worker' => $induction_worker,
             'induction' => $induction,
+            'result' => $result,
             'logo' => $logo,
         ];
 
