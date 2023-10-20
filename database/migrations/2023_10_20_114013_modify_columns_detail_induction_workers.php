@@ -12,7 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('detail_induction_workers', function (Blueprint $table) {
-            $table->unsignedBigInteger('report')->nullable();
+            $table->decimal('identified', 4, 1)->nullable()->change();
+            $table->decimal('risk_level', 4, 1)->nullable()->change();
+            $table->decimal('correct_measure', 4, 1)->nullable()->change();
+            $table->string('time')->nullable()->change();
+            $table->string('difficulty')->nullable()->change();
         });
     }
 
@@ -21,8 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('detail_induction_workers', function (Blueprint $table) {
-            $table->dropColumn('report');
-        });
+        //
     }
 };

@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('detail_induction_workers', function (Blueprint $table) {
-            $table->unsignedBigInteger('report')->nullable();
+            $table->decimal('note', 4, 1)->change();
+            $table->decimal('note_reference', 4, 1)->change();
         });
     }
 
@@ -22,7 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('detail_induction_workers', function (Blueprint $table) {
-            $table->dropColumn('report');
+            //
         });
     }
 };

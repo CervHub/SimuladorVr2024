@@ -2,83 +2,68 @@
 
 require("conexion.php");
 
-// Definir los parámetros en un array
-
 $query_params_login = array(
     ':dni' => $_POST['dni'],
     ':id_company' => $_POST['id_company'],
 );
 
-$queryLogin = "
-SELECT *
-FROM workers
-WHERE code_worker LIKE '%-' || :dni
-  AND id_company = :id_company
-LIMIT 1;
-";
+// Establecer la zona horaria de la sesión en Perú
+$db->exec("SET TIME ZONE 'America/Lima'");
 
-$queryInduction = "
-SELECT
+$queryInduction = "SELECT
     inductions.id as induction_id,
     w.id as id_workshop,
-    induction_workers.id as induction_workers,
-    inductions.date_start,
-    inductions.date_end,
-    inductions.time_start,
-    inductions.time_end,
-    wc.alias as name
-FROM
-    induction_workers
-JOIN
-    inductions ON induction_workers.id_induction = inductions.id
-JOIN
-    workshops AS w ON inductions.id_workshop = w.id
-JOIN
-	workshop_companies AS wc 
-	ON wc.id_workshop = w.id
-WHERE
-    induction_workers.id_worker = :id_worker
+    induction_workers.id as cabecera_id,
+    (induction_workers.num_report + 1) as intento,
+    inductions.date_start || ' ' || inductions.time_start as fecha_inicio,
+    inductions.date_end || ' ' || inductions.time_end as fecha_fin,
+    wc.alias as taller,
+    workers.nombre as nombre,
+    workers.apellido as apellido,
+    workers.position as cargo,
+    s.name as nombre_servicio,
+	s.id as id_service
+FROM induction_workers
+JOIN inductions ON induction_workers.id_induction = inductions.id
+JOIN workshops AS w ON inductions.id_workshop = w.id
+JOIN workshop_companies AS wc ON wc.id_workshop = w.id
+JOIN workers ON induction_workers.id_worker = workers.id
+JOIN services as s ON s.id = workers.id_service
+WHERE induction_workers.id_worker in (SELECT id FROM workers WHERE code_worker LIKE '%-' || :dni AND id_company = :id_company)
     AND wc.id_company = :id_company
-    AND inductions.date_end >= CURRENT_DATE
-    AND inductions.date_start <= CURRENT_DATE
-;
-";
-
-// AND inductions.time_end >= CURRENT_TIME
-// AND inductions.time_start <= CURRENT_TIME
+    AND (to_timestamp(inductions.date_end || ' ' || inductions.time_end, 'YYYY-MM-DD HH24:MI:SS')) >= CURRENT_TIMESTAMP
+    AND (to_timestamp(inductions.date_start || ' ' || inductions.time_start, 'YYYY-MM-DD HH24:MI:SS')) <= CURRENT_TIMESTAMP
+;";
 
 try {
-    $stmt = $db->prepare($queryLogin);
-    // Bind de los parámetros utilizando el array
-    $stmt->execute($query_params_login);
+    $stmt1 = $db->prepare($queryInduction);
+    $stmt1->execute($query_params_login);
 
-    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // Restablecer la zona horaria de la sesión a su valor predeterminado si es necesario
+    $db->exec("RESET TIME ZONE");
 
-    if (!empty($results)) {
-        $id_user = $results[0]['id'];
-        
-        $query_params_induction = array(
-            ':id_worker' => $id_user,
-            ':id_company' => $query_params_login['id_company'];
-        );
-        
-        $stmt1 = $db->prepare($queryInduction);
-        // Bind de los parámetros utilizando el array
-        $stmt1->execute($query_params_induction);
-
+    if ($stmt1->rowCount() > 0) {
         $responseData = [
-            'dni' => $_POST['dni'], // Debes reemplazar esto con el valor de $dni si lo deseas
-            'id_worker' => $id_user, // Usamos el valor obtenido de la consulta anterior
-            'worker' => $results[0]['code_worker'], // Usamos el valor obtenido de la consulta anterior
-            'inducciones' => $stmt1->fetchAll(PDO::FETCH_ASSOC), // Obtenemos las inducciones de la consulta $stmt1
+            'dni' => $query_params_login[':dni'],
+            'inducciones' => $stmt1->fetchAll(PDO::FETCH_ASSOC),
         ];
 
-        $jsonResponse = json_encode($responseData);
-        echo $jsonResponse;
+        // Establecer encabezados HTTP y enviar respuesta JSON
+        header('Content-Type: application/json');
+        echo json_encode($responseData);
     } else {
-        echo json_encode(array('error' => 'No se encontraron resultados para el usuario'));
+        // No se encontraron resultados, enviar una respuesta apropiada
+        header('Content-Type: application/json');
+        http_response_code(404); // Código 404 para "No encontrado".
+        echo json_encode(array('error' => 'No se encontraron datos.'));
     }
 } catch (PDOException $ex) {
+    // Manejar errores PDO
+    header('Content-Type: application/json');
     echo json_encode(array('error' => 'Error en la consulta: ' . $ex->getMessage()));
+} catch (Exception $ex) {
+    // Manejar otros errores generales
+    header('Content-Type: application/json');
+    echo json_encode(array('error' => 'Error general: ' . $ex->getMessage()));
 }
 ?>

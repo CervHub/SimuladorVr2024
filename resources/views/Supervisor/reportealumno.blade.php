@@ -85,6 +85,7 @@
                                 <th>Inducción</th>
                                 <th>Fecha - Inicio</th>
                                 <th>Fecha - Finalización</th>
+                                <th>N de intentos</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
@@ -128,26 +129,49 @@
                 tbody.empty(); // Limpia cualquier fila existente en la tabla
 
                 // Recorre las inducciones en la respuesta y agrega filas a la tabla
-                response.inductions.forEach(function(induccion) {
+                response.inductions.forEach(function(induccion, index) {
                     var newRow = '<tr>' +
                         '<td>' + induccion.id + '</td>' +
                         '<td>' + induccion.alias + '</td>' +
                         '<td>' + induccion.date_start + ' ' + induccion.time_start + '</td>' +
                         '<td>' + induccion.date_end + ' ' + induccion.time_end + '</td>' +
-                        '<td>';
+                        '<td>' + induccion.num_report + '</td>' +
+                        '<td><button class="btn btn-custom btn-primary text-white me-0" data-bs-toggle="collapse" data-bs-target="#details' + index + '">Ver Intentos</button></td>' +
+                        '</tr>';
 
-                    // Verificar si induction.note es null y deshabilitar el botón en consecuencia
-                    if (induccion.note === null) {
-                        newRow += '<button class="btn btn-custom btn-primary text-white me-0" disabled>Descargar Reporte</button>';
-                    } else {
-                        newRow += '<a href="{{ url('view/pdf') }}/' + induccion.id + '" target="_blank" class="btn btn-custom btn-primary text-white me-0">' +
-                            '<span class="mdi mdi-file-download"> Descargar Reporte</span>' +
-                            '</a>';
-                    }
+                    var detailsRow = '<tr>' +
+                        '<td colspan="6">' +
+                        '<div id="details' + index + '" class="collapse">' +
+                        '<table class="display dataTable table table-striped">' +
+                        '<thead>' +
+                        '<tr>' +
+                        '<th>Num Intento</th>' +
+                        '<th>Fecha Inicio</th>' +
+                        '<th>Fecha Fin</th>' +
+                        '<th>Nota Obetenida</th>' +
+                        '<th>Accciones</th>' +
+                        '</tr>' +
+                        '</thead>' +
+                        '<tbody>' +
+                        '<tr>' +
+                        '<td>Dato 1</td>' +
+                        '<td>Valor 1</td>' +
+                        '</tr>' +
+                        '<tr>' +
+                        '<td>Dato 2</td>' +
+                        '<td>Valor 2</td>' +
+                        '</tr>' +
+                        '</tbody>' +
+                        '</table>' +
+                        '</div>' +
+                        '</td>' +
+                        '</tr>';
 
-                    newRow += '</td></tr>';
                     tbody.append(newRow);
+                    tbody.append(detailsRow);
                 });
+
+
 
 
 

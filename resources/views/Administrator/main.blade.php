@@ -1,7 +1,7 @@
 @extends('base')
 
 @section('message-primary')
-Bienvenido, <span class="text-black fw-bold">{{Auth::user()->name}}</span>
+Bienvenido, <span class="welcome-text fw-bold">{{Auth::user()->name}} {{Auth::user()->last_name}}</span>
 @endsection
 
 @section('message-secondary')

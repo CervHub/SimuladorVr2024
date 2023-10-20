@@ -12,7 +12,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('induction_workers', function (Blueprint $table) {
-            $table->unsignedBigInteger('num_report')->default(1)->nullable();
+            $table->unsignedBigInteger('num_report')->default(0)->nullable();
         });
     }
 
@@ -23,3 +23,4 @@ return new class extends Migration
         });
     }
 };
+c:

@@ -176,14 +176,16 @@ class SuperAdminController extends Controller
     {
         // Crear un arreglo asociativo con los datos que deseas incluir en el JSON
         $requestData = $this->companyController->detalle($request->id);
-
+        $worker = $requestData->workers->sortBy('id')->first(function ($worker) {
+            return $worker->id_role === 2;
+        });
         $responseData = [
             'id' => $requestData->id,
             'nombre' => $requestData->name,
             'ruc' => $requestData->ruc,
             'descripcion' => $requestData->description,
-            'trabajadores' => $requestData->workers[0],
-            'usuario' => $requestData->workers[0]->user,
+            'trabajadores' => $worker,
+            'usuario' => $worker->user,
             'status' => $requestData->status,
         ];
 

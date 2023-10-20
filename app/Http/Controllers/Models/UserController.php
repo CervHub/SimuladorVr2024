@@ -141,7 +141,7 @@ class UserController extends Controller
         try {
             $worker = Worker::find($request->id_worker);
             $worker->position = $request->position;
-            
+
             $worker->nombre = $request->name;
             $worker->apellido = $request->last_name;
             $worker->save();
@@ -210,6 +210,8 @@ class UserController extends Controller
             $new_worker->id_role = 4;
             $new_worker->id_user = $user->id;
             $new_worker->id_company = $id_company;
+            $new_worker->nombre = $request->name;
+            $new_worker->apellido = $request->last_name;
             $new_worker->id_service = $request->id_service;
             $new_worker->position = $request->position;
             $new_worker->status = '1';
