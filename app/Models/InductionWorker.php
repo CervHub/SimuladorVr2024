@@ -13,11 +13,29 @@ class InductionWorker extends Model
         return $this->belongsTo(Worker::class, 'id_worker');
     }
 
+    public function induction()
+    {
+        return $this->belongsTo(Induction::class, 'id_induction');
+    }
+
+    public function detail()
+    {
+        return $this->hasMany(DetailInductionWorker::class, 'induction_worker_id');
+    }
+
+    public function detailsByReport($reportValue)
+    {
+        return $this->hasMany(DetailInductionWorker::class, 'induction_worker_id')
+            ->where('report', $reportValue);
+    }
+
+
+
     public function getPonderadoAttribute()
     {
-        $nota = ($this->reference_note != 0) ? (number_format($this->note,0) / $this->reference_note) * 20 : 0;
+        $nota = ($this->reference_note != 0) ? (number_format($this->note, 0) / $this->reference_note) * 20 : 0;
 
-        return number_format($nota,0) ;
+        return number_format($nota, 0);
     }
 
     public function getPorcentajeAttribute()

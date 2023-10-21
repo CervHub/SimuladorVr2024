@@ -697,32 +697,62 @@ class SupervisorController extends Controller
         // ];
 
         // return response()->json($responseData);
-        $workerIds = Worker::where('code_worker', 'LIKE', '%' . '-' . $request->doi)
+        // $workerIds = Worker::where('code_worker', 'LIKE', '%' . '-' . $request->doi)
+        //     ->where('id_company', session('id_company'))
+        //     ->pluck('id');
+
+        // $inductions = InductionWorker::join('inductions', 'induction_workers.id_induction', '=', 'inductions.id')
+        //     ->join('workshops as w', 'inductions.id_workshop', '=', 'w.id') // Inner join con workshops
+        //     ->whereIn('induction_workers.id_worker', $workerIds) // Usar WHERE IN
+        //     ->where('induction_workers.status', '1')
+        //     ->orderBy('induction_workers.id', 'desc')
+        //     ->select(
+        //         'induction_workers.id',
+        //         'induction_workers.id_worker',
+        //         'inductions.id as induction_id',
+        //         'w.id as id_workshop',
+        //         'induction_workers.id as induction_workers',
+        //         'inductions.date_start',
+        //         'inductions.date_end',
+        //         'inductions.time_start',
+        //         'inductions.time_end',
+        //         'w.name as name',
+        //         'inductions.alias',
+        //         'induction_workers.num_report'
+        //     )->get();
+        $workerIds = Worker::where('code_worker', 'LIKE', '%' . '-' . '12345678')
             ->where('id_company', session('id_company'))
             ->pluck('id');
 
-        $inductions = InductionWorker::join('inductions', 'induction_workers.id_induction', '=', 'inductions.id')
-            ->join('workshops as w', 'inductions.id_workshop', '=', 'w.id') // Inner join con workshops
-            ->whereIn('induction_workers.id_worker', $workerIds) // Usar WHERE IN
-            ->where('induction_workers.status', '1')
-            ->orderBy('induction_workers.id', 'desc')
-            ->select(
-                'induction_workers.id',
-                'induction_workers.id_worker',
-                'inductions.id as induction_id',
-                'w.id as id_workshop',
-                'induction_workers.id as induction_workers',
-                'inductions.date_start',
-                'inductions.date_end',
-                'inductions.time_start',
-                'inductions.time_end',
-                'w.name as name',
-                'inductions.alias',
-                'induction_workers.note'
-            )->get();
+        $inductions = InductionWorker::whereIn('id_worker', $workerIds)->get();
+
+        $inductionsData = [];
+
+        foreach ($inductions as $induction) {
+            $inductionData = [
+                'id_induction_workers' => $induction->id,
+                'date_start' => $induction->induction->date_start . ' ' . $induction->induction->time_start,
+                'date_end' => $induction->induction->date_end . ' ' . $induction->induction->time_end,
+                'num_report' => $induction->num_report,
+                'name_taller' => $induction->induction->alias,
+            ];
+            $intentos = [];
+            for ($i = 1; $i <= $induction->num_report; $i++) {
+                $data = $induction->detailsByReport($i)->first();
+                $intentos[] = [
+                    'intento' => $data->report,
+                    'note' => $data->note,
+                    'note_reference' => $data->note_reference,
+                    'date_start' => $data->start_date,
+                    'date_end' => $data->end_date,
+                ];
+            }
+            $inductionData['intentos'] = $intentos;
+            $inductionsData[] = $inductionData;
+        }
         $responseData = [
             'workers' => $workerIds,
-            'inductions' => $inductions,
+            'inductions' => $inductionsData,
         ];
 
         return response()->json($responseData);
