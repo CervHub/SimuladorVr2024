@@ -157,13 +157,18 @@
                     induccion.intentos.forEach(
                         function(item, index) {
                             detailsRow += '<tr>' +
-                                '<td>' + 'Intento ' + (index + 1) + '</td>' +
+                                '<td>' + 'Intento ' + item.intento + '</td>' +
                                 '<td>' + item.date_start + '</td>' +
                                 '<td>' + item.date_end + '</td>' +
                                 '<td>' + item.note + '</td>' +
-                                '<td><button class="btn btn-custom btn-primary text-white me-0">Descargar Reporte</button></td>' +
+                                '<td>' +
+                                '<a href="{{url('view/pdf')}}/' + induccion.id_induction_workers + '/' + item.intento +'" target="_blank" class="btn btn-custom btn-primary text-white me-0">' +
+                                '<span class="mdi mdi-file-download"> Descargar Reporte</span>' +
+                                '</a>' +
+                                '</td>' +
                                 '</tr>';
                         }
+
                     );
 
                     detailsRow += '</tbody></table></div></td></tr>';

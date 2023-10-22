@@ -407,8 +407,8 @@
                         </div> -->
 
                         @php
-                        $fechaInicio = new DateTime($induction_worker->start_date);
-                        $fechaFin = new DateTime($induction_worker->end_date);
+                        $fechaInicio = new DateTime($data->start_date);
+                        $fechaFin = new DateTime($data->end_date);
                         $diferencia = $fechaInicio->diff($fechaFin);
 
                         $duracionEnHoras = $diferencia->format('%I:%S');
@@ -416,11 +416,11 @@
 
                         <div class="dl-row">
                             <dt class="dl-term-secondary">Fecha inicio:</dt>
-                            <dd class="dl-definition">{{$induction_worker->start_date}}</dd>
+                            <dd class="dl-definition">{{$data->start_date}}</dd>
                         </div>
                         <div class="dl-row">
                             <dt class="dl-term-secondary">Fecha fin:</dt>
-                            <dd class="dl-definition">{{$induction_worker->end_date}}</dd>
+                            <dd class="dl-definition">{{$data->end_date}}</dd>
                         </div>
                         <div class="dl-row">
                             <dt class="dl-term-secondary">Duración:</dt>
@@ -453,7 +453,7 @@
             @foreach($detail_induction_worker as $key => $data)
             <tr style="height: 20px;"> <!-- Ajusta la altura según tus preferencias -->
                 <td style="text-align: left;">{{$key + 1}}. {{$data->case}}</td>
-                <td>{{round($data->identified,0)}}</td>
+                <td>{{round($data->num_errors,0)}}</td>
                 <!-- <td>{{$data->risk_level}}</td>
                 <td>{{$data->correct_measure}}</td>
                 <td>{{date("H:i", strtotime($data->time))}}</td> -->
@@ -461,7 +461,7 @@
             @endforeach
             <tr>
                 <th>TOTAL</th>
-                <th>{{round($detail_induction_worker->sum('identified'))}}</th>
+                <th>{{round($detail_induction_worker->sum('num_errors'))}}</th>
                 <!-- <th>{{$detail_induction_worker->sum('risk_level')}}</th>
                 <th>{{$detail_induction_worker->sum('correct_measure')}}</th>
                 <th>-</th> -->
@@ -477,15 +477,15 @@
                     <table style="border-collapse: collapse; border: 1px solid black;">
                         <tr style="border-collapse: collapse; border: 1px solid black;">
                             <td style="border-collapse: collapse; border: 1px solid black;">Total de Errores:</td>
-                            <td style="border-collapse: collapse; border: 1px solid black;">{{$total_errores}}</td>
+                            <td style="border-collapse: collapse; border: 1px solid black;">{{round($detail_induction_worker->sum('num_errors'))}}</td>
                         </tr>
                         <tr style="border-collapse: collapse; border: 1px solid black;">
                             <td style="border-collapse: collapse; border: 1px solid black;"> Puntaje Inicial:</td>
-                            <td style="border-collapse: collapse; border: 1px solid black;">100</td>
+                            <td style="border-collapse: collapse; border: 1px solid black;">{{$data->note_reference}}</td>
                         </tr>
                         <tr style="border-collapse: collapse; border: 1px solid black;">
                             <td style="border-collapse: collapse; border: 1px solid black;">Puntaje Final:</td>
-                            <td style="border-collapse: collapse; border: 1px solid black;">{{100 - $total_errores}}</td>
+                            <td style="border-collapse: collapse; border: 1px solid black;">{{$data->note}}</td>
                         </tr>
                         <!-- Agrega más filas de datos según sea necesario -->
                     </table>

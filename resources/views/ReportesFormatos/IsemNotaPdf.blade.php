@@ -397,10 +397,10 @@
                             <dt class="dl-term-secondary">Escenario:</dt>
                             <dd class="dl-definition">{{$induction->alias}}</dd>
                         </div>
-                        <div class="dl-row">
+                        <!-- <div class="dl-row">
                             <dt class="dl-term-secondary">Total de Casos:</dt>
                             <dd class="dl-definition">{{$casosTotales}}</dd>
-                        </div>
+                        </div> -->
                         <div class="dl-row">
                             <dt class="dl-term-secondary">Casos Asignados:</dt>
                             <dd class="dl-definition">8</dd>
@@ -411,8 +411,8 @@
                         </div>
 
                         @php
-                        $fechaInicio = new DateTime($induction_worker->start_date);
-                        $fechaFin = new DateTime($induction_worker->end_date);
+                        $fechaInicio = new DateTime($data->start_date);
+                        $fechaFin = new DateTime($data->end_date);
                         $diferencia = $fechaInicio->diff($fechaFin);
 
                         $duracionEnHoras = $diferencia->format('%I:%S');
@@ -420,11 +420,11 @@
 
                         <div class="dl-row">
                             <dt class="dl-term-secondary">Fecha inicio:</dt>
-                            <dd class="dl-definition">{{$induction_worker->start_date}}</dd>
+                            <dd class="dl-definition">{{$data->start_date}}</dd>
                         </div>
                         <div class="dl-row">
                             <dt class="dl-term-secondary">Fecha fin:</dt>
-                            <dd class="dl-definition">{{$induction_worker->end_date}}</dd>
+                            <dd class="dl-definition">{{$data->end_date}}</dd>
                         </div>
                         <div class="dl-row">
                             <dt class="dl-term-secondary">Duración:</dt>
@@ -481,11 +481,11 @@
                     <table style="border-collapse: collapse; border: 1px solid black;">
                         <tr style="border-collapse: collapse; border: 1px solid black;">
                             <td style="border-collapse: collapse; border: 1px solid black;">Nota de Referencia:</td>
-                            <td style="border-collapse: collapse; border: 1px solid black;">{{number_format($induction_worker->reference_note,0)}}</td>
+                            <td style="border-collapse: collapse; border: 1px solid black;">{{number_format($data->note_reference,0)}}</td>
                         </tr>
                         <tr style="border-collapse: collapse; border: 1px solid black;">
                             <td style="border-collapse: collapse; border: 1px solid black;"> Nota Obetenida:</td>
-                            <td style="border-collapse: collapse; border: 1px solid black;">{{number_format($induction_worker->note,0)}}</td>
+                            <td style="border-collapse: collapse; border: 1px solid black;">{{number_format($data->note,0)}}</td>
                         </tr>
                         <tr style="border-collapse: collapse; border: 1px solid black;">
                             <td style="border-collapse: collapse; border: 1px solid black;">Nota ponderada:</td>

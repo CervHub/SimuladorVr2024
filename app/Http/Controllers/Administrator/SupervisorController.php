@@ -513,15 +513,44 @@ class SupervisorController extends Controller
         return redirect()->back();
     }
 
+    public function calcularPonderadoPorcentajeYCategoria($referenceNote, $note)
+    {
+        $ponderado = ($referenceNote != 0) ? (number_format($note, 0) / $referenceNote) * 20 : 0;
 
+        $porcentaje = 0;
+        $categoria = '';
 
-    public function visualizar_reporte_notas($id_induction_worker)
+        if ($ponderado >= 2 && $ponderado <= 6) {
+            $porcentaje = 25;
+            $categoria = 'Seguimiento';
+        } elseif ($ponderado >= 7 && $ponderado <= 11) {
+            $porcentaje = 59;
+            $categoria = 'En Proceso';
+        } elseif ($ponderado >= 12 && $ponderado <= 16) {
+            $porcentaje = 75;
+            $categoria = 'Competente';
+        } elseif ($ponderado >= 17 && $ponderado <= 20) {
+            $porcentaje = 100;
+            $categoria = 'Muy Competente';
+        } else {
+            $categoria = 'Desconocido';
+        }
+
+        return [
+            'ponderado' => number_format($ponderado, 0),
+            'porcentaje' => $porcentaje,
+            'categoria' => $categoria,
+        ];
+    }
+
+    public function visualizar_reporte_notas($id_induction_worker, $intento)
     {
 
         $induction_worker = InductionWorker::find($id_induction_worker);
         $worker = Worker::find($induction_worker->id_worker);
         $induction = Induction::find($induction_worker->id_induction);
         $detail_induction_worker = DetailInductionWorker::where('induction_worker_id', $induction_worker->id)
+            ->where('report', $intento)
             ->orderBy('time', 'asc')
             ->get();
 
@@ -530,7 +559,16 @@ class SupervisorController extends Controller
         $casosBuenos = count($detail_induction_worker);
         $casosMalos = 8 - $casosBuenos;
         // $logo = Worker::where('id_company', $induction->id_company)->first()->user->photo;
+        $data = $detail_induction_worker[0];
         $logo = Company::find($induction->id_company)->url_image_desktop;
+
+
+        $result = $this->calcularPonderadoPorcentajeYCategoria($data->note_reference, $data->note);
+        $ponderado = $result['ponderado'];
+        $porcentaje = $result['porcentaje'];
+        $categoria = $result['categoria'];
+
+
         $data = [
             'induction_worker' => $induction_worker,
             'worker' => $worker,
@@ -540,18 +578,19 @@ class SupervisorController extends Controller
             'casosTotales' => $casosTotales,
             'casosBuenos' => $casosBuenos,
             'casosMalos' => $casosMalos,
-            'nota' => $induction_worker->Ponderado,
-            'categoria' => $induction_worker->Categoria,
-            'porcentaje' => $induction_worker->Porcentaje,
+            'nota' => $ponderado,
+            'categoria' => $categoria,
+            'porcentaje' => $porcentaje,
             'logo' => $logo,
             'logo_taller' => $induction->workshop->photo,
             'total_errores' => 20,
+            'data' => $data,
         ];
         $pdf = PDF::loadView('ReportesFormatos.asistenciaPDF', $data);
         // Configura los márgenes directamente en DOMPDF
         if ($induction->id_company == 2) {
             $pdf = PDF::loadView('ReportesFormatos.IsemNotaPdf', $data);
-        } else if ($induction->id_company == 4) {
+        } else if ($induction->id_company == 3) {
             $pdf = PDF::loadView('ReportesFormatos.ConfipetrolNotaPdf', $data);
         }
         return $pdf->stream('reporte.pdf');
