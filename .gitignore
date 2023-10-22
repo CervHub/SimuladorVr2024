@@ -4,7 +4,7 @@
 /public/hot
 /public/storage
 /public/workshops
-/public/logo_giphoto
+/public/logo_photo
 /storage/*.key
 /vendor
 .env
