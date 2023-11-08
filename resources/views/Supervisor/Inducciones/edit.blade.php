@@ -42,6 +42,10 @@
                     </div>
                     <div class="form-group row">
                         <div class="col-md-6">
+                            <label for="status">Intentos:</label>
+                            <input type="number" id="intentos" class="form-control" name="intentos">
+                        </div>
+                        <div class="col-md-6">
                             <label for="status">Estado:</label>
                             <select class="form-control" id="status" name="status">
                                 <option value="1">Activo</option>

@@ -153,6 +153,7 @@
                 $('#startTime').val(response.time_start);
                 $('#endTime').val(response.time_end);
                 $("#status").val(response.status);
+                $("#intentos").val(response.intentos);
                 $("#course").val(response.id_workshop);
                 $("#edit_id_induction").val(response.id);
             },

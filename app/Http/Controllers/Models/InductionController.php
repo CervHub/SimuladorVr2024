@@ -23,6 +23,7 @@ class InductionController extends Controller
                 'id_workshop' => $request->course,
                 'id_company' => session('id_company'),
                 'nota_referencial' => $company->ponderado,
+                'intentos' => $company->intentos,
                 'status' => '1',
                 'id_worker' => session('id_worker'),
                 'alias' => $request->alias,

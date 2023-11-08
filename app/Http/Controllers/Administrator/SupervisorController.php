@@ -379,6 +379,7 @@ class SupervisorController extends Controller
             'id_workshop' => $requestData->id_workshop,
             'date_start' => $requestData->date_start,
             'date_end' => $requestData->date_end,
+            'intentos' => $requestData->intentos,
             'time_start' => $requestData->time_start,
             'time_end' => $requestData->time_end,
             'status' => $requestData->status

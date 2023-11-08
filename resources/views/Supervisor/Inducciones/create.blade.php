@@ -44,7 +44,7 @@
                     <div class="form-group row">
                         <div class="col-md-6">
                             <label for="status">Intentos:</label>
-                            <input type="number" class="form-control" name="intentos">
+                            <input type="number" value="1" class="form-control" name="intentos">
                         </div>
                         <div class="col-md-6">
                             <label for="status">Estado:</label>
