@@ -23,7 +23,7 @@ class InductionController extends Controller
                 'id_workshop' => $request->course,
                 'id_company' => session('id_company'),
                 'nota_referencial' => $company->ponderado,
-                'intentos' => $company->intentos,
+                'intentos' => $request->intentos,
                 'status' => '1',
                 'id_worker' => session('id_worker'),
                 'alias' => $request->alias,
@@ -51,6 +51,7 @@ class InductionController extends Controller
             $induction->time_start = $request->start_time;
             $induction->time_end = $request->end_time;
             $induction->status = $request->status;
+            $induction->intentos = $request->intentos;
             $induction->save();
             return true;
         } catch (\Throwable $th) {

@@ -8,7 +8,13 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form action="{{route('entrenador.update.induction')}}" method="POST">
+            <!-- Capa de superposición con icono de carga -->
+            <div id="loading-overlay" style="display: none;">
+                <div class="modal-body text-center">
+                    <i class="fas fa-spinner fa-spin"></i> Cargando...
+                </div>
+            </div>
+            <form action="{{route('entrenador.update.induction')}}" method="POST" id="form-edit">
                 @csrf
                 <div class="modal-body">
                     <div class="form-group">

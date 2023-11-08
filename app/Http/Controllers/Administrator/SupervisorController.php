@@ -625,7 +625,8 @@ class SupervisorController extends Controller
         // Configura los márgenes directamente en DOMPDF
         if ($induction->id_company == 2) {
             $pdf = PDF::loadView('ReportesFormatos.IsemNotaPdf', $data);
-        } else if ($induction->id_company == 3) {
+        } else if ($induction->id_company == 4) {
+            
             $pdf = PDF::loadView('ReportesFormatos.ConfipetrolNotaPdf', $data);
         }
         return $pdf->stream('reporte.pdf');

@@ -8,7 +8,8 @@ $note = $_POST['note'];
 $note_reference = $_POST['note_reference'];
 $start_date = $_POST['start_date'];
 $end_date = $_POST['end_date'];
-
+$rol = $_POST['rol'];
+echo "El rol ingresado es: " . $rol;
 $jsonData = $_POST['json']; // Esto ya contiene el JSON decodificado
 
 // Puedes acceder a los elementos del JSON directamente
@@ -55,7 +56,7 @@ try {
 
           if ($count['count'] == 0) {
             // No existe un registro, puedes insertarlo
-            $stmtInsert = $db->prepare('INSERT INTO detail_induction_workers (induction_worker_id, "case", identified, risk_level, correct_measure, "time", difficulty, report, note, note_reference, "start_date", end_date, num_errors) VALUES (:induction_worker_id, :case, :identified, :risk_level, :correct_measure, :time, :difficulty, :report, :note, :note_reference, :start_date, :end_date, :num_errors)');
+            $stmtInsert = $db->prepare('INSERT INTO detail_induction_workers (induction_worker_id, "case", identified, risk_level, correct_measure, "time", difficulty, report, note, note_reference, "start_date", end_date, num_errors,"json",rol) VALUES (:induction_worker_id, :case, :identified, :risk_level, :correct_measure, :time, :difficulty, :report, :note, :note_reference, :start_date, :end_date, :num_errors,:json,:rol)');
             $stmtInsert->bindParam(':induction_worker_id', $cabecera_id);
             $stmtInsert->bindParam(':case', $item['case']);
             $stmtInsert->bindParam(':identified', $item['identified']);
@@ -63,6 +64,8 @@ try {
             $stmtInsert->bindParam(':correct_measure', $item['correct_measure']);
             $stmtInsert->bindParam(':time', $item['time']);
             $stmtInsert->bindParam(':difficulty', $item['difficulty']);
+            $stmtInsert->bindParam(':json', json_encode($item['json']));
+            $stmtInsert->bindParam(':rol', $rol);
             $stmtInsert->bindParam(':report', $nuevoIntento);
             $stmtInsert->bindParam(':note', $note, PDO::PARAM_STR);
             $stmtInsert->bindParam(':note_reference', $note_reference, PDO::PARAM_STR);

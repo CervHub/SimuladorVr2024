@@ -134,6 +134,8 @@
 <!-- Editar Modal -->
 <script>
     function editar(id) {
+        $('#loading-overlay').show();
+        $('#form-edit').hide();
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': "{{ csrf_token() }}"
@@ -156,6 +158,8 @@
                 $("#intentos").val(response.intentos);
                 $("#course").val(response.id_workshop);
                 $("#edit_id_induction").val(response.id);
+                $('#loading-overlay').hide();
+                $('#form-edit').show();
             },
             error: function(xhr, ajaxOptions, thrownError) {
                 console.log("Error en la conexión:", xhr.status, thrownError);
