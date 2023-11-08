@@ -9,12 +9,11 @@ $note_reference = $_POST['note_reference'];
 $start_date = $_POST['start_date'];
 $end_date = $_POST['end_date'];
 $rol = $_POST['rol'];
-echo "El rol ingresado es: " . $rol;
 $jsonData = $_POST['json']; // Esto ya contiene el JSON decodificado
-
 // Puedes acceder a los elementos del JSON directamente
 $jsonData = json_decode($jsonData, true); // Convertirlo en un arreglo asociativo si lo deseas
 
+// Imprimir el JSON en formato legible
 try {
   $db->exec("SET TIME ZONE 'America/Lima'");
 

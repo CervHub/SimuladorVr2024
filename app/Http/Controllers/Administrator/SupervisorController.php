@@ -618,7 +618,6 @@ class SupervisorController extends Controller
             'porcentaje' => $porcentaje,
             'logo' => $logo,
             'logo_taller' => $induction->workshop->photo,
-            'total_errores' => 20,
             'data' => $data,
         ];
         $pdf = PDF::loadView('ReportesFormatos.asistenciaPDF', $data);
@@ -626,8 +625,16 @@ class SupervisorController extends Controller
         if ($induction->id_company == 2) {
             $pdf = PDF::loadView('ReportesFormatos.IsemNotaPdf', $data);
         } else if ($induction->id_company == 4) {
-            
-            $pdf = PDF::loadView('ReportesFormatos.ConfipetrolNotaPdf', $data);
+            $errores = round($detail_induction_worker->sum('num_errors'));
+            $aciertos = $induction_worker->puntaje - $errores;
+            $data['nota'] = $aciertos;
+            $data['imagen'] = "https://quickchart.io/chart?c={type:'doughnut', data:{datasets:[{data:[$aciertos,$errores],backgroundColor:['rgb(32,164,81)','rgb(255,0,0)'],}],labels:['Puntaje Inicial', 'Nº Errores'],},options:{title:{display:false},plugins: { datalabels: { color: 'white' } },},}";
+            if ($induction->alias == "ANÁLISIS DE FALLAS") {
+                $data['json'] = json_decode($detail_induction_worker[0]->json, true);
+                $pdf = PDF::loadView('ReportesFormatos.ConfipetrolAnalisisFallas', $data);
+            } else {
+                $pdf = PDF::loadView('ReportesFormatos.ConfipetrolNotaPdf', $data);
+            }
         }
         return $pdf->stream('reporte.pdf');
     }
@@ -739,7 +746,7 @@ class SupervisorController extends Controller
     {
         return view('Supervisor.reportealumno');
     }
-    public function  reportealumnodetail(Request $request)
+    public function reportealumnodetail(Request $request)
     {
 
         // $worker = Worker::where('code_worker', 'LIKE', '%' . '-' . $request->doi)
