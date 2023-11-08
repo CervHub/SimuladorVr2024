@@ -8,16 +8,24 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form action="{{route('superadministrador.editar.taller.company')}}" method="POST">
+
+            <!-- Capa de superposición con icono de carga -->
+            <div id="loading-overlay" style="display: none;">
+                <div class="modal-body text-center">
+                    <i class="fas fa-spinner fa-spin"></i> Cargando...
+                </div>
+            </div>
+            <form action="{{route('superadministrador.editar.taller.company')}}" method="POST" id="form-edit">
                 @csrf
                 <div class="modal-body">
                     <div class="form-group">
                         <label>Taller:</label>
-                        <select class="form-control js-example-basic-single" id="workshop_editar" name="id_workshop">
+                        <!-- <select class="form-control js-example-basic-single" id="workshop_editar" name="id_workshop">
                             @foreach($workshops as $workshop)
                             <option value="{{$workshop->id}}">{{$workshop->name}}</option>
                             @endforeach
-                        </select>
+                        </select> -->
+                        <input type="text" class="form-control" id="workshop_editar" name="id_workshop" readonly>
                     </div>
                     <div class="form-group">
                         <label for="firstName">Nombre:</label>

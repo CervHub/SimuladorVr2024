@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('description');
             $table->string('ruc')->nullable();
             $table->string('status')->default('1');
+            $table->integer('ponderado')->default('100');
             $table->timestamps();
         });
     }

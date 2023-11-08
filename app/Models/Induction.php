@@ -15,6 +15,7 @@ class Induction extends Model
         'time_start',
         'time_end',
         'id_workshop',
+        'nota_referencial',
         'id_company',
         'status',
         'id_worker',

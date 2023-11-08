@@ -95,7 +95,7 @@ class AdminController extends Controller
 
         $this->updateImage($request, 'desktopLogo', 'url_image_desktop', $company);
         $this->updateImage($request, 'mobileLogo', 'url_image_mobile', $company);
-
+        $company->ponderado = $request->ponderado;
         $company->save();
         Session::flash('success', 'Se ha cargado exitosamente.');
 

@@ -97,6 +97,7 @@ class SuperAdminController extends Controller
 
         $responseData = [
             'id' => $requestData->id,
+            'nombre' => $requestData->workshop->name,
             'alias' => $requestData->alias,
             'id_workshop' => $requestData->id_workshop,
             'status' => $requestData->status,

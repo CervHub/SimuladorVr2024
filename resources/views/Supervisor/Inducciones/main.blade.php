@@ -22,7 +22,7 @@
             <div class="d-sm-flex align-items-center justify-content-between border-bottom">
                 <div>
                     <div class="btn-wrapper">
-                        <a href="#" class="btn btn-primary text-white p-3" data-toggle="modal" data-target="#createModal"><i class="icon-plus"></i> Create New</a>
+                        <a href="#" class="btn btn-primary text-white p-3" data-toggle="modal" data-target="#createModal"><i class="icon-plus"></i> Crear Capacitación</a>
                     </div>
                 </div>
             </div>
@@ -61,15 +61,15 @@
 
             <div class="card rounded-0 mt-3">
                 <div class="card-body table-responsive">
-                    <h4 class="card-title">Induccion - Grupos</h4>
+                    <h4 class="card-title">Capacitaciones - Grupos</h4>
                     <table id="myTable" class="display dataTable table table-striped">
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Inducción</th>
+                                <th>Taller</th>
                                 <th>Fecha - Inicio</th>
                                 <th>Fecha - Finalización</th>
-                                <th>N° de Evaluados</th>
+                                <th>N° de Usuarios</th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>

@@ -18,7 +18,7 @@
                     <div class="btn-wrapper">
                         <a href="#" class="btn btn-primary text-white p-3 btn-sm" data-toggle="modal" data-target="#createModal">
                             <i class="icon-plus"></i> <!-- Icono de agregar aquí -->
-                            Create New
+                            Registrar Trabajador
                         </a>
                         <a href="{{route('induction.formato.masivo')}}" class="btn btn-success text-white p-3 btn-sm">
                             <i class="mdi mdi-arrow-down-bold-circle-outline"></i> <!-- Icono de descarga aquí -->
@@ -73,13 +73,13 @@
 
             <div class="card rounded-0 mt-3">
                 <div class="card-body table-responsive">
-                    <h4 class="card-title">Empresas</h4>
+                    <h4 class="card-title">Trabajadores - {{$nombre_service}}</h4>
                     <table id="myTable" class="display dataTable table table-striped">
                         <thead>
                             <tr>
                                 <th>ID</th>
                                 <th>Codigo de Empleado</th>
-                                <th>Nombres y Apellidos</th>
+                                <!-- <th>Nombres y Apellidos</th> -->
                                 <th>Nombres</th>
                                 <th>Apellidos</th>
                                 <th>DOI</th>
@@ -92,7 +92,7 @@
                         <tr>
                             <td>{{$worker->id}}</td>
                             <td>{{$worker->code_worker}}</td>
-                            <td>{{$worker->user->name}}</td>
+                            <!-- <td>{{$worker->user->name}}</td> -->
                             <td>{{$worker->nombre}}</td>
                             <td>{{$worker->apellido}}</td>
                             <td>{{$worker->user->doi}}</td>
@@ -161,7 +161,8 @@
 
 <script>
     function editar(id) {
-
+        $('#loading-overlay').show();
+        $('#form-edit').hide();
         console.log("Id para editar", id)
 
         $.ajaxSetup({
@@ -183,6 +184,8 @@
                 $('#position_editar').val(response.position);
                 $('#dni_editar').val(response.dni);
                 $('#worker_id_editar').val(response.id);
+                $('#loading-overlay').hide();
+                $('#form-edit').show();
             },
             error: function(xhr, ajaxOptions, thrownError) {
                 console.log("Error en la conexión:", xhr.status, thrownError);

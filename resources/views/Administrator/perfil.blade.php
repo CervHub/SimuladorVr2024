@@ -105,7 +105,7 @@
                     <div class="col-lg-12">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <div>
-                                <h4 class="card-title card-title-dash">Actualizar Logo de la Empresa</h4>
+                                <h4 class="card-title card-title-dash">Actualizar Datos de la Empresa</h4>
                             </div>
                         </div>
                         <form action="{{route('administrador.updatecompany')}}" method="POST" enctype="multipart/form-data">
@@ -121,6 +121,11 @@
                                 $url_image_mobile = '';
                                 }
                                 @endphp
+
+                                <div class="mb-3">
+                                    <label for="desktopLogo" class="form-label">Nota:</label>
+                                    <input type="text" class="form-control" id="ponderado" name="ponderado" value="{{$company->ponderado}}" accept="image/*">
+                                </div>
 
                                 <div class="mb-3">
                                     <label for="desktopLogo" class="form-label">Logo de Desktop (Tamaño: 128x64 píxeles, máximo 1MB)</label>

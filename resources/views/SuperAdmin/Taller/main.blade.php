@@ -147,6 +147,8 @@
 <!-- Detalles de cada registro -->
 <script>
     function editar(id) {
+        $('#loading-overlay').show();
+        $('#form-edit').hide();
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': "{{ csrf_token() }}"
@@ -160,11 +162,16 @@
                 id: id // Agrega el ID a los datos que serán enviados
             },
             success: function(response) {
+
                 console.log(response);
                 $('#id_workshop_company').val(response.id);
                 $('#alias_editar').val(response.alias);
                 $('#status_editar').val(response.status);
                 $('#id_workshop_editar').val(response.id_workshop);
+                $('#workshop_editar').val(response.nombre);
+
+                $('#loading-overlay').hide();
+                $('#form-edit').show();
 
             },
             error: function(xhr, ajaxOptions, thrownError) {

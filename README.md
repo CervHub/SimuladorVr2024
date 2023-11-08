@@ -36,9 +36,13 @@ Utilizamos tecnologías específicas en cada una de estas capas para garantizar 
   - Acceder a los informes generados por su empresa.
   - Interactuar con los informes en entornos de realidad virtual.
 
-## Cómo Crear el Proyecto
+## Setear base de datos
 
 Para crear el proyecto Simuladores VR en tu entorno de desarrollo, sigue estos pasos:
 
-1. Clona este repositorio en tu computadora:
+1. Setear base de datos:
 
+```
+php artisan migrate:refresh --seed
+
+```

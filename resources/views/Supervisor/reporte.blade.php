@@ -76,6 +76,19 @@
                                 <input type="date" class="form-control" id="fecha_fin" name="fecha_fin">
                             </div>
                         </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="fecha_fin">Empresa:</label>
+                                <select name="id_service" id="service">
+                                    <option value="all">Todos</option>
+                                    @foreach($services as $item)
+                                    <option value="{{$item->id}}">{{$item->name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
                     </div>
                     <h4 class="card-title">Induccion - Grupo</h4>
                     <table id="myTable" class="display dataTable table table-striped">

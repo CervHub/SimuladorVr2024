@@ -7,23 +7,27 @@ use App\Models\Induction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use App\Models\Company;
 
 class InductionController extends Controller
 {
     public function create(Request $request)
     {
+        $company = Company::find(session('id_company'));
         try {
-            Induction::create([
+            $induction = Induction::create([
                 'date_start' => $request->start_date,
                 'date_end' => $request->end_date,
                 'time_start' => $request->start_time,
                 'time_end' => $request->end_time,
                 'id_workshop' => $request->course,
                 'id_company' => session('id_company'),
+                'nota_referencial' => $company->ponderado,
                 'status' => '1',
                 'id_worker' => session('id_worker'),
                 'alias' => $request->alias,
             ]);
+
             return true;
         } catch (\Throwable $th) {
             Session::flash('error', 'Hubo un error al crear la inducción.');

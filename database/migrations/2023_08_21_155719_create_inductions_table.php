@@ -17,6 +17,7 @@ return new class extends Migration
             $table->time('time_start'); // Hora de inicio
             $table->date('date_end');   // Fecha de fin
             $table->time('time_end');   // Hora de fin
+            $table->integer('nota_referencial')->nullable();
             $table->unsignedBigInteger('id_company');
             $table->unsignedBigInteger('id_workshop');
             $table->string('status');

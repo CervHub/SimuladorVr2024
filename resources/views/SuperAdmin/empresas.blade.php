@@ -155,6 +155,8 @@
 <!-- Detalles de cada registro -->
 <script>
     function details(id) {
+        $('#loading-overlay').show();
+        $('#modalContent').hide();
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': "{{ csrf_token() }}"
@@ -175,6 +177,9 @@
                 $('#ruc_detalle').text(response.ruc);
                 $('#password_detalle').text(response.usuario.password_text);
                 $('#codigo_detalle').text(response.trabajadores.code_worker);
+                $('#loading-overlay').hide();
+                $('#modalContent').show();
+
             },
             error: function(xhr, ajaxOptions, thrownError) {
                 console.log("Error en la conexión:", xhr.status, thrownError);
@@ -203,6 +208,7 @@
 <!-- Detalles de cada registro -->
 <script>
     function editar(id) {
+        $('#loading-overlay').show();
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': "{{ csrf_token() }}"
@@ -222,6 +228,8 @@
                 $('#name_editar').val(response.nombre);
                 $('#ruc_editar').val(response.ruc);
                 $('#status_editar').val(response.status);
+                $('#form-edit').hide();
+
             },
             error: function(xhr, ajaxOptions, thrownError) {
                 console.log("Error en la conexión:", xhr.status, thrownError);
