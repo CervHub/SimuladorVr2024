@@ -12,7 +12,7 @@ try {
     // Establece las opciones de PDO según sea necesario
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-    // echo "Conexion Exitosa";
+    echo "Conexion Exitosa";
 } catch (PDOException $e) {
     echo "Error de conexión: " . $e->getMessage();
 }
