@@ -78,7 +78,7 @@
             <div class="card rounded-0 mt-3">
                 <div class="card-body table-responsive">
                     <h4 class="card-title">Inducciones - Grupos <span id="namename"></span></h4>
-                    <table id="myTable" class="display dataTable table table-striped">
+                    <table id="myTable" class="display dataTable table">
                         <thead>
                             <tr>
                                 <th>ID</th>
@@ -130,7 +130,7 @@
 
                 // Recorre las inducciones en la respuesta y agrega filas a la tabla
                 response.inductions.forEach(function(induccion, index) {
-                    var newRow = '<tr>' +
+                    var newRow = '<tr class="table-primary">' +
                         '<td>' + induccion.id_induction_workers + '</td>' +
                         '<td>' + induccion.name_taller + '</td>' +
                         '<td>' + induccion.date_start + '</td>' +
@@ -142,9 +142,9 @@
                     var detailsRow = '<tr>' +
                         '<td colspan="6">' +
                         '<div id="details' + index + '" class="collapse">' +
-                        '<table class="display dataTable table table-striped mt-3">' +
+                        '<table class="display dataTable table table-stripep">' +
                         '<thead>' +
-                        '<tr>' +
+                        '<tr class="table-secondary">' +
                         '<th>Num Intento</th>' +
                         '<th>Fecha Inicio</th>' +
                         '<th>Fecha Fin</th>' +
@@ -157,7 +157,7 @@
                     induccion.intentos.forEach(
                         function(item, index) {
                             detailsRow += '<tr>' +
-                                '<td>' + 'Intento ' + item.intento + '</td>' +
+                                '<td>' + item.intento + '</td>' +
                                 '<td>' + item.date_start + '</td>' +
                                 '<td>' + item.date_end + '</td>' +
                                 '<td>' + item.note + '</td>' +

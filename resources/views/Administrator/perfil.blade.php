@@ -143,7 +143,7 @@
                                     @endif
                                 </div>
                                 <input type="hidden" name="id_company" value="{{ Auth::user()->id }}">
-                                <button type="submit" class="btn btn-primary">Actualizar Logos</button>
+                                <button type="submit" class="btn btn-primary">Actualizar</button>
                             </div>
                         </form>
                     </div>

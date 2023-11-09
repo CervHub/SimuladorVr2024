@@ -638,9 +638,8 @@ class SupervisorController extends Controller
         }
         return $pdf->stream('reporte.pdf');
     }
-    public function descargar_asistencia($id_induction, $fecha_inicio = null, $fecha_fin = null)
+    public function descargar_asistencia($id_induction, $fecha_inicio = null, $fecha_fin = null,$id_service)
     {
-
         // Verifica si al menos una de las fechas es "0000-00-00"
         if ($fecha_inicio === '0000-00-00' || $fecha_fin === '0000-00-00') {
             // No apliques ningún filtro de fecha
@@ -672,6 +671,7 @@ class SupervisorController extends Controller
             'induction' => $induction,
             'result' => $result,
             'logo' => $logo,
+            'id_service' => $id_service
         ];
 
         // Configura los márgenes directamente en DOMPDF

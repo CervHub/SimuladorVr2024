@@ -80,8 +80,8 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="fecha_fin">Empresa:</label>
-                                <select name="id_service" id="service">
-                                    <option value="all">Todos</option>
+                                <select name="id_service" class="form-control" id="service">
+                                    <option value="0">Todos</option>
                                     @foreach($services as $item)
                                     <option value="{{$item->id}}">{{$item->name}}</option>
                                     @endforeach
@@ -120,10 +120,10 @@
                                 </td>
                                 <td>
                                     <div class="btn-group" role="group">
-                                        <a href="#" class="btn btn-custom btn-info text-white me-0" onclick="modificarEnlace(this, '{{ route('descargar_asistencia_pdf', ['id_induction' => $induction->id, 'fecha_inicio' => '0000-00-00', 'fecha_fin' => '0000-00-00']) }}')">
+                                        <a href="#" class="btn btn-custom btn-info text-white me-0" onclick="modificarEnlace(this, '{{ route('descargar_asistencia_pdf', ['id_induction' => $induction->id, 'fecha_inicio' => '0000-00-00', 'fecha_fin' => '0000-00-00', 'id_service' => 0]) }}')">
                                             <i class="fas fa-file-pdf"></i>
                                         </a>
-                                        <a href="#" class="btn btn-custom btn-success  text-white me-0" onclick="modificarEnlace(this, '{{ route('descargar_asistencia_excel', ['id_induction' => $induction->id, 'fecha_inicio' => '0000-00-00', 'fecha_fin' => '0000-00-00']) }}')">
+                                        <a href="#" class="btn btn-custom btn-success  text-white me-0" onclick="modificarEnlace(this, '{{ route('descargar_asistencia_excel', ['id_induction' => $induction->id, 'fecha_inicio' => '0000-00-00', 'fecha_fin' => '0000-00-00', 'id_service' => 0]) }}')">
                                             <i class="fas fa-file-excel"></i>
                                         </a>
                                     </div>
@@ -148,25 +148,30 @@
 <script>
     // Función para modificar el enlace y realizar la redirección
     function modificarEnlace(enlace, ruta) {
-        // Obtener las fechas de los campos de entrada
-        var fechaInicio = document.getElementById('fecha_inicio').value;
-        var fechaFin = document.getElementById('fecha_fin').value;
+    // Obtener las fechas de los campos de entrada
+    var fechaInicio = document.getElementById('fecha_inicio').value;
+    var fechaFin = document.getElementById('fecha_fin').value;
+    var id_service = document.getElementById('service').value;
 
-        // Verificar si ambos campos de fecha están llenos
-        if (fechaInicio !== '' && fechaFin !== '') {
-            // Reemplazar las dos últimas fechas por las fechas de los campos de entrada en la ruta
-            var nuevoHref = ruta.replace(/\/\d{4}-\d{2}-\d{2}\/\d{4}-\d{2}-\d{2}$/, '/' + fechaInicio + '/' + fechaFin);
+    // Reemplazar "/0" por el nuevo id_service en la ruta
+    ruta = ruta.replace(/\/0$/, '/' + id_service);
 
-            // Abrir el enlace en una nueva ventana o pestaña (_blank)
-            window.open(nuevoHref, '_blank');
-        } else {
-            // Si no se modificaron las fechas, ir al URL por defecto
-            window.open(ruta, '_blank');
-        }
-
-        // Evitar que el enlace se siga al hacer clic
-        return false;
+    // Verificar si ambos campos de fecha están llenos
+    if (fechaInicio !== '' && fechaFin !== '') {
+        // Reemplazar las dos últimas fechas por las fechas de los campos de entrada en la ruta
+        ruta = ruta.replace(/\/\d{4}-\d{2}-\d{2}\/\d{4}-\d{2}-\d{2}$/, '/' + fechaInicio + '/' + fechaFin);
     }
+
+    // Agregar "/" al final de la URL
+    ruta = ruta + '/';
+
+    // Abrir el enlace en una nueva ventana o pestaña (_blank)
+    window.open(ruta, '_blank');
+
+    // Evitar que el enlace se siga al hacer clic
+    return false;
+}
+
 </script>
 
 @endsection
