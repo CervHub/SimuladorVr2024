@@ -663,7 +663,7 @@ class SupervisorController extends Controller
             ->join('services as s', 's.id', '=', 'workers.id_service')
             ->join('users as u', 'u.id', '=', 'workers.id_user')
             ->where('induction_workers.id_induction', $id_induction)
-            ->select('workers.position', 's.name as servicio', 'workers.nombre', 'u.doi', 'workers.apellido')
+            ->select('workers.position', 's.name as servicio', 's.id as id_service', 'workers.nombre', 'u.doi', 'workers.apellido')
             ->get();
         $logo = Company::find($induction->id_company)->url_image_desktop;
         $data = [
@@ -673,12 +673,13 @@ class SupervisorController extends Controller
             'logo' => $logo,
             'id_service' => $id_service
         ];
-
         // Configura los márgenes directamente en DOMPDF
         if ($induction->id_company == 2) {
             $pdf = PDF::loadView('ReportesFormatos.IsemAsistenciaPdf', $data);
         } else if ($induction->id_company == 4) {
             $pdf = PDF::loadView('ReportesFormatos.ConfipetrolAsistenciaPdf', $data);
+        } else if ($induction->id_company == 3){
+            $pdf = PDF::loadView('ReportesFormatos.LuzDelSurAsistenciaPdf', $data);
         }
 
         return $pdf->stream('reporte.pdf');
