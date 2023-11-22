@@ -635,10 +635,16 @@ class SupervisorController extends Controller
             } else {
                 $pdf = PDF::loadView('ReportesFormatos.ConfipetrolNotaPdf', $data);
             }
+        } else if ($induction->id_company == 3) {
+            $errores = round($detail_induction_worker->sum('num_errors'));
+            $aciertos = $induction_worker->puntaje - $errores;
+            $data['nota'] = $aciertos;
+            $data['imagen'] = "https://quickchart.io/chart?c={type:'doughnut', data:{datasets:[{data:[$aciertos,$errores],backgroundColor:['rgb(32,164,81)','rgb(255,0,0)'],}],labels:['Puntaje Inicial', 'Nº Errores'],},options:{title:{display:false},plugins: { datalabels: { color: 'white' } },},}";
+            $pdf = PDF::loadView('ReportesFormatos.LuzDelSurNotaPdf', $data);
         }
         return $pdf->stream('reporte.pdf');
     }
-    public function descargar_asistencia($id_induction, $fecha_inicio = null, $fecha_fin = null,$id_service)
+    public function descargar_asistencia($id_induction, $fecha_inicio = null, $fecha_fin = null, $id_service)
     {
         // Verifica si al menos una de las fechas es "0000-00-00"
         if ($fecha_inicio === '0000-00-00' || $fecha_fin === '0000-00-00') {
@@ -678,7 +684,7 @@ class SupervisorController extends Controller
             $pdf = PDF::loadView('ReportesFormatos.IsemAsistenciaPdf', $data);
         } else if ($induction->id_company == 4) {
             $pdf = PDF::loadView('ReportesFormatos.ConfipetrolAsistenciaPdf', $data);
-        } else if ($induction->id_company == 3){
+        } else if ($induction->id_company == 3) {
             $pdf = PDF::loadView('ReportesFormatos.LuzDelSurAsistenciaPdf', $data);
         }
 

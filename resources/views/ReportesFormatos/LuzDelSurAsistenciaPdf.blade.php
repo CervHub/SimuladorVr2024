@@ -138,59 +138,51 @@
         <table style="width: 100%">
             <tbody>
                 <tr style="background-color: #c9c9c9;">
-                    <td class="text-center"
-                        style="font-weight: bold; padding-top: 0px; padding-bottom: 0px; width: 5%;">
+                    <td class="text-center" style="font-weight: bold; padding-top: 0px; padding-bottom: 0px; width: 5%;">
                         N°
                     </td>
-                    <td class="text-center"
-                        style="font-weight: bold; padding-top: 0px; padding-bottom: 0px; width: 20%;">
-                        COD. TRABAJADOR
+                    <td class="text-center" style="font-weight: bold; padding-top: 0px; padding-bottom: 0px; width: 20%;">
+                        CODIDO
                     </td>
                     <td class="text-center" style="font-weight: bold;">
-                        TRABAJADOR
+                        NOMBRES Y APELLIDOS
                     </td>
-                    <!-- <td class="text-center" style="font-weight: bold;">
+                    <td class="text-center" style="font-weight: bold;">
                         CARGO
-                    </td> -->
-                    <td class="text-center"
-                        style="font-weight: bold;padding-top: 0px; padding-bottom: 0px; width: 25%;">
+                    </td>
+                    <td class="text-center" style="font-weight: bold;padding-top: 0px; padding-bottom: 0px; width: 5%;">
                         EMPRESA
                     </td>
-                </tr>
-                @foreach($result as $data)
-                @if($id_service == 0)
-                <tr style="background-color: {{ $loop->even ? '#c9c9c9' : '#ffffff' }}">
-                    <td class="text-center">{{ $loop->iteration }}</td>
-                    <td class="column__key--black text-center">{{ $data->doi }}</td>
-                    <td class="column__key--black text-center">{{ $data->nombre }} {{ $data->apellido }}</td>
-                    <!-- <td class="column__key--black text-center">{{ $data->position }}</td> -->
-                    <td class="text-center">
-                        @if(isset($data->servicio))
-                        {{ $data->servicio }}
-                        @else
-                        No se encontró empresa
-                        @endif
+                    <td class="text-center" style="font-weight: bold;padding-top: 0px; padding-bottom: 0px; width: 5%;">
+                        NOTA
                     </td>
                 </tr>
-                @else
-                @if($id_service == $data->id_service)
-                <tr style="background-color: {{ $loop->even ? '#c9c9c9' : '#ffffff' }}">
-                    <td class="text-center">{{ $loop->iteration }}</td>
-                    <td class="column__key--black text-center">{{ $data->doi }}</td>
-                    <td class="column__key--black text-center">{{ $data->nombre }} {{ $data->apellido }}</td>
-                    <!-- <td class="column__key--black text-center">{{ $data->position }}</td> -->
-                    <td class="text-center">
-                        @if(isset($data->servicio))
-                        {{ $data->servicio }}
-                        @else
-                        No se encontró empresa
-                        @endif
-                    </td>
+                <?php $rowNumber = 1; ?>
+                @foreach($induction_worker as $data)
+                @if($id_service != 0)
+                @if($data->worker->service->id == $id_service)
+                <tr style="background-color: {{ $rowNumber % 2 == 0 ? '#c9c9c9' : '#ffffff' }}">
+                    <td class="text-center">{{ $rowNumber }}</td>
+                    <td class="column__key--black text-center">{{ $data->worker->user->doi }}</td>
+                    <td class="column__key--black text-center">{{ $data->worker->nombre }} {{ $data->worker->apellido }}</td>
+                    <td class="column__key--black text-center">{{ $data->worker->position }}</td>
+                    <td class="text-center" style="width: 100px;">{{$data->worker->service->name}}</td>
+                    <td class="text-center">-</td>
                 </tr>
+                <?php $rowNumber++; ?>
                 @endif
+                @else
+                <tr style="background-color: {{ $rowNumber % 2 == 0 ? '#c9c9c9' : '#ffffff' }}">
+                    <td class="text-center">{{ $rowNumber }}</td>
+                    <td class="column__key--black text-center">{{ $data->worker->user->doi }}</td>
+                    <td class="column__key--black text-center">{{ $data->worker->nombre }} {{ $data->worker->apellido }}</td>
+                    <td class="column__key--black text-center">{{ $data->worker->position }}</td>
+                    <td class="text-center" style="width: 100px;">{{$data->worker->service->name}}</td>
+                    <td class="text-center">-</td>
+                </tr>
+                <?php $rowNumber++; ?>
                 @endif
                 @endforeach
-
             </tbody>
         </table>
 

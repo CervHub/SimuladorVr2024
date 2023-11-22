@@ -136,6 +136,7 @@ class SuperAdminController extends Controller
 
     public function editartallercompany(Request $request)
     {
+        dd($request);
         $estado = $this->workshopcompanyController->edit($request);
         if ($estado) {
             Session::flash('success', 'La actualizacion se ha realizado exitosamente.');
