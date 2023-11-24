@@ -3,10 +3,16 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="detalleModalLabel">Detalles de la Compañía</h5>
+                <h5 class="modal-title" id="detalleModalLabel">Detalles del Entrenador</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
+            </div>
+            <!-- Capa de superposición con icono de carga -->
+            <div id="loading-overlay" style="display: none;">
+                <div class="modal-body text-center">
+                    <i class="fas fa-spinner fa-spin"></i> Cargando...
+                </div>
             </div>
             <div class="modal-body" id="modalContent">
                 <!-- Contenido de los detalles de la compañía -->

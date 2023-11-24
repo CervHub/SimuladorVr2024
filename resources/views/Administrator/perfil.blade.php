@@ -105,7 +105,7 @@
                     <div class="col-lg-12">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <div>
-                                <h4 class="card-title card-title-dash">Actualizar Logo de la Empresa</h4>
+                                <h4 class="card-title card-title-dash">Actualizar Datos de la Empresa</h4>
                             </div>
                         </div>
                         <form action="{{route('administrador.updatecompany')}}" method="POST" enctype="multipart/form-data">
@@ -123,6 +123,11 @@
                                 @endphp
 
                                 <div class="mb-3">
+                                    <label for="desktopLogo" class="form-label">Nota:</label>
+                                    <input type="text" class="form-control" id="ponderado" name="ponderado" value="{{$company->ponderado}}" accept="image/*">
+                                </div>
+
+                                <div class="mb-3">
                                     <label for="desktopLogo" class="form-label">Logo de Desktop (Tamaño: 128x64 píxeles, máximo 1MB)</label>
                                     <input type="file" class="form-control" id="desktopLogo" name="desktopLogo" accept="image/*">
                                     @if ($url_image_desktop)
@@ -138,7 +143,7 @@
                                     @endif
                                 </div>
                                 <input type="hidden" name="id_company" value="{{ Auth::user()->id }}">
-                                <button type="submit" class="btn btn-primary">Actualizar Logos</button>
+                                <button type="submit" class="btn btn-primary">Actualizar</button>
                             </div>
                         </form>
                     </div>

@@ -8,6 +8,12 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
+            <!-- Capa de superposición con icono de carga -->
+            <div id="loading-overlay" style="display: none;">
+                <div class="modal-body text-center">
+                    <i class="fas fa-spinner fa-spin"></i> Cargando...
+                </div>
+            </div>
             <div class="modal-body" id="modalContent">
                 <!-- Contenido de los detalles de la compañía -->
 

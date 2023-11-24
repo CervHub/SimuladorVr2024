@@ -20,6 +20,8 @@ return new class extends Migration
             $table->decimal('correct_measure', 3, 1); // Medida Correcta
             $table->string('time'); // Tiempo
             $table->string('difficulty'); // Dificultad
+            $table->string('rol')->nullable();
+            $table->text('json')->nullable();
             $table->timestamps();
 
             // Define la clave foránea

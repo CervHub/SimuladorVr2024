@@ -81,8 +81,9 @@
                                     <label class="badge badge-danger">No Activo</label>
                                     @else
                                     <label class="badge badge-primary">Activo</label>
-                                    @endif    
-                                </td>                                <td>{{$worker->created_at}}</td>
+                                    @endif
+                                </td>
+                                <td>{{$worker->created_at}}</td>
                                 <td>
                                     <button class="btn btn-custom btn-warning text-white me-0" data-toggle="modal" data-target="#editModal" onclick="editar({{$worker->id}})">
                                         <span class="icon icon-pencil"></span> Editar
@@ -192,6 +193,8 @@
 <!-- Detalles de cada registro -->
 <script>
     function details(id) {
+        $('#loading-overlay').show();
+        $('#modalContent').hide();
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': "{{ csrf_token() }}"
@@ -212,6 +215,8 @@
                 $('#doi_detalle').text(response.doi);
                 $('#password_detalle').text(response.worker.user.password_text);
                 $('#codigo_detalle').text(response.worker.code_worker);
+                $('#loading-overlay').hide();
+                $('#modalContent').show();
             },
             error: function(xhr, ajaxOptions, thrownError) {
                 console.log("Error en la conexión:", xhr.status, thrownError);

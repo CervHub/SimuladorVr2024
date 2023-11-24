@@ -28,7 +28,7 @@
                     <div class="btn-wrapper">
                         <a href="#" class="btn btn-primary text-white p-3 btn-sm" data-toggle="modal" data-target="#createModal">
                             <i class="icon-plus"></i> <!-- Icono de agregar aquí -->
-                            Create New
+                            Inscribir Usuario
                         </a>
                         <a href="{{route('induction.formato')}}" class="btn btn-success text-white p-3 btn-sm">
                             <i class="mdi mdi-arrow-down-bold-circle-outline"></i> <!-- Icono de descarga aquí -->
@@ -82,7 +82,7 @@
 
             <div class="card rounded-0 mt-3">
                 <div class="card-body table-responsive">
-                    <h4 class="card-title">Empresas</h4>
+                    <h4 class="card-title text-upper">INSCRITOS - {{$induction->alias}}</h4>
                     <table id="myTable" class="display dataTable table table-striped">
                         <thead>
                             <tr>
@@ -190,7 +190,7 @@
                 $('#id_worker').val(response.id);
                 if (response == 'Error') {
                     $('#mensaje_error').text("Consulta Sin datos.");
-                }else{
+                } else {
                     $('#mensaje_error').text("");
                 }
                 console.log("Aqui");

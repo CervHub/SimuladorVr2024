@@ -15,6 +15,7 @@ $queryInduction = "SELECT
     w.id as id_workshop,
     induction_workers.id as cabecera_id,
     (induction_workers.num_report + 1) as intento,
+    inductions.intentos,
     inductions.date_start || ' ' || inductions.time_start as fecha_inicio,
     inductions.date_end || ' ' || inductions.time_end as fecha_fin,
     wc.alias as taller,
@@ -29,7 +30,8 @@ JOIN workshops AS w ON inductions.id_workshop = w.id
 JOIN workshop_companies AS wc ON wc.id_workshop = w.id
 JOIN workers ON induction_workers.id_worker = workers.id
 JOIN services as s ON s.id = workers.id_service
-WHERE induction_workers.id_worker in (SELECT id FROM workers WHERE code_worker LIKE '%-' || :dni AND id_company = :id_company)
+WHERE inductions.intentos >= (induction_workers.num_report + 1) 
+    AND induction_workers.id_worker in (SELECT id FROM workers WHERE code_worker LIKE '%-' || :dni AND id_company = :id_company)
     AND wc.id_company = :id_company
     AND (to_timestamp(inductions.date_end || ' ' || inductions.time_end, 'YYYY-MM-DD HH24:MI:SS')) >= CURRENT_TIMESTAMP
     AND (to_timestamp(inductions.date_start || ' ' || inductions.time_start, 'YYYY-MM-DD HH24:MI:SS')) <= CURRENT_TIMESTAMP

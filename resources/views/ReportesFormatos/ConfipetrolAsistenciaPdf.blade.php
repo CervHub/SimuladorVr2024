@@ -142,13 +142,16 @@
                         N°
                     </td>
                     <td class="text-center" style="font-weight: bold; padding-top: 0px; padding-bottom: 0px; width: 20%;">
-                        COD. TRABAJADOR
+                        CODIDO
                     </td>
                     <td class="text-center" style="font-weight: bold;">
-                        TRABAJADOR
+                        NOMBRES Y APELLIDOS
                     </td>
                     <td class="text-center" style="font-weight: bold;">
                         CARGO
+                    </td>
+                    <td class="text-center" style="font-weight: bold;padding-top: 0px; padding-bottom: 0px; width: 5%;">
+                        EMPRESA
                     </td>
                     <td class="text-center" style="font-weight: bold;padding-top: 0px; padding-bottom: 0px; width: 5%;">
                         NOTA
@@ -156,15 +159,29 @@
                 </tr>
                 <?php $rowNumber = 1; ?>
                 @foreach($induction_worker as $data)
+                @if($id_service != 0)
+                @if($data->worker->service->id == $id_service)
                 <tr style="background-color: {{ $rowNumber % 2 == 0 ? '#c9c9c9' : '#ffffff' }}">
                     <td class="text-center">{{ $rowNumber }}</td>
                     <td class="column__key--black text-center">{{ $data->worker->user->doi }}</td>
                     <td class="column__key--black text-center">{{ $data->worker->nombre }} {{ $data->worker->apellido }}</td>
                     <td class="column__key--black text-center">{{ $data->worker->position }}</td>
-                    <td class="text-center">{{$data->Ponderado}}</td>
-
+                    <td class="text-center" style="width: 100px;">{{$data->worker->service->name}}</td>
+                    <td class="text-center">-</td>
                 </tr>
                 <?php $rowNumber++; ?>
+                @endif
+                @else
+                <tr style="background-color: {{ $rowNumber % 2 == 0 ? '#c9c9c9' : '#ffffff' }}">
+                    <td class="text-center">{{ $rowNumber }}</td>
+                    <td class="column__key--black text-center">{{ $data->worker->user->doi }}</td>
+                    <td class="column__key--black text-center">{{ $data->worker->nombre }} {{ $data->worker->apellido }}</td>
+                    <td class="column__key--black text-center">{{ $data->worker->position }}</td>
+                    <td class="text-center" style="width: 100px;">{{$data->worker->service->name}}</td>
+                    <td class="text-center">-</td>
+                </tr>
+                <?php $rowNumber++; ?>
+                @endif
                 @endforeach
             </tbody>
         </table>

@@ -3,7 +3,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="createModal">Registrar Empresa</h5>
+                <h5 class="modal-title" id="createModal">Registrar Servicio</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -13,15 +13,15 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="firstName">Nombre:</label>
-                        <input type="text" class="form-control" id="firstName" name="name" placeholder="Ingrese su nombre" required>
+                        <input type="text" class="form-control" id="firstName" name="name" placeholder="Ingrese nombre" required>
                     </div>
                     <div class="form-group">
                         <label for="lastName">Descripcion:</label>
-                        <input type="text" class="form-control" id="lastName" name="description" placeholder="Ingrese su apellido" required>
+                        <input type="text" class="form-control" id="lastName" name="description" placeholder="Ingrese su descripcion" required>
                     </div>
                     <div class="form-group">
-                        <label for="ruc">RUC:</label>
-                        <input type="text" class="form-control" id="ruc" name="ruc" placeholder="Ingrese su RUC" required>
+                        <label for="ruc">Identificador de Empresa:</label>
+                        <input type="text" class="form-control" id="ruc" name="ruc" placeholder="Ingrese Identificado de Empresa" required>
                         <small class="form-text text-muted small">*Solo números</small>
                     </div>
                 </div>

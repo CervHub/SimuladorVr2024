@@ -55,8 +55,8 @@ class SupervisorController extends Controller
         $inductions = Induction::where('id_company', session('id_company'))
             ->orderBy('id', 'desc')
             ->get();
-
-        return view('Supervisor.reporte', compact('inductions'));
+        $services = Service::where('id_company', session('id_company'))->get();
+        return view('Supervisor.reporte', compact('inductions', 'services'));
     }
     public function crearservicio(Request $request)
     {
@@ -106,10 +106,10 @@ class SupervisorController extends Controller
     public function matricula(Request $request, $id_service)
     {
         $id_company = session('id_company');
-
+        $nombre_service = Service::find($id_service)->name;
         $workers = Worker::where('id_company', $id_company)->where('id_service', $id_service)->where('status', '1')->get();
 
-        return view('Supervisor.Matricula.matricula', compact('id_service', 'workers'));
+        return view('Supervisor.Matricula.matricula', compact('id_service', 'workers', 'nombre_service'));
     }
 
     public function crearuser(Request $request)
@@ -238,59 +238,90 @@ class SupervisorController extends Controller
     }
     public function cargamasivainduction(Request $request)
     {
-        $id_company = session('id_company');
-        $id_induction = $request->id_induction;
-        // Verifica si se ha subido un archivo
-        if ($request->hasFile('archivo_trabajadores')) {
-            $archivo = $request->file('archivo_trabajadores');
+        try {
+            $id_company = session('id_company');
+            $id_induction = $request->id_induction;
 
-            // Leer el archivo Excel y obtener los datos
-            $datos = Excel::toArray([], $archivo);
-            $filasConProblemas = []; // Almacenar filas con problemas
-            $primerFila = true; // Bandera para omitir la primera fila (encabezado)
+            // Verifica si se ha subido un archivo
+            if ($request->hasFile('archivo_trabajadores')) {
+                $archivo = $request->file('archivo_trabajadores');
 
-            // Iterar sobre las filas y ejecutar el método createTrabajadorMasivo
-            foreach ($datos as $hoja) {
-                foreach ($hoja as $fila) {
-                    if ($primerFila) {
-                        $primerFila = false; // Se marca la primera fila como leída (encabezado)
-                        continue; // Se omite la primera fila (encabezado)
-                    }
+                // Leer el archivo Excel y obtener los datos
+                $datos = Excel::toArray([], $archivo);
+                $filasConProblemas = []; // Almacenar filas con problemas
+                $filaActual = 1; // Iniciar desde la fila 2 (después del encabezado)
 
-                    if ($fila[1]) {
-                        $service = Service::where('name', $fila[1])->first();
-                    }
+                // Iterar sobre las filas y ejecutar el método createTrabajadorMasivo
+                $primerFila = true; // Bandera para omitir la primera fila (encabezado)
 
-                    if ($fila[0]) {
-                        $worker = Worker::where('code_worker', 'LIKE', '%' . $fila[0] . '%')
-                            ->where('id_company', session('id_company'))
-                            ->where('id_service', $service->id)
-                            ->first();
-                    }
+                foreach ($datos as $hoja) {
+                    foreach ($hoja as $fila) {
+                        if ($primerFila) {
+                            $primerFila = false; // Se marca la primera fila como leída (encabezado)
+                            continue; // Se omite la primera fila (encabezado)
+                        }
+                        $service = null;
+                        $worker = null;
 
-                    if ($worker) {
-                        // Validar que no exista otro registro con la misma inducción y usuario
-                        $existingRecord = InductionWorker::where('id_induction', $id_induction)
-                            ->where('id_worker', $worker->id)
-                            ->first();
+                        if ($fila[1]) {
+                            $service = Service::where('name', $fila[1])->first();
+                        }
 
-                        if (!$existingRecord) {
-                            $new_induction = new InductionWorker();
-                            $new_induction->id_induction = $id_induction;
-                            $new_induction->id_worker = $worker->id;
-                            $new_induction->status = '1';
-                            $new_induction->save();
-                        } else {
-                            if ($existingRecord->status == '0') {
-                                $existingRecord->status = '1';
-                                $existingRecord->save();
+                        if ($fila[0]) {
+                            $worker = Worker::where('code_worker', 'LIKE', '%' . $fila[0] . '%')
+                                ->where('id_company', session('id_company'))
+                                ->where('id_service', optional($service)->id) // Use optional() to handle null service
+                                ->first();
+                        }
+
+                        if (!$service) {
+                            // Agregar esta fila al array de filas con problemas
+                            $filasConProblemas[] = 'El servicio no existe para la fila ' . $filaActual;
+                        }
+                        if (!$worker) {
+                            // Agregar esta fila al array de filas con problemas
+                            $filasConProblemas[] = 'El trabajador no existe para la fila ' . $filaActual;
+                        }
+
+                        if ($worker) {
+                            // Validar que no exista otro registro con la misma inducción y usuario
+                            $existingRecord = InductionWorker::where('id_induction', $id_induction)
+                                ->where('id_worker', $worker->id)
+                                ->first();
+
+                            if (!$existingRecord) {
+                                $new_induction = new InductionWorker();
+                                $new_induction->id_induction = $id_induction;
+                                $new_induction->id_worker = $worker->id;
+                                $new_induction->status = '1';
+                                $new_induction->save();
+                            } else {
+                                if ($existingRecord->status == '0') {
+                                    $existingRecord->status = '1';
+                                    $existingRecord->save();
+                                    $filasConProblemas[] = 'Se activo al trabajador de la fila ' . $filaActual;
+                                } else {
+
+                                    $filasConProblemas[] = 'Ya esta registrado el trabajador de la fila ' . $filaActual;
+                                }
                             }
                         }
+
+                        $filaActual++; // Incrementar el contador de fila
                     }
                 }
             }
+
+            if (count($filasConProblemas) > 0) {
+                // Notificar errores en las filas con problemas
+                $errorMessages = implode(', ', $filasConProblemas);
+                Session::flash('error', 'Errores en las siguientes filas: ' . $errorMessages);
+            } else {
+                Session::flash('success', 'Se cargó exitosamente.');
+            }
+        } catch (\Exception $e) {
+            Session::flash('error', 'Ocurrió un error: ' . $e->getMessage());
         }
-        Session::flash('success', 'Se Cargo exitosamente.');
 
         return redirect()->back();
     }
@@ -298,6 +329,7 @@ class SupervisorController extends Controller
     {
         $workshops = WorkshopCompany::where('id_company', session('id_company'))->get();
         $inductions = Induction::where('id_company', session('id_company'))
+            ->where('status', '1')
             ->orderBy('id', 'desc')
             ->get();
 
@@ -307,19 +339,20 @@ class SupervisorController extends Controller
     public function induccioneliminar(Request $request)
     {
         $induction = Induction::find($request->id_induction);
-        $workers = InductionWorker::where('id_induction', $induction->id)->get();
+        // $workers = InductionWorker::where('id_induction', $induction->id)->get();
 
-        // Obtener los IDs de los workers
-        $workerIds = $workers->pluck('id');
+        // // Obtener los IDs de los workers
+        // $workerIds = $workers->pluck('id');
 
-        // Eliminar los registros de DetailInductionWorker asociados a los workers
-        DetailInductionWorker::whereIn('induction_worker_id', $workerIds)->delete();
+        // // Eliminar los registros de DetailInductionWorker asociados a los workers
+        // DetailInductionWorker::whereIn('induction_worker_id', $workerIds)->delete();
 
-        // Eliminar los workers
-        foreach ($workers as $worker) {
-            $worker->delete();
-        }
-        $induction->delete();
+        // // Eliminar los workers
+        // foreach ($workers as $worker) {
+        //     $worker->delete();
+        // }
+        $induction->status = '0';
+        $induction->save();
         // Aquí puedes realizar cualquier otra acción necesaria.
 
         return redirect()->back()->with('success', 'La simulación y sus detalles, trabajos y empleados asociados se han eliminado correctamente.');
@@ -346,6 +379,7 @@ class SupervisorController extends Controller
             'id_workshop' => $requestData->id_workshop,
             'date_start' => $requestData->date_start,
             'date_end' => $requestData->date_end,
+            'intentos' => $requestData->intentos,
             'time_start' => $requestData->time_start,
             'time_end' => $requestData->time_end,
             'status' => $requestData->status
@@ -367,7 +401,8 @@ class SupervisorController extends Controller
     {
         $inductionworkers = InductionWorker::where('id_induction', $id_induction)->where('status', '1')->get();
         $services = Company::find(session('id_company'))->services;
-        return view('Supervisor.InductionStudents.index', compact('id_induction', 'inductionworkers', 'services'));
+        $induction = Induction::find($id_induction);
+        return view('Supervisor.InductionStudents.index', compact('id_induction', 'inductionworkers', 'services', 'induction'));
     }
 
     public function searchworker(Request $request)
@@ -513,15 +548,44 @@ class SupervisorController extends Controller
         return redirect()->back();
     }
 
+    public function calcularPonderadoPorcentajeYCategoria($referenceNote, $note)
+    {
+        $ponderado = ($referenceNote != 0) ? (number_format($note, 0) / $referenceNote) * 20 : 0;
 
+        $porcentaje = 0;
+        $categoria = '';
 
-    public function visualizar_reporte_notas($id_induction_worker)
+        if ($ponderado >= 2 && $ponderado <= 6) {
+            $porcentaje = 25;
+            $categoria = 'Seguimiento';
+        } elseif ($ponderado >= 7 && $ponderado <= 11) {
+            $porcentaje = 59;
+            $categoria = 'En Proceso';
+        } elseif ($ponderado >= 12 && $ponderado <= 16) {
+            $porcentaje = 75;
+            $categoria = 'Competente';
+        } elseif ($ponderado >= 17 && $ponderado <= 20) {
+            $porcentaje = 100;
+            $categoria = 'Muy Competente';
+        } else {
+            $categoria = 'Desconocido';
+        }
+
+        return [
+            'ponderado' => number_format($ponderado, 0),
+            'porcentaje' => $porcentaje,
+            'categoria' => $categoria,
+        ];
+    }
+
+    public function visualizar_reporte_notas($id_induction_worker, $intento)
     {
 
         $induction_worker = InductionWorker::find($id_induction_worker);
         $worker = Worker::find($induction_worker->id_worker);
         $induction = Induction::find($induction_worker->id_induction);
         $detail_induction_worker = DetailInductionWorker::where('induction_worker_id', $induction_worker->id)
+            ->where('report', $intento)
             ->orderBy('time', 'asc')
             ->get();
 
@@ -530,7 +594,16 @@ class SupervisorController extends Controller
         $casosBuenos = count($detail_induction_worker);
         $casosMalos = 8 - $casosBuenos;
         // $logo = Worker::where('id_company', $induction->id_company)->first()->user->photo;
+        $data = $detail_induction_worker[0];
         $logo = Company::find($induction->id_company)->url_image_desktop;
+
+
+        $result = $this->calcularPonderadoPorcentajeYCategoria($data->note_reference, $data->note);
+        $ponderado = $result['ponderado'];
+        $porcentaje = $result['porcentaje'];
+        $categoria = $result['categoria'];
+
+
         $data = [
             'induction_worker' => $induction_worker,
             'worker' => $worker,
@@ -540,25 +613,39 @@ class SupervisorController extends Controller
             'casosTotales' => $casosTotales,
             'casosBuenos' => $casosBuenos,
             'casosMalos' => $casosMalos,
-            'nota' => $induction_worker->Ponderado,
-            'categoria' => $induction_worker->Categoria,
-            'porcentaje' => $induction_worker->Porcentaje,
+            'nota' => $ponderado,
+            'categoria' => $categoria,
+            'porcentaje' => $porcentaje,
             'logo' => $logo,
             'logo_taller' => $induction->workshop->photo,
-            'total_errores' => 20,
+            'data' => $data,
         ];
         $pdf = PDF::loadView('ReportesFormatos.asistenciaPDF', $data);
         // Configura los márgenes directamente en DOMPDF
         if ($induction->id_company == 2) {
             $pdf = PDF::loadView('ReportesFormatos.IsemNotaPdf', $data);
         } else if ($induction->id_company == 4) {
-            $pdf = PDF::loadView('ReportesFormatos.ConfipetrolNotaPdf', $data);
+            $errores = round($detail_induction_worker->sum('num_errors'));
+            $aciertos = $induction_worker->puntaje - $errores;
+            $data['nota'] = $aciertos;
+            $data['imagen'] = "https://quickchart.io/chart?c={type:'doughnut', data:{datasets:[{data:[$aciertos,$errores],backgroundColor:['rgb(32,164,81)','rgb(255,0,0)'],}],labels:['Puntaje Inicial', 'Nº Errores'],},options:{title:{display:false},plugins: { datalabels: { color: 'white' } },},}";
+            if ($induction->alias == "ANÁLISIS DE FALLAS") {
+                $data['json'] = json_decode($detail_induction_worker[0]->json, true);
+                $pdf = PDF::loadView('ReportesFormatos.ConfipetrolAnalisisFallas', $data);
+            } else {
+                $pdf = PDF::loadView('ReportesFormatos.ConfipetrolNotaPdf', $data);
+            }
+        } else if ($induction->id_company == 3) {
+            $errores = round($detail_induction_worker->sum('num_errors'));
+            $aciertos = $induction_worker->puntaje - $errores;
+            $data['nota'] = $aciertos;
+            $data['imagen'] = "https://quickchart.io/chart?c={type:'doughnut', data:{datasets:[{data:[$aciertos,$errores],backgroundColor:['rgb(32,164,81)','rgb(255,0,0)'],}],labels:['Puntaje Inicial', 'Nº Errores'],},options:{title:{display:false},plugins: { datalabels: { color: 'white' } },},}";
+            $pdf = PDF::loadView('ReportesFormatos.LuzDelSurNotaPdf', $data);
         }
         return $pdf->stream('reporte.pdf');
     }
-    public function descargar_asistencia($id_induction, $fecha_inicio = null, $fecha_fin = null)
+    public function descargar_asistencia($id_induction, $fecha_inicio = null, $fecha_fin = null, $id_service)
     {
-
         // Verifica si al menos una de las fechas es "0000-00-00"
         if ($fecha_inicio === '0000-00-00' || $fecha_fin === '0000-00-00') {
             // No apliques ningún filtro de fecha
@@ -582,7 +669,7 @@ class SupervisorController extends Controller
             ->join('services as s', 's.id', '=', 'workers.id_service')
             ->join('users as u', 'u.id', '=', 'workers.id_user')
             ->where('induction_workers.id_induction', $id_induction)
-            ->select('workers.position', 's.name as servicio', 'workers.nombre', 'u.doi', 'workers.apellido')
+            ->select('workers.position', 's.name as servicio', 's.id as id_service', 'workers.nombre', 'u.doi', 'workers.apellido')
             ->get();
         $logo = Company::find($induction->id_company)->url_image_desktop;
         $data = [
@@ -590,13 +677,15 @@ class SupervisorController extends Controller
             'induction' => $induction,
             'result' => $result,
             'logo' => $logo,
+            'id_service' => $id_service
         ];
-
         // Configura los márgenes directamente en DOMPDF
         if ($induction->id_company == 2) {
             $pdf = PDF::loadView('ReportesFormatos.IsemAsistenciaPdf', $data);
         } else if ($induction->id_company == 4) {
             $pdf = PDF::loadView('ReportesFormatos.ConfipetrolAsistenciaPdf', $data);
+        } else if ($induction->id_company == 3) {
+            $pdf = PDF::loadView('ReportesFormatos.LuzDelSurAsistenciaPdf', $data);
         }
 
         return $pdf->stream('reporte.pdf');
@@ -664,7 +753,7 @@ class SupervisorController extends Controller
     {
         return view('Supervisor.reportealumno');
     }
-    public function  reportealumnodetail(Request $request)
+    public function reportealumnodetail(Request $request)
     {
 
         // $worker = Worker::where('code_worker', 'LIKE', '%' . '-' . $request->doi)
@@ -697,32 +786,62 @@ class SupervisorController extends Controller
         // ];
 
         // return response()->json($responseData);
+        // $workerIds = Worker::where('code_worker', 'LIKE', '%' . '-' . $request->doi)
+        //     ->where('id_company', session('id_company'))
+        //     ->pluck('id');
+
+        // $inductions = InductionWorker::join('inductions', 'induction_workers.id_induction', '=', 'inductions.id')
+        //     ->join('workshops as w', 'inductions.id_workshop', '=', 'w.id') // Inner join con workshops
+        //     ->whereIn('induction_workers.id_worker', $workerIds) // Usar WHERE IN
+        //     ->where('induction_workers.status', '1')
+        //     ->orderBy('induction_workers.id', 'desc')
+        //     ->select(
+        //         'induction_workers.id',
+        //         'induction_workers.id_worker',
+        //         'inductions.id as induction_id',
+        //         'w.id as id_workshop',
+        //         'induction_workers.id as induction_workers',
+        //         'inductions.date_start',
+        //         'inductions.date_end',
+        //         'inductions.time_start',
+        //         'inductions.time_end',
+        //         'w.name as name',
+        //         'inductions.alias',
+        //         'induction_workers.num_report'
+        //     )->get();
         $workerIds = Worker::where('code_worker', 'LIKE', '%' . '-' . $request->doi)
             ->where('id_company', session('id_company'))
             ->pluck('id');
 
-        $inductions = InductionWorker::join('inductions', 'induction_workers.id_induction', '=', 'inductions.id')
-            ->join('workshops as w', 'inductions.id_workshop', '=', 'w.id') // Inner join con workshops
-            ->whereIn('induction_workers.id_worker', $workerIds) // Usar WHERE IN
-            ->where('induction_workers.status', '1')
-            ->orderBy('induction_workers.id', 'desc')
-            ->select(
-                'induction_workers.id',
-                'induction_workers.id_worker',
-                'inductions.id as induction_id',
-                'w.id as id_workshop',
-                'induction_workers.id as induction_workers',
-                'inductions.date_start',
-                'inductions.date_end',
-                'inductions.time_start',
-                'inductions.time_end',
-                'w.name as name',
-                'inductions.alias',
-                'induction_workers.note'
-            )->get();
+        $inductions = InductionWorker::whereIn('id_worker', $workerIds)->get();
+
+        $inductionsData = [];
+
+        foreach ($inductions as $induction) {
+            $inductionData = [
+                'id_induction_workers' => $induction->id,
+                'date_start' => $induction->induction->date_start . ' ' . $induction->induction->time_start,
+                'date_end' => $induction->induction->date_end . ' ' . $induction->induction->time_end,
+                'num_report' => $induction->num_report,
+                'name_taller' => $induction->induction->alias,
+            ];
+            $intentos = [];
+            for ($i = 1; $i <= $induction->num_report; $i++) {
+                $data = $induction->detailsByReport($i)->first();
+                $intentos[] = [
+                    'intento' => $data->report,
+                    'note' => $data->note,
+                    'note_reference' => $data->note_reference,
+                    'date_start' => $data->start_date,
+                    'date_end' => $data->end_date,
+                ];
+            }
+            $inductionData['intentos'] = $intentos;
+            $inductionsData[] = $inductionData;
+        }
         $responseData = [
             'workers' => $workerIds,
-            'inductions' => $inductions,
+            'inductions' => $inductionsData,
         ];
 
         return response()->json($responseData);

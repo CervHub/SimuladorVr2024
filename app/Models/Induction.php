@@ -15,6 +15,8 @@ class Induction extends Model
         'time_start',
         'time_end',
         'id_workshop',
+        'nota_referencial',
+        'intentos',
         'id_company',
         'status',
         'id_worker',
@@ -32,7 +34,8 @@ class Induction extends Model
     {
         return $this->hasMany(InductionWorker::class, 'id_induction');
     }
-    public function alias(){
+    public function alias()
+    {
         return $this->hasMany(InductionWorker::class, 'id_induction');
     }
 }

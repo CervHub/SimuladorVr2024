@@ -19,6 +19,6 @@ class Worker extends Model
     }
     public function service()
     {
-        return $this->belongsTo(Company::class, 'id_service');
+        return $this->belongsTo(Service::class, 'id_service');
     }
 }

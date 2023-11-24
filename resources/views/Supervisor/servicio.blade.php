@@ -16,7 +16,7 @@
             <div class="d-sm-flex align-items-center justify-content-between border-bottom">
                 <div>
                     <div class="btn-wrapper">
-                        <a href="#" class="btn btn-primary text-white p-3 btn-sm" data-toggle="modal" data-target="#createModal"><i class="icon-plus"></i> Create New</a>
+                        <a href="#" class="btn btn-primary text-white p-3 btn-sm" data-toggle="modal" data-target="#createModal"><i class="icon-plus"></i> Crear Servicio</a>
                     </div>
                 </div>
 
@@ -160,6 +160,8 @@
 <!-- Editar Entrenador -->
 <script>
     function editar(id) {
+        $('#loading-overlay').show();
+        $('#form-edit').hide();
         console.log(id);
         $.ajaxSetup({
             headers: {
@@ -179,6 +181,8 @@
                 $('#description_editar').val(response.description);
                 $('#name_editar').val(response.name);
                 $('#ruc_editar').val(response.ruc);
+                $('#loading-overlay').hide();
+                $('#form-edit').show();
             },
             error: function(xhr, ajaxOptions, thrownError) {
                 console.log("Error en la conexión:", xhr.status, thrownError);
@@ -191,6 +195,8 @@
 <!-- Detalles de cada registro -->
 <script>
     function details(id) {
+        $('#loading-overlay').show();
+        $('#form-edit').hide();
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': "{{ csrf_token() }}"
@@ -211,6 +217,8 @@
                 $('#doi_detalle').text(response.doi);
                 $('#password_detalle').text(response.worker.user.password_text);
                 $('#codigo_detalle').text(response.worker.code_worker);
+                $('#loading-overlay').hide();
+                $('#form-edit').show();
             },
             error: function(xhr, ajaxOptions, thrownError) {
                 console.log("Error en la conexión:", xhr.status, thrownError);

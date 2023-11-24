@@ -10,7 +10,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body" id="modalContent">
+                <div class="modal-body" >
                     <!-- Contenido de los detalles de la compañía -->
 
                     <p><strong>ID:</strong> <span id="id_eliminar"></span></p>

@@ -3,7 +3,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="createModalLabel">Crear Inducción</h5>
+                <h5 class="modal-title" id="createModalLabel">Crear Capacitación</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -12,11 +12,11 @@
                 @csrf
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="course">Curso:</label>
+                        <label for="course">Teller:</label>
                         <input type="hidden" value="" name="alias" id="alias">
-                        <select class="form-control"  name="course" id="course">
+                        <select class="form-control" name="course" id="course">
                             @foreach($workshops as $workshop)
-                                <option value="{{$workshop->id_workshop}}">{{$workshop->alias}}</option>
+                            <option value="{{$workshop->id_workshop}}">{{$workshop->alias}}</option>
                             @endforeach
                             <!-- Agrega más opciones de cursos según sea necesario -->
                         </select>
@@ -24,17 +24,17 @@
                     <div class="form-group row">
                         <div class="col-md-6">
                             <label for="startDate">Fecha de inicio:</label>
-                            <input type="date" class="form-control"  name="start_date">
+                            <input type="date" class="form-control" name="start_date">
                         </div>
                         <div class="col-md-6">
                             <label for="startTime">Hora de inicio:</label>
-                            <input type="time" class="form-control"  name="start_time">
+                            <input type="time" class="form-control" name="start_time">
                         </div>
                     </div>
                     <div class="form-group row">
                         <div class="col-md-6">
                             <label for="endDate">Fecha de término:</label>
-                            <input type="date" class="form-control"  name="end_date">
+                            <input type="date" class="form-control" name="end_date">
                         </div>
                         <div class="col-md-6">
                             <label for="endTime">Hora de término:</label>
@@ -43,12 +43,17 @@
                     </div>
                     <div class="form-group row">
                         <div class="col-md-6">
+                            <label for="status">Intentos:</label>
+                            <input type="number" value="1" class="form-control" name="intentos">
+                        </div>
+                        <div class="col-md-6">
                             <label for="status">Estado:</label>
                             <select class="form-control" name="status">
                                 <option value="1">Activo</option>
                                 <option value="0">Inactivo</option>
                             </select>
                         </div>
+
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -61,7 +66,7 @@
 </div>
 <script>
     // Espera a que se cargue la página
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function() {
         // Obtiene el elemento select y el campo oculto
         const selectCurso = document.getElementById("course");
         const inputAlias = document.getElementById("alias");
@@ -71,7 +76,7 @@
         inputAlias.value = aliasPredeterminado; // Establece el alias por defecto
 
         // Agrega un evento para detectar cambios en el elemento select
-        selectCurso.addEventListener("change", function () {
+        selectCurso.addEventListener("change", function() {
             // Obtiene el alias del curso seleccionado
             const aliasSeleccionado = selectCurso.options[selectCurso.selectedIndex].text;
             inputAlias.value = aliasSeleccionado; // Actualiza el alias

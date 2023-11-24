@@ -77,8 +77,8 @@
 
             <div class="card rounded-0 mt-3">
                 <div class="card-body table-responsive">
-                    <h4 class="card-title">Inducciones - Grupos para <span id="namename"></span></h4>
-                    <table id="myTable" class="display dataTable table table-striped">
+                    <h4 class="card-title">Inducciones - Grupos <span id="namename"></span></h4>
+                    <table id="myTable" class="display dataTable table">
                         <thead>
                             <tr>
                                 <th>ID</th>
@@ -125,16 +125,16 @@
             success: function(response) {
                 console.log(response);
                 var tbody = $('#myTable tbody');
-                $('#namename').text(response.name + ' ' + response.last_name);
+                // $('#namename').text(response.name + ' ' + response.last_name);
                 tbody.empty(); // Limpia cualquier fila existente en la tabla
 
                 // Recorre las inducciones en la respuesta y agrega filas a la tabla
                 response.inductions.forEach(function(induccion, index) {
-                    var newRow = '<tr>' +
-                        '<td>' + induccion.id + '</td>' +
-                        '<td>' + induccion.alias + '</td>' +
-                        '<td>' + induccion.date_start + ' ' + induccion.time_start + '</td>' +
-                        '<td>' + induccion.date_end + ' ' + induccion.time_end + '</td>' +
+                    var newRow = '<tr class="table-primary">' +
+                        '<td>' + induccion.id_induction_workers + '</td>' +
+                        '<td>' + induccion.name_taller + '</td>' +
+                        '<td>' + induccion.date_start + '</td>' +
+                        '<td>' + induccion.date_end + '</td>' +
                         '<td>' + induccion.num_report + '</td>' +
                         '<td><button class="btn btn-custom btn-primary text-white me-0" data-bs-toggle="collapse" data-bs-target="#details' + index + '">Ver Intentos</button></td>' +
                         '</tr>';
@@ -142,38 +142,40 @@
                     var detailsRow = '<tr>' +
                         '<td colspan="6">' +
                         '<div id="details' + index + '" class="collapse">' +
-                        '<table class="display dataTable table table-striped">' +
+                        '<table class="display dataTable table table-stripep">' +
                         '<thead>' +
-                        '<tr>' +
+                        '<tr class="table-secondary">' +
                         '<th>Num Intento</th>' +
                         '<th>Fecha Inicio</th>' +
                         '<th>Fecha Fin</th>' +
-                        '<th>Nota Obetenida</th>' +
-                        '<th>Accciones</th>' +
+                        '<th>Nota Obtenida</th>' +
+                        '<th>Acciones</th>' +
                         '</tr>' +
                         '</thead>' +
-                        '<tbody>' +
-                        '<tr>' +
-                        '<td>Dato 1</td>' +
-                        '<td>Valor 1</td>' +
-                        '</tr>' +
-                        '<tr>' +
-                        '<td>Dato 2</td>' +
-                        '<td>Valor 2</td>' +
-                        '</tr>' +
-                        '</tbody>' +
-                        '</table>' +
-                        '</div>' +
-                        '</td>' +
-                        '</tr>';
+                        '<tbody>';
+
+                    induccion.intentos.forEach(
+                        function(item, index) {
+                            detailsRow += '<tr>' +
+                                '<td>' + item.intento + '</td>' +
+                                '<td>' + item.date_start + '</td>' +
+                                '<td>' + item.date_end + '</td>' +
+                                '<td>' + item.note + '</td>' +
+                                '<td>' +
+                                '<a href="{{url('view/pdf')}}/' + induccion.id_induction_workers + '/' + item.intento +'" target="_blank" class="btn btn-custom btn-primary text-white me-0">' +
+                                '<span class="mdi mdi-file-download"> Descargar Reporte</span>' +
+                                '</a>' +
+                                '</td>' +
+                                '</tr>';
+                        }
+
+                    );
+
+                    detailsRow += '</tbody></table></div></td></tr>';
 
                     tbody.append(newRow);
                     tbody.append(detailsRow);
                 });
-
-
-
-
 
             },
             error: function(xhr, ajaxOptions, thrownError) {

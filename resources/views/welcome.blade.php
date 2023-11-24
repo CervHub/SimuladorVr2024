@@ -17,7 +17,7 @@
     <style>
         .content-wrapper {
             background-image: url('{{asset('logo/fondo.jpg')}}');
-            background-size: auto;
+            background-size: cover;
             background-repeat: no-repeat;
         }
 
@@ -45,6 +45,14 @@
     border: 0;
 }
 
+
+@media (min-width: 1200px) {
+    #login-item {
+  margin-right: 5% !important;
+  margin-left: auto !important;
+}
+}
+
     </style>
 </head>
 
@@ -53,7 +61,7 @@
         <div class="container-fluid page-body-wrapper full-page-wrapper">
             <div class="content-wrapper d-flex align-items-center auth px-0">
                 <div class="row w-100 mx-0">
-                    <div class="col-lg-4 mx-auto">
+                    <div class="col-lg-4 mx-auto" id="login-item">
                         <div class="auth-form-light text-left py-5 px-4 px-sm-5">
                             <div class="brand-logo text-center">
                                 <img src="{{asset('logo/logo.png')}}" alt="logo">

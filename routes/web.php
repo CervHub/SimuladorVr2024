@@ -73,7 +73,7 @@ Route::middleware(['admin', 'auth'])->group(function () {
 });
 
 //BEGIN Rutas para Entrenador
-Route::middleware(['entrenador'])->group(function () {
+Route::middleware(['entrenador', 'auth'])->group(function () {
     Route::get('entrenador/dashboard', [SupervisorController::class, 'index'])->name('entrenador');
     Route::get('entrenador/servicio', [SupervisorController::class, 'servicio'])->name('entrenador.servicio');
     Route::get('entrenador/reporte', [SupervisorController::class, 'reporte'])->name('entrenador.reporte');
@@ -102,7 +102,7 @@ Route::middleware(['entrenador'])->group(function () {
     Route::post('induction/cargamasiva', [SupervisorController::class, 'cargamasivainduction'])->name('induction.cargamasiva');
     Route::post('induction/eliminar', [SupervisorController::class, 'eliminarinductionworker'])->name('entrenador.eliminar.induction.worker');
     // Ruta para descargar asistencia
-    Route::get('descargar_asistencia/{id_induction}/{fecha_inicio}/{fecha_fin}', [SupervisorController::class, 'descargar_asistencia'])->name('descargar_asistencia_pdf');
+    Route::get('descargar_asistencia/{id_induction}/{fecha_inicio}/{fecha_fin}/{id_service}', [SupervisorController::class, 'descargar_asistencia'])->name('descargar_asistencia_pdf');
     Route::get('descargar_asistencia_excel/{id_induction}/{fecha_inicio}/{fecha_fin}', [SupervisorController::class, 'descargar_asistencia_excel'])->name('descargar_asistencia_excel');
 
     // Ruta para descargar Zip de reportes de notas individuales
@@ -125,7 +125,7 @@ Route::get('isem/v1/insertnota/{json}', [ApiIsemController::class, 'insertnota']
 Route::get('isem/v1/insertcasos/{json}', [ApiIsemController::class, 'insertcasos']);
 Route::get('isem/v1/{dni}', [ApiIsemController::class, 'induction']);
 
-Route::get('view/pdf/{id_induction_worker}', [SupervisorController::class, 'visualizar_reporte_notas'])
+Route::get('view/pdf/{id_induction_worker}/{intento}', [SupervisorController::class, 'visualizar_reporte_notas'])
     ->name('view.pdf');
 
 
