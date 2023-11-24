@@ -73,7 +73,7 @@ Route::middleware(['admin', 'auth'])->group(function () {
 });
 
 //BEGIN Rutas para Entrenador
-Route::middleware(['entrenador'])->group(function () {
+Route::middleware(['entrenador', 'auth'])->group(function () {
     Route::get('entrenador/dashboard', [SupervisorController::class, 'index'])->name('entrenador');
     Route::get('entrenador/servicio', [SupervisorController::class, 'servicio'])->name('entrenador.servicio');
     Route::get('entrenador/reporte', [SupervisorController::class, 'reporte'])->name('entrenador.reporte');
