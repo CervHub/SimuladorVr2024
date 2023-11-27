@@ -122,7 +122,7 @@
                                 }
                                 @endphp
 
-                                <div class="mb-3">
+                                <div class="mb-3" style="display: none;">
                                     <label for="desktopLogo" class="form-label">Nota:</label>
                                     <input type="text" class="form-control" id="ponderado" name="ponderado" value="{{$company->ponderado}}" accept="image/*">
                                 </div>

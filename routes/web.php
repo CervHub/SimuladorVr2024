@@ -70,6 +70,10 @@ Route::middleware(['admin', 'auth'])->group(function () {
     Route::post('administrador/updatecompany', [AdminController::class, 'updateCompany'])->name('administrador.updatecompany');
     Route::post('administrador/updatecolormobile', [AdminController::class, 'updatecolormobile'])->name('updatecolormobile');
     Route::post('administrador/updatecolordesktop', [AdminController::class, 'updatecolordesktop'])->name('updatecolordesktop');
+
+    // MOdificacion para actualizar rutas de los talleres desde el administrador
+    Route::get('administrador/talleres', [AdminController::class, 'talleres'])->name('administrador.talleres');
+    Route::post('administrador/talleres/update', [AdminController::class, 'updateTalleres'])->name('administrador.talleres.update');
 });
 
 //BEGIN Rutas para Entrenador

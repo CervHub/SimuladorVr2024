@@ -53,140 +53,170 @@
 
     .text-center {
         text-align: center;
+        white-space: pre-line;
+
     }
 
     .text-rigth {
         text-align: right;
+        white-space: pre-line;
+    }
+
+    .text-left {
+        text-align: left;
+        white-space: pre-line;
+    }
+
+    .text-small {
+        font-size: xx-small;
+    }
+
+    .bold-center {
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .text-light {
+        font-weight: lighter
+    }
+
+    .text-small2 {
+        font-size: x-small;
+        text-align: center;
+    }
+
+    .text-bold {
+        font-weight: bold;
     }
 </style>
 
 <body style="box-sizing: border-box">
-    <div class="main__container">
-        <table style="width: 100%">
-            <tbody>
-                <tr>
-                    <td class="text-center" style="padding-top: 0px; padding-bottom: 0px; width: 20%;">
-                        <img src="{{$logo}}" width="64px" alt="Logo">
-                    </td>
-                    <td nowrap colspan="4" style="padding-top: 0px; padding-bottom: 0px;">
-                        <h3 class="title">REPORTE DE EVALUACIÓN</h3>
-                    </td>
-                    <td class="text-center" style="padding-top: 0px; padding-bottom: 0px; width: 20%;">
-                        {{ \Carbon\Carbon::now('America/Lima')->format('Y-m-d H:i:s') }}
-                    </td>
 
-                </tr>
-            </tbody>
-        </table>
-        <table style="width: 100%">
-            <tbody>
-                <tr>
-                    <td style="width: 20%">
-                        <span class="column__key">
-                            Simulador:
-                        </span>
-                    </td>
-                    <td colspan="11">
-                        {{$induction->alias}}
-                    </td>
-                </tr>
-                <tr>
-                    <td style="width: 20%">
-                        <span class="column__key">
-                            Instructor:
-                        </span>
-                    </td>
-                    <td colspan="11">
-                        {{$induction->worker->user->name}} {{$induction->worker->user->last_name}}
-                    </td>
-                </tr>
-                <tr>
-                    <td style="width: 20%">
-                        <span class="column__key">
-                            Fecha de Inicio:
-                        </span>
-                    </td>
-                    <td colspan="5">
-                        {{$induction->date_start}} {{$induction->time_start}}
-                    </td>
-                    <td style="width: 20%">
-                        <span class="column__key">
-                            Fecha de Fin:
-                        </span>
-                    </td>
-                    <td colspan="5">
-                        {{$induction->date_end}} {{$induction->time_end}}
-                    </td>
-                </tr>
-                <!-- <tr>
-                    <td style="width: 20%">
-                        <span class="column__key">
-                            Empresa:
-                        </span>
-                    </td>
-                    <td colspan="5">
-                        Empresa XYZ
-                    </td>
-                </tr>
-                <tr>
-                    <td style="border-left: white;border-bottom: white; border-right: white;" colspan="6">
+    <table class="cabecera" style="width: 100%">
+        <tbody>
+            <tr class="even text-size">
+                <td style="width: 20% !important;" rowspan="2" class="text-center"> <img src="{{ $logo }}"
+                        width="64px" alt="Logo"></td>
+                <td class="bold-center text-center" style="width: 80% !important; font-size: 14px;">FORMATO</td>
+                <td style="width: 20% !important;" rowspan="2" class="text-left text-small">Código: DDC-FR-001
+                    Revisión: 00
+                    Aprobado: SSDH
+                    Fecha: 08/01/2018
+                </td>
+            </tr>
+            <tr class="odd text-size" style="width: 80% !important; font-size: 14px;">
+                <td class="bold-center text-center">REGISTRO DE CAPACITACIÓN</td>
+            </tr>
+            <tr class="even text-size">
+                <td colspan="2" rowspan="3" class="text-left text-small text-bold">RAZÓN SOCIAL: LUZ DEL SUR
+                    S.A.A.
+                    RUC: 20331898008
+                    DIRECCIÓN: AV CANAVAL Y MOREYRA 380
+                    ACTIVIDAD: DISTRIBUCIÓN DE ENERGÍA ELÉCTRICA
+                </td>
+                <td style="width: 20% !important; padding: 0;" class="text-center text-small text-bold">N° Registro:
+                    25550
+                </td>
+            </tr>
+            <tr>
+                <td style=" padding: 0;" class="text-center text-small">N° de trabajadores:
+                </td>
+            </tr>
+            <tr>
+                <td style=" padding: 0;" class="text-center text-small text-bold">{{$result->count()}}
+                </td>
+            </tr>
+        </tbody>
+    </table>
 
-                    </td>
-                </tr> -->
-            </tbody>
-        </table>
-        <table style="width: 100%">
-            <tbody>
-                <tr style="background-color: #c9c9c9;">
-                    <td class="text-center" style="font-weight: bold; padding-top: 0px; padding-bottom: 0px; width: 5%;">
-                        N°
-                    </td>
-                    <td class="text-center" style="font-weight: bold; padding-top: 0px; padding-bottom: 0px; width: 20%;">
-                        CODIDO
-                    </td>
-                    <td class="text-center" style="font-weight: bold;">
-                        NOMBRES Y APELLIDOS
-                    </td>
-                    <td class="text-center" style="font-weight: bold;">
-                        CARGO
-                    </td>
-                    <td class="text-center" style="font-weight: bold;padding-top: 0px; padding-bottom: 0px; width: 5%;">
-                        EMPRESA
-                    </td>
-                    <td class="text-center" style="font-weight: bold;padding-top: 0px; padding-bottom: 0px; width: 5%;">
-                        NOTA
-                    </td>
-                </tr>
-                <?php $rowNumber = 1; ?>
-                @foreach($induction_worker as $data)
-                @if($id_service != 0)
-                @if($data->worker->service->id == $id_service)
-                <tr style="background-color: {{ $rowNumber % 2 == 0 ? '#c9c9c9' : '#ffffff' }}">
-                    <td class="text-center">{{ $rowNumber }}</td>
-                    <td class="column__key--black text-center">{{ $data->worker->user->doi }}</td>
-                    <td class="column__key--black text-center">{{ $data->worker->nombre }} {{ $data->worker->apellido }}</td>
-                    <td class="column__key--black text-center">{{ $data->worker->position }}</td>
-                    <td class="text-center" style="width: 100px;">{{$data->worker->service->name}}</td>
-                    <td class="text-center">-</td>
-                </tr>
-                <?php $rowNumber++; ?>
-                @endif
-                @else
-                <tr style="background-color: {{ $rowNumber % 2 == 0 ? '#c9c9c9' : '#ffffff' }}">
-                    <td class="text-center">{{ $rowNumber }}</td>
-                    <td class="column__key--black text-center">{{ $data->worker->user->doi }}</td>
-                    <td class="column__key--black text-center">{{ $data->worker->nombre }} {{ $data->worker->apellido }}</td>
-                    <td class="column__key--black text-center">{{ $data->worker->position }}</td>
-                    <td class="text-center" style="width: 100px;">{{$data->worker->service->name}}</td>
-                    <td class="text-center">-</td>
-                </tr>
-                <?php $rowNumber++; ?>
-                @endif
-                @endforeach
-            </tbody>
-        </table>
+    <section>
+        <h3 class="text-center">
+            REGISTRO DE CAPACITACIÓN
+            Evento: {{ $induction->alias }}
+            Sesión 1: Fecha : {{ \Carbon\Carbon::parse($induction->date_start)->format('d/m/Y') }}
+            SALA DE CAPACITACION SAN JUAN
+            Expositor : {{$induction->worker->user->name}} {{$induction->worker->user->last_name}}
+        </h3>
+    </section>
 
-    </div>
+    <section>
+        <h4 style="padding: 0; margin: 0;">
+            Marcar con (X) según corresponda:
+        </h4>
+        <h4 class="text-light" style="padding: 0; margin-top: 15px; text-align:center;">
+            1-Inducción( ) 2-Capacitación( X ) 3-Entrenamiento(  ) 4-Jornada( ) 5-Simulacro de Emergencia( )
+        </h4>
+    </section>
+
+    <table border="1" style="width: 100%">
+        <thead>
+            <tr>
+                <th class="text-small2" style="width: 5%">ITEM</th>
+                <th class="text-small2" style="width: 10%">FICHA</th>
+                <th class="text-small2" style="width: 15%">NOMBRES</th>
+                <th class="text-small2" style="width: 15%">APELLIDOS</th>
+                <th class="text-small2" style="width: 10%">DNI</th>
+                <th class="text-small2" style="width: 15%">ÁREA</th>
+                <th class="text-small2" style="width: 10%">NOTA</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($result as $item)
+                <tr>
+                    <td>{{ $loop->iteration }}</td>
+                    <td>-</td>
+                    <td>{{$item->nombre}}</td>
+                    <td>{{$item->apellido}}</td>
+                    <td>{{$item->doi}}</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+            @endforeach
+            <!-- Add more rows as needed -->
+        </tbody>
+    </table>
+
+    <br>
+    <table border="1" style="width: 100%;">
+        <tbody>
+            <tr>
+                <td rowspan="2"
+                    style="width: 50%; text-align: left; vertical-align: top; text-decoration: underline;"
+                    class="text-small2">
+                    Observaciones:
+                </td>
+                <td style="width: 50%; height: 20px; text-align: left; vertical-align: bottom;" class="text-small2">
+                    Capacitador: {{$induction->worker->user->name}} {{$induction->worker->user->last_name}}</td>
+            </tr>
+            <tr>
+                <td style="height: 60px; text-align: left; vertical-align: bottom;" class="text-small2">
+                    Firma:_________________________________________________</td>
+            </tr>
+        </tbody>
+    </table>
+
+
+    {{-- <h5 style="padding-bottom: 0; margin-bottom:5px;"> Responsable del registro: </h5>
+    <table border="1" style="width: 100%">
+        <thead>
+            <tr>
+                <th style="width: 30%; text-align: left;">NOMBRE</th>
+                <th style="width: 30%; text-align: left;">CARGO</th>
+                <th style="width: 20%; text-align: left;">FIRMA</th>
+                <th style="width: 20%; text-align: left;">FECHA</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="text-align: left;">Juan Julio Trigueros Galvez</td>
+                <td style="text-align: left;">Jefe Dpto. Gestión del Talento</td>
+                <td style="text-align: left;"></td>
+                <td style="text-align: left;"></td>
+            </tr>
+            <!-- Add more rows as needed -->
+        </tbody>
+    </table> --}}
+
 </body>
 
 </html>

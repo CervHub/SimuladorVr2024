@@ -22,6 +22,7 @@ $queryInduction = "SELECT
     workers.nombre as nombre,
     workers.apellido as apellido,
     workers.position as cargo,
+    workers.celular as celular,
     s.name as nombre_servicio,
 	s.id as id_service
 FROM induction_workers

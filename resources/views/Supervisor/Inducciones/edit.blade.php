@@ -14,17 +14,12 @@
                     <i class="fas fa-spinner fa-spin"></i> Cargando...
                 </div>
             </div>
-            <form action="{{route('entrenador.update.induction')}}" method="POST" id="form-edit">
+            <form action="{{ route('entrenador.update.induction') }}" method="POST" id="form-edit">
                 @csrf
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="course">Taller:</label>
-                        <select class="form-control" id="course" name="course" disabled>
-                            @foreach($workshops as $workshop)
-                            <option value="{{$workshop->id}}">{{$workshop->alias}}</option>
-                            @endforeach
-                            <!-- Agrega más opciones de cursos según sea necesario -->
-                        </select>
+                        <input type="text" id="curso" class="form-control" readonly>
                     </div>
                     <div class="form-group row">
                         <div class="col-md-6">

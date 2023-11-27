@@ -9,7 +9,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Models\UserController;
 use Illuminate\Support\Facades\Session;
 use App\Models\Company;
-
+use App\Models\WorkshopCompany;
+use Illuminate\Support\Facades\DB;
 class AdminController extends Controller
 {
 
@@ -149,5 +150,39 @@ class AdminController extends Controller
 
         // Puedes enviar una respuesta JSON si lo deseas
         return response()->json(['message' => 'Color para dispositivos de escritorio actualizado correctamente']);
+    }
+
+    public function talleres(Request $request)
+    {
+
+        $workshop_companies = WorkshopCompany::where('id_company', session('id_company'))->get();
+        $id_company = session('id_company');
+        $workers = Worker::where('id_company', $id_company)->where('id_role', 3)->where('status', '1')->get();
+        return view('Administrator.tallernotas', compact('workers', 'workshop_companies'));
+    }
+
+    public function updateTalleres(Request $request)
+    {
+        $values = $request->input('values');
+
+        DB::beginTransaction();
+
+        try {
+            foreach ($values as $value) {
+                WorkshopCompany::where('id', $value['id'])->update([
+                    'pondered_note' => $value['pondered_note'],
+                    'minimum_passing_note' => $value['minimum_passing_note']
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json(['message' => 'Conexión exitosa'], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            // Aquí puedes manejar el error como quieras
+            return response()->json(['message' => 'Ocurrió un error al actualizar los datos'], 500);
+        }
     }
 }

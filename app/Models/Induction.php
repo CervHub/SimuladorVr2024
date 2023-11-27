@@ -21,6 +21,8 @@ class Induction extends Model
         'status',
         'id_worker',
         'alias',
+        'pondered_note',
+        'minimum_passing_note',
     ];
     public function workshop()
     {

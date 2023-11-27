@@ -8,12 +8,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use App\Models\Company;
+use App\Models\WorkshopCompany;
+
 
 class InductionController extends Controller
 {
     public function create(Request $request)
     {
         $company = Company::find(session('id_company'));
+        $notas = WorkshopCompany::where('id_company',$company->id)->where('id_workshop',$request->course)->first();
         try {
             $induction = Induction::create([
                 'date_start' => $request->start_date,
@@ -27,10 +30,15 @@ class InductionController extends Controller
                 'status' => '1',
                 'id_worker' => session('id_worker'),
                 'alias' => $request->alias,
+                'pondered_note' => $notas->pondered_note,
+                'minimum_passing_note' => $notas->minimum_passing_note,
             ]);
 
             return true;
         } catch (\Throwable $th) {
+            // Volcar y terminar el script para ver el error
+       
+
             Session::flash('error', 'Hubo un error al crear la inducción.');
             return false;
         }

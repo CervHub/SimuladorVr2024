@@ -377,6 +377,7 @@ class SupervisorController extends Controller
         $responseData = [
             'id' => $requestData->id,
             'id_workshop' => $requestData->id_workshop,
+            'name' => $requestData->workshop->name,
             'date_start' => $requestData->date_start,
             'date_end' => $requestData->date_end,
             'intentos' => $requestData->intentos,
