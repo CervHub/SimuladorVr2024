@@ -164,11 +164,11 @@
             @foreach ($result as $item)
                 <tr>
                     <td>{{ $loop->iteration }}</td>
-                    <td>-</td>
+                    <td>{{$item->employee_code}}</td>
                     <td>{{$item->nombre}}</td>
                     <td>{{$item->apellido}}</td>
                     <td>{{$item->doi}}</td>
-                    <td>-</td>
+                    <td>{{$item->department}}</td>
                     <td>-</td>
                 </tr>
             @endforeach
@@ -186,36 +186,16 @@
                     Observaciones:
                 </td>
                 <td style="width: 50%; height: 20px; text-align: left; vertical-align: bottom;" class="text-small2">
-                    Capacitador: {{$induction->worker->user->name}} {{$induction->worker->user->last_name}}</td>
+                    Capacitador: {{$induction->worker->nombre}} {{$induction->worker->apellido}}</td>
             </tr>
             <tr>
-                <td style="height: 60px; text-align: left; vertical-align: bottom;" class="text-small2">
-                    Firma:_________________________________________________</td>
+                <td style="height: 80px; text-align: left; vertical-align: bottom; position: relative;" class="text-small2">
+                    <img src="{{ $signature }}" alt="" style="max-height: 95%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: -1;">
+                    Firma:_________________________________________________
+                </td>
             </tr>
         </tbody>
     </table>
-
-
-    {{-- <h5 style="padding-bottom: 0; margin-bottom:5px;"> Responsable del registro: </h5>
-    <table border="1" style="width: 100%">
-        <thead>
-            <tr>
-                <th style="width: 30%; text-align: left;">NOMBRE</th>
-                <th style="width: 30%; text-align: left;">CARGO</th>
-                <th style="width: 20%; text-align: left;">FIRMA</th>
-                <th style="width: 20%; text-align: left;">FECHA</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td style="text-align: left;">Juan Julio Trigueros Galvez</td>
-                <td style="text-align: left;">Jefe Dpto. Gestión del Talento</td>
-                <td style="text-align: left;"></td>
-                <td style="text-align: left;"></td>
-            </tr>
-            <!-- Add more rows as needed -->
-        </tbody>
-    </table> --}}
 
 </body>
 

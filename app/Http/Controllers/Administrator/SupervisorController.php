@@ -23,6 +23,8 @@ use App\Exports\InductionExcelReportExport;
 use App\Models\Company;
 use App\Models\User;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+
 
 class SupervisorController extends Controller
 {
@@ -40,7 +42,45 @@ class SupervisorController extends Controller
 
     public function index(Request $request)
     {
-        return view('Supervisor.index');
+        $id_company = session('id_company');
+
+        $induccionesPorMes = DB::table(DB::raw('generate_series(1,12) as month'))
+            ->leftJoin('inductions', function ($join) use ($id_company) {
+                $join->on(DB::raw('EXTRACT(MONTH FROM date_start)'), '=', 'month')
+                    ->where('inductions.id_company', '=', $id_company);
+            })
+            ->select(
+                DB::raw('month as mes'),
+                DB::raw('COALESCE(ARRAY_AGG(inductions.id), ARRAY[]::integer[]) as ids_inducciones')
+            )
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
+        foreach ($induccionesPorMes as $induccionesDelMes) {
+            $idsInducciones = explode(',', trim($induccionesDelMes->ids_inducciones, '{}'));
+
+            $estadoTrabajadoresPorMes = [
+                'approved' => 0,
+                'disapproved' => 0,
+                'pending' => 0,
+            ];
+
+            foreach ($idsInducciones as $idInduccion) {
+                if ($idInduccion === 'NULL') {
+                    continue;
+                }
+
+                $induccion = Induction::find($idInduccion);
+                $estadoTrabajadores = $induccion->workersStatus();
+
+                $estadoTrabajadoresPorMes['approved'] += $estadoTrabajadores['approved'];
+                $estadoTrabajadoresPorMes['disapproved'] += $estadoTrabajadores['disapproved'];
+                $estadoTrabajadoresPorMes['pending'] += $estadoTrabajadores['pending'];
+            }
+
+            $induccionesDelMes->estadoTrabajadores = $estadoTrabajadoresPorMes;
+        }
+        return view('Supervisor.index', compact('induccionesPorMes'));
     }
 
     public function servicio(Request $request)
@@ -135,7 +175,9 @@ class SupervisorController extends Controller
             // Actualizar los campos del trabajador
             $worker->nombre = $request->name;
             $worker->apellido = $request->last_name;
-
+            $worker->employee_code = $request->employee_code;
+            $worker->position = $request->position;
+            $worker->department = $request->department;
             $worker->save();
 
             // Éxito
@@ -175,7 +217,6 @@ class SupervisorController extends Controller
 
     public function cargamasiva(Request $request)
     {
-
         $id_company = session('id_company');
         // Verifica si se ha subido un archivo
         if ($request->hasFile('archivo_trabajadores')) {
@@ -184,31 +225,59 @@ class SupervisorController extends Controller
             // Leer el archivo Excel y obtener los datos
             $datos = Excel::toArray([], $archivo);
             $filasConProblemas = []; // Almacenar filas con problemas
-            $primerFila = true; // Bandera para omitir la primera fila (encabezado)
+
+            // Obtener las cabeceras (primera fila)
+            $cabeceras = $datos[0][0];
+
+            // Convertir todas las cabeceras a minúsculas
+            $cabeceras = array_map('strtolower', $cabeceras);
+
+            // Buscar las columnas requeridas
+            $indiceNombres = array_search('nombres', $cabeceras);
+            $indiceApellidos = array_search('apellidos', $cabeceras);
+            $indiceDOI = array_search('doi', $cabeceras);
+            $indiceCargo = array_search('cargo', $cabeceras);
+
+            // Buscar las columnas opcionales
+            $indiceCodigoTrabajador = array_search('codigo de trabajador', $cabeceras);
+            $indiceDepartamento = array_search('departamento', $cabeceras);
+
+            // Verificar si se encontraron todas las columnas requeridas
+            if ($indiceNombres === false || $indiceApellidos === false || $indiceDOI === false || $indiceCargo === false) {
+                Session::flash('error', 'El archivo Excel no tiene todas las columnas requeridas (nombres, apellidos, doi, cargo).');
+                return redirect()->back();
+            }
 
             // Iterar sobre las filas y ejecutar el método createTrabajadorMasivo
             foreach ($datos as $hoja) {
+                $contador = 0;
                 foreach ($hoja as $fila) {
-                    if ($primerFila) {
-                        $primerFila = false; // Se marca la primera fila como leída (encabezado)
-                        continue; // Se omite la primera fila (encabezado)
+                    if ($contador == 0) { // Si es la primera fila (cabecera), se omite
+                        $contador++;
+                        continue;
                     }
 
+                    // Obtener los valores de las columnas opcionales, o usar un valor predeterminado si no se encontraron
+                    $codigoTrabajador = $indiceCodigoTrabajador !== false ? $fila[$indiceCodigoTrabajador] : null;
+                    $departamento = $indiceDepartamento !== false ? $fila[$indiceDepartamento] : null;
+
                     $result = $this->userController->createTrabajadorMasivo(
-                        $fila[0],
-                        $fila[1],
-                        $fila[2],
-                        $fila[3],
+                        $fila[$indiceNombres],
+                        $fila[$indiceApellidos],
+                        $fila[$indiceDOI],
+                        $fila[$indiceCargo],
                         $request->id_service,
-                        $id_company
+                        $id_company,
+                        $codigoTrabajador,
+                        $departamento,
                     );
 
                     if (!$result) {
                         $filasConProblemas[] = $fila; // Agregar fila a las que tienen problemas
                     }
+                    $contador++;
                 }
             }
-
             if (empty($filasConProblemas)) {
                 // Todas las creaciones fueron exitosas
                 Session::flash('success', 'Se crearon los trabajadores satisfactoriamente.');
@@ -219,7 +288,7 @@ class SupervisorController extends Controller
                 $totalFilas = count($filasConProblemas);
 
                 for ($i = 0; $i < $totalFilas; $i++) {
-                    $errorString .= $filasConProblemas[$i][2];
+                    $errorString .= $filasConProblemas[$i][$indiceDOI];
 
                     if ($i < $totalFilas - 1) {
                         $errorString .= ', ';
@@ -478,6 +547,8 @@ class SupervisorController extends Controller
             'last_name' => $worker->apellido,
             'position' => $worker->position,
             'dni' => $worker->user->doi,
+            'department' => $worker->department,
+            'employee_code' => $worker->employee_code,
         ];
 
         // Responder con el arreglo en formato JSON
@@ -621,6 +692,7 @@ class SupervisorController extends Controller
             'logo_taller' => $induction->workshop->photo,
             'data' => $data,
         ];
+
         $pdf = PDF::loadView('ReportesFormatos.asistenciaPDF', $data);
         // Configura los márgenes directamente en DOMPDF
         if ($induction->id_company == 2) {
@@ -670,15 +742,18 @@ class SupervisorController extends Controller
             ->join('services as s', 's.id', '=', 'workers.id_service')
             ->join('users as u', 'u.id', '=', 'workers.id_user')
             ->where('induction_workers.id_induction', $id_induction)
-            ->select('workers.position', 's.name as servicio', 's.id as id_service', 'workers.nombre', 'u.doi', 'workers.apellido')
+            ->select('workers.position', 'workers.department', 'workers.employee_code', 's.name as servicio', 's.id as id_service', 'workers.nombre', 'u.doi', 'workers.apellido')
             ->get();
         $logo = Company::find($induction->id_company)->url_image_desktop;
+        $dataImage = file_get_contents(public_path($induction->worker->user->signature));
+        $base64 = 'data:image/' . pathinfo($induction->worker->user->signature, PATHINFO_EXTENSION) . ';base64,' . base64_encode($dataImage);
         $data = [
             'induction_worker' => $induction_worker,
             'induction' => $induction,
             'result' => $result,
             'logo' => $logo,
-            'id_service' => $id_service
+            'id_service' => $id_service,
+            'signature' => $base64
         ];
         // Configura los márgenes directamente en DOMPDF
         if ($induction->id_company == 2) {

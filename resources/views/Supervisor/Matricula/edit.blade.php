@@ -14,21 +14,34 @@
                     <i class="fas fa-spinner fa-spin"></i> Cargando...
                 </div>
             </div>
-            <form action="{{route('matricula.edituser')}}" method="POST" id="form-edit">
+            <form action="{{ route('matricula.edituser') }}" method="POST" id="form-edit">
                 @csrf
                 <div class="modal-body">
                     <input type="hidden" name="worker_id" id="worker_id_editar" value="">
                     <div class="form-group">
                         <label for="firstName">Nombre:</label>
-                        <input type="text" class="form-control" name="name" id="name_editar" placeholder="Ingrese su nombre">
+                        <input type="text" class="form-control" name="name" id="name_editar"
+                            placeholder="Ingrese su nombre">
                     </div>
                     <div class="form-group">
                         <label for="lastName">Apellido:</label>
-                        <input type="text" class="form-control" name="last_name" id="last_name_editar" placeholder="Ingrese su apellido">
+                        <input type="text" class="form-control" name="last_name" id="last_name_editar"
+                            placeholder="Ingrese su apellido">
                     </div>
                     <div class="form-group">
                         <label for="position">Cargo:</label>
-                        <input type="text" class="form-control" name="position" id="position_editar" placeholder="Ingrese su cargo">
+                        <input type="text" class="form-control" name="position" id="position_editar"
+                            placeholder="Ingrese su cargo">
+                    </div>
+                    <div class="form-group">
+                        <label for="department">Departamento o Área: (Opcional)</label>
+                        <input type="text" class="form-control" name="department" id="department_editar"
+                            placeholder="Ingrese su departamento o área">
+                    </div>
+                    <div class="form-group">
+                        <label for="employee_code">Código de Trabajador: (Opcional)</label>
+                        <input type="text" class="form-control" name="employee_code" id="employee_code_editar"
+                            placeholder="Ingrese el código del trabajador">
                     </div>
                     <div class="form-group">
                         <label for="dni">Documento de Identidad (Referencial):</label>

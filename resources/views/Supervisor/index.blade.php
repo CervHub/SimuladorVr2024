@@ -25,7 +25,7 @@
                                         <div class=""></div>
                                     </div>
                                 </div>
-                                <canvas id="lineChart" width="573" height="187"
+                                <canvas id="lineChart" width="573" height="300"
                                     style="display: block; height: 150px; width: 459px;"
                                     class="chartjs-render-monitor"></canvas>
                             </div>
@@ -53,23 +53,27 @@
                                     style="display: block; height: 150px; width: 459px;"
                                     class="chartjs-render-monitor"></canvas>
                             </div>
-                            <div class="mt-4">
+                            <div class="mt-4 mb-4">
                                 <ul class="list-group">
                                     <li class="list-group-item">
                                         <p class="mb-1">Total de Inscripciones</p>
-                                        <h2 class="text-info">1000</h2> <!-- Reemplaza con tus datos reales -->
+                                        <h2 id="totalInscripcionesAnuales" class="text-info">1000</h2>
+                                        <!-- Reemplaza con tus datos reales -->
                                     </li>
                                     <li class="list-group-item">
                                         <p class="mb-1">Aprobados</p>
-                                        <h2 class="text-success">700</h2> <!-- Reemplaza con tus datos reales -->
+                                        <h2 id="totalAprobadosAnuales" class="text-success">700</h2>
+                                        <!-- Reemplaza con tus datos reales -->
                                     </li>
                                     <li class="list-group-item">
                                         <p class="mb-1">Desaprobados</p>
-                                        <h2 class="text-danger">200</h2> <!-- Reemplaza con tus datos reales -->
+                                        <h2 id="totalDesaprobadosAnuales" class="text-danger">200</h2>
+                                        <!-- Reemplaza con tus datos reales -->
                                     </li>
                                     <li class="list-group-item">
                                         <p class="mb-1">Pendientes de Notas</p>
-                                        <h2 class="text-warning">100</h2> <!-- Reemplaza con tus datos reales -->
+                                        <h2 id="totalPendientesAnuales" class="text-warning">100</h2>
+                                        <!-- Reemplaza con tus datos reales -->
                                     </li>
                                 </ul>
                             </div>
@@ -164,12 +168,113 @@
     </script>
 
     <script>
+        var dataporMes = @json($induccionesPorMes);
+        console.log(dataporMes);
+
+        var labelsGrafica = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre",
+            "Octubre", "Noviembre", "Diciembre"
+        ];
+
+        var aprobados = dataporMes.map(function(induccion) {
+            return induccion.estadoTrabajadores.approved;
+        });
+
+        var desaprobados = dataporMes.map(function(induccion) {
+            return induccion.estadoTrabajadores.disapproved;
+        });
+
+        var pendientes = dataporMes.map(function(induccion) {
+            return induccion.estadoTrabajadores.pending;
+        });
+
+        var totalAprobadosAnuales = aprobados.reduce(function(a, b) {
+            return a + b;
+        }, 0);
+
+        var totalDesaprobadosAnuales = desaprobados.reduce(function(a, b) {
+            return a + b;
+        }, 0);
+
+        var totalPendientesAnuales = pendientes.reduce(function(a, b) {
+            return a + b;
+        }, 0);
+
+        var totalInscripcionesAnuales = totalAprobadosAnuales + totalDesaprobadosAnuales + totalPendientesAnuales;
+
+        $('#totalAprobadosAnuales').text(totalAprobadosAnuales);
+        $('#totalDesaprobadosAnuales').text(totalDesaprobadosAnuales);
+        $('#totalPendientesAnuales').text(totalPendientesAnuales);
+        $('#totalInscripcionesAnuales').text(totalInscripcionesAnuales);
+
+        if (window.lineChart instanceof Chart) {
+            window.lineChart.destroy();
+        }
+
+        var lineChartCtx = document.getElementById("lineChart").getContext("2d");
+        window.lineChart = new Chart(lineChartCtx, {
+            type: "line",
+            data: {
+                labels: labelsGrafica,
+                datasets: [{
+                        label: "Aprobados",
+                        data: aprobados,
+                        fill: false,
+                        borderColor: "#2196f3",
+                        backgroundColor: "#2196f3",
+                        borderWidth: 1,
+                        smooth: 0.4,
+                    },
+                    {
+                        label: "Desaprobados",
+                        data: desaprobados,
+                        fill: false,
+                        borderColor: "#f32196",
+                        backgroundColor: "#f32196",
+                        borderWidth: 1,
+                        smooth: 0.4,
+                    },
+                    {
+                        label: "Pendientes",
+                        data: pendientes,
+                        fill: false,
+                        borderColor: "#4caf50",
+                        backgroundColor: "#4caf50",
+                        borderWidth: 1,
+                        smooth: 0.4,
+                    },
+                ],
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'Evolución de Aprobados, Desaprobados y Pendientes de Nota a lo largo del año'
+                },
+                tooltips: {
+                    callbacks: {
+                        title: function(tooltipItem, data) {
+                            var index = tooltipItem[0]['index'];
+                            return labelsGrafica[index];
+                        },
+                        label: function(tooltipItem, data) {
+                            var dataset = data['datasets'][tooltipItem['datasetIndex']];
+                            return dataset['data'][tooltipItem['index']];
+                        }
+                    }
+                },
+                legend: {
+                    position: 'bottom',
+                }
+            }
+        });
+    </script>
+
+    <script>
         var donutChartCtxAnual = document.getElementById("donutChartAnual").getContext("2d");
 
         var dataDonutChartAnual = {
             labels: ["Aprobados", "Desaprobados", "Pendientes de Notas"],
             datasets: [{
-                data: [700, 200, 100], // Reemplaza con tus datos reales
+                data: [totalAprobadosAnuales, totalDesaprobadosAnuales, totalPendientesAnuales],
                 backgroundColor: ["#28a745", "#dc3545", "#ffc107"],
                 hoverBackgroundColor: ["#218838", "#c82333", "#ffb21a"],
                 borderWidth: 1,
@@ -218,74 +323,6 @@
             type: 'doughnut',
             data: dataDonutChart,
             options: donutChartOptions,
-        });
-    </script>
-
-    <script>
-        // Datos genéricos
-        var labelsGrafica = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre",
-            "Octubre", "Noviembre", "Diciembre"
-        ];
-        var aprobados = [150, 180, 200, 220, 190, 210, 180, 200, 230, 250, 240, 220];
-        var desaprobados = [20, 15, 10, 25, 30, 20, 15, 10, 5, 30, 25, 20];
-        var pendientes = [30, 25, 35, 40, 35, 30, 25, 20, 15, 40, 35, 30];
-
-        if (window.lineChart instanceof Chart) {
-            window.lineChart.destroy();
-        }
-
-        var lineChartCtx = document.getElementById("lineChart").getContext("2d");
-        window.lineChart = new Chart(lineChartCtx, {
-            type: "line",
-            data: {
-                labels: labelsGrafica,
-                datasets: [{
-                        label: "Aprobados",
-                        data: aprobados,
-                        fill: false,
-                        borderColor: "#2196f3",
-                        backgroundColor: "#2196f3",
-                        borderWidth: 1,
-                    },
-                    {
-                        label: "Desaprobados",
-                        data: desaprobados,
-                        fill: false,
-                        borderColor: "#f32196",
-                        backgroundColor: "#f32196",
-                        borderWidth: 1,
-                    },
-                    {
-                        label: "Pendientes",
-                        data: pendientes,
-                        fill: false,
-                        borderColor: "#4caf50",
-                        backgroundColor: "#4caf50",
-                        borderWidth: 1,
-                    },
-                ],
-            },
-            options: {
-                title: {
-                    display: true,
-                    text: 'Evolución de Aprobados, Desaprobados y Pendientes de Nota a lo largo del año'
-                },
-                tooltips: {
-                    callbacks: {
-                        title: function(tooltipItem, data) {
-                            var index = tooltipItem[0]['index'];
-                            return labelsGrafica[index];
-                        },
-                        label: function(tooltipItem, data) {
-                            var dataset = data['datasets'][tooltipItem['datasetIndex']];
-                            return dataset['data'][tooltipItem['index']];
-                        }
-                    }
-                },
-                legend: {
-                    position: 'bottom',
-                }
-            }
         });
     </script>
 

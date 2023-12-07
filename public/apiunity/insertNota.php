@@ -55,7 +55,7 @@ try {
 
           if ($count['count'] == 0) {
             // No existe un registro, puedes insertarlo
-            $stmtInsert = $db->prepare('INSERT INTO detail_induction_workers (induction_worker_id, "case", identified, risk_level, correct_measure, "time", difficulty, report, note, note_reference, "start_date", end_date, num_errors,"json",rol) VALUES (:induction_worker_id, :case, :identified, :risk_level, :correct_measure, :time, :difficulty, :report, :note, :note_reference, :start_date, :end_date, :num_errors,:json,:rol)');
+            $stmtInsert = $db->prepare('INSERT INTO detail_induction_workers (induction_worker_id, "case", identified, risk_level, correct_measure, "time", difficulty, report, note, note_reference, "start_date", end_date, num_errors,"json",rol, created_at, updated_at) VALUES (:induction_worker_id, :case, :identified, :risk_level, :correct_measure, :time, :difficulty, :report, :note, :note_reference, :start_date, :end_date, :num_errors,:json,:rol, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)');            
             $stmtInsert->bindParam(':induction_worker_id', $cabecera_id);
             $stmtInsert->bindParam(':case', $item['case']);
             $stmtInsert->bindParam(':identified', $item['identified']);

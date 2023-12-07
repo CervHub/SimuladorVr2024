@@ -8,7 +8,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form action="{{route('matricula.crearuser')}}" method="POST">
+            <form action="{{ route('matricula.crearuser') }}" method="POST">
                 @csrf
                 <div class="modal-body">
                     <div class="form-group">
@@ -21,16 +21,27 @@
                     </div>
                     <div class="form-group">
                         <label for="lastName">Cargo:</label>
-                        <input type="text" class="form-control" name="position" placeholder="Ingrese su apellido">
+                        <input type="text" class="form-control" name="position" placeholder="Ingrese su Cargo">
+                    </div>
+                    <div class="form-group">
+                        <label for="department">Departamento o Área: (Opcional)</label>
+                        <input type="text" class="form-control" name="department"
+                            placeholder="Ingrese su departamento o área">
+                    </div>
+                    <div class="form-group">
+                        <label for="employee_code">Código de Trabajador:</label>
+                        <input type="text" class="form-control" name="employee_code"
+                            placeholder="Ingrese el código del trabajador">
                     </div>
                     <div class="form-group">
                         <label for="ruc">Documento de Identidad:</label>
-                        <input type="text" class="form-control" id="doi" name="doi" placeholder="Ingrese su Documento de Identidad" pattern="[0-9]*" inputmode="numeric">
-                        <small class="form-text text-muted small">*Solo números</small>
+                        <input type="text" class="form-control" id="doi" name="doi"
+                            placeholder="Ingrese su Documento de Identidad" pattern="[0-9]*" inputmode="numeric">
+                        {{-- <small class="form-text text-muted small">*Solo números</small> --}}
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <input type="hidden" value="{{$id_service}}" name="id_service">
+                    <input type="hidden" value="{{ $id_service }}" name="id_service">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-primary">Guardar</button>
                 </div>

@@ -40,4 +40,24 @@ class Induction extends Model
     {
         return $this->hasMany(InductionWorker::class, 'id_induction');
     }
+    public function workersStatus()
+    {
+        $approved = $this->hasMany(InductionWorker::class, 'id_induction')
+            ->where('final_note', '>=', $this->minimum_passing_note ?? 50)
+            ->get();
+
+        $disapproved = $this->hasMany(InductionWorker::class, 'id_induction')
+            ->where('final_note', '<', $this->minimum_passing_note ?? 50)
+            ->get();
+
+        $pending = $this->hasMany(InductionWorker::class, 'id_induction')
+            ->whereNull('final_note')
+            ->get();
+
+        return [
+            'approved' => count($approved),
+            'disapproved' => count($disapproved),
+            'pending' => count($pending),
+        ];
+    }
 }

@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Worker;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str; // Importa la clase Str para generar contraseñas únicas
+use Illuminate\Support\Facades\File;
 
 class UserController extends Controller
 {
@@ -96,7 +97,14 @@ class UserController extends Controller
         try {
 
             $password = Str::random(12); // Genera una cadena aleatoria de 12 caracteres
-
+            $filename = "";
+            if ($request->hasFile('signature')) {
+                $signatureImage = $request->file('signature');
+                $uniqueFileName = time() . '_' . uniqid() . '.' . $signatureImage->getClientOriginalExtension();
+                $destinationPath = public_path('signatures');
+                $signatureImage->move($destinationPath, $uniqueFileName);
+                $filename = 'signatures/' . $uniqueFileName;
+            }
             // Nuevo Entrenador
             if ($exists_user) {
                 $user = new User();
@@ -105,6 +113,7 @@ class UserController extends Controller
                 $user->status = '1';
                 $user->doi = $request->doi;
                 $user->email = $correo;
+                $user->signature = $filename;
                 $user->password = bcrypt($password); // Encripta la contraseña
                 $user->password_text = $password;
                 $user->save();
@@ -122,6 +131,7 @@ class UserController extends Controller
             $new_worker->apellido = $request->last_name;
             $new_worker->id_service = $id_service;
             $new_worker->position = $request->position;
+            $new_worker->department = $request->department;
             $new_worker->status = '1';
             $new_worker->code_worker = $codeWorker;
             $new_worker->save();
@@ -131,6 +141,7 @@ class UserController extends Controller
             return false;
         }
     }
+
     public function detalle($id)
     {
         $data = Worker::find($id);
@@ -144,8 +155,26 @@ class UserController extends Controller
 
             $worker->nombre = $request->name;
             $worker->apellido = $request->last_name;
+            $worker->department = $request->department;
             $worker->save();
 
+            if ($request->hasFile('signature')) {
+                // Eliminar la imagen anterior si existe
+                $oldSignature = $worker->user->signature;
+                if ($oldSignature && File::exists(public_path($oldSignature))) {
+                    File::delete(public_path($oldSignature));
+                }
+
+                // Guardar la nueva imagen
+                $signatureImage = $request->file('signature');
+                $uniqueFileName = time() . '_' . uniqid() . '.' . $signatureImage->getClientOriginalExtension();
+                $destinationPath = public_path('signatures');
+                $signatureImage->move($destinationPath, $uniqueFileName);
+                $filename = 'signatures/' . $uniqueFileName;
+
+                $worker->user->signature = $filename;
+                $worker->user->save();
+            }
             return true;
         } catch (\Throwable $th) {
             Session::flash('error', 'Ocurrio algo inesperado al actualizar los datos.');
@@ -215,7 +244,9 @@ class UserController extends Controller
             $new_worker->id_service = $request->id_service;
             $new_worker->position = $request->position;
             $new_worker->status = '1';
+            $new_worker->department = $request->department;
             $new_worker->code_worker = $codeWorker;
+            $new_worker->employee_code = $request->employee_code;
             $new_worker->save();
 
             return true;
@@ -224,7 +255,7 @@ class UserController extends Controller
         }
     }
 
-    public function createTrabajadorMasivo($name, $last_name, $doi, $position, $id_service, $id_company)
+    public function createTrabajadorMasivo($name, $last_name, $doi, $position, $id_service, $id_company, $codigo, $department)
     {
         //Usuario Para EServicio
         // Generar correo basado en el nombre y convertir a minúsculas
@@ -277,6 +308,8 @@ class UserController extends Controller
             $new_worker->apellido = $last_name;
             $new_worker->status = '1';
             $new_worker->code_worker = $codeWorker;
+            $new_worker->department = $department;
+            $new_worker->employee_code = $codigo;  
             $new_worker->save();
 
             return true;
