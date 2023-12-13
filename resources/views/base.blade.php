@@ -154,7 +154,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <!-- End custom js for this page-->
     @yield('js')
-
+    @yield('jscontent')
     <!-- Agrega jQuery (asegúrate de que la ruta del archivo sea correcta) -->
 
     <script>

@@ -246,9 +246,9 @@ class UserController extends Controller
             $new_worker->status = '1';
             $new_worker->department = $request->department;
             $new_worker->code_worker = $codeWorker;
+            $new_worker->celular = $request->celular ?? '';
             $new_worker->employee_code = $request->employee_code;
             $new_worker->save();
-
             return true;
         } catch (\Throwable $th) {
             return false;
@@ -309,7 +309,7 @@ class UserController extends Controller
             $new_worker->status = '1';
             $new_worker->code_worker = $codeWorker;
             $new_worker->department = $department;
-            $new_worker->employee_code = $codigo;  
+            $new_worker->employee_code = $codigo;
             $new_worker->save();
 
             return true;

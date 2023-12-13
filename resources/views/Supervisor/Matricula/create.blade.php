@@ -24,7 +24,7 @@
                         <input type="text" class="form-control" name="position" placeholder="Ingrese su Cargo">
                     </div>
                     <div class="form-group">
-                        <label for="department">Departamento o Área: (Opcional)</label>
+                        <label for="department">Gerencia: (Opcional)</label>
                         <select class="form-control" id="department" name="department">
                             <option value="">Seleccione un departamento</option>
                             @foreach ($departamentos as $departamento)
@@ -34,20 +34,26 @@
                     </div>
 
                     <div class="form-group" id="areaDiv" style="display: none;">
-                        <label for="area">Área:</label>
+                        <label for="area">Departamento:</label>
                         <select class="form-control" id="area" name="area">
                             <!-- Las áreas se llenarán aquí con jQuery -->
                         </select>
 
                         <!-- Elemento de carga -->
                         <div id="loading" style="display: none;">
-                            <p>Cargando áreas...</p>
+                            <p>Cargando Departamentos...</p>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="employee_code">Código de Trabajador:</label>
+                        <label for="employee_code">Código de Trabajador (Opcional):</label>
                         <input type="text" class="form-control" name="employee_code"
                             placeholder="Ingrese el código del trabajador">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cellphone_number">Número de Celular (Opcional):</label>
+                        <input type="text" class="form-control" name="celular"
+                            placeholder="Ingrese el número de celular">
                     </div>
                     <div class="form-group">
                         <label for="ruc">Documento de Identidad:</label>

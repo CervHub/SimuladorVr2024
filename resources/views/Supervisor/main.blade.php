@@ -38,3 +38,9 @@
         </li>
     </ul>
 @endsection
+
+@section('js')
+    <script>
+        console.log("Detecto");
+    </script>
+@endsection

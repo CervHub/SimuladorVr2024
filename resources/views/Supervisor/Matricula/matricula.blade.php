@@ -18,21 +18,21 @@
                                 <i class="icon-plus"></i> <!-- Icono de agregar aquí -->
                                 Registrar Trabajador
                             </a>
-                            <a href="{{ route('induction.formato.masivo') }}" class="btn btn-success text-white p-3 btn-sm">
+                            {{-- <a href="{{ route('induction.formato.masivo') }}" class="btn btn-success text-white p-3 btn-sm">
                                 <i class="mdi mdi-arrow-down-bold-circle-outline"></i> <!-- Icono de descarga aquí -->
                                 Descargar Formato
-                            </a>
+                            </a> --}}
                         </div>
                     </div>
                     <div class="">
-                        <form action="{{ route('matricula.cargamasiva') }}" method="POST" enctype="multipart/form-data">
+                        {{-- <form action="{{ route('matricula.cargamasiva') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <input type="hidden" value="{{ $id_service }}" name="id_service">
                             <input type="file" name="archivo_trabajadores" class="form-control-file btn btn-sm mt-2"
                                 accept=".xlsx" required>
                             <button type="submit" class="btn btn-success btn-sm mt-2 "><i class="fas fa-upload"></i>
                                 Importar trabajadores</button>
-                        </form>
+                        </form> --}}
                     </div>
                 </div>
 
@@ -130,11 +130,12 @@
     @include('Supervisor.Matricula.delete')
 @endsection
 
-@section('js')
+@section('jscontent')
     <!-- Activar DataTables -->
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
     <script>
+        console.log("Estamos adentro");
         $(document).ready(function() {
             $('#miTabla').DataTable({
                 searching: false,
@@ -168,6 +169,7 @@
 
     <script>
         function editar(id) {
+            console.log("Holi");
             $('#loading-overlay').show();
             $('#form-edit').hide();
             console.log("Id para editar", id)
@@ -189,8 +191,9 @@
                     $('#name_editar').val(response.name);
                     $('#last_name_editar').val(response.last_name);
                     $('#position_editar').val(response.position);
-                    $('#department_editar').val(response.department);
+                    // $('#department_editar').val(response.department);
                     $('#dni_editar').val(response.dni);
+                    $('#celular_editar').val(response.celular);
                     $('#worker_id_editar').val(response.id);
                     $('#employee_code_editar').val(response.employee_code);
                     $('#loading-overlay').hide();

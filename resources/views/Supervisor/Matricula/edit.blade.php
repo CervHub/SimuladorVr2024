@@ -33,16 +33,23 @@
                         <input type="text" class="form-control" name="position" id="position_editar"
                             placeholder="Ingrese su cargo">
                     </div>
-                    <div class="form-group">
+                    {{-- <div class="form-group">
                         <label for="department">Departamento o Área: (Opcional)</label>
                         <input type="text" class="form-control" name="department" id="department_editar"
                             placeholder="Ingrese su departamento o área">
-                    </div>
+                    </div> --}}
                     <div class="form-group">
                         <label for="employee_code">Código de Trabajador: (Opcional)</label>
                         <input type="text" class="form-control" name="employee_code" id="employee_code_editar"
                             placeholder="Ingrese el código del trabajador">
                     </div>
+
+                    <div class="form-group">
+                        <label for="cellphone_number">Número de Celular: (Opcional)</label>
+                        <input type="text" class="form-control" name="celular" id="celular_editar"
+                            placeholder="Ingrese el número de celular">
+                    </div>
+
                     <div class="form-group">
                         <label for="dni">Documento de Identidad (Referencial):</label>
                         <input type="text" class="form-control" name="dni" id="dni_editar" readonly>

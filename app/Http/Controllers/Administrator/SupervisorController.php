@@ -182,6 +182,7 @@ class SupervisorController extends Controller
             $worker->employee_code = $request->employee_code;
             $worker->position = $request->position;
             $worker->department = $request->department;
+            $worker->celular = $request->celular;
             $worker->save();
 
             // Éxito
@@ -553,6 +554,7 @@ class SupervisorController extends Controller
             'dni' => $worker->user->doi,
             'department' => $worker->department,
             'employee_code' => $worker->employee_code,
+            'celular' => $worker->celular,
         ];
 
         // Responder con el arreglo en formato JSON
