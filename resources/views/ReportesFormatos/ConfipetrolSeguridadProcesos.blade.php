@@ -348,11 +348,11 @@
                         </div>
                         <div class="dl-row">
                             <dt class="dl-term-secondary">Nombre:</dt>
-                            <dd class="dl-definition">{{ $worker->user->name }}</dd>
+                            <dd class="dl-definition">{{ $worker->nombre }}</dd>
                         </div>
                         <div class="dl-row">
                             <dt class="dl-term-secondary">Apellidos:</dt>
-                            <dd class="dl-definition">{{ $worker->user->last_name }}</dd>
+                            <dd class="dl-definition">{{ $worker->apellido }}</dd>
                         </div>
                         {{-- <div class="dl-row">
                             <dt class="dl-term-secondary">Fecha:</dt>
@@ -400,12 +400,8 @@
                         </div>
                         <div class="dl-row">
                             <dt class="dl-term-secondary">Taller:</dt>
-                            @if ($detail_induction_worker[0]->rol != '' or $detail_induction_worker[0]->rol != '-')
-                                <dd class="dl-definition">{{ strtoupper($induction->alias) }} /
-                                    {{ strtoupper($detail_induction_worker[0]->rol) }}</dd>
-                            @else
-                                <dd class="dl-definition">{{ strtoupper($induction->alias) }}</dd>
-                            @endif
+
+                            <dd class="dl-definition">{{ strtoupper($induction->alias) }}</dd>
                         </div>
                         @php
                             $fechaInicio = new DateTime($data->start_date);
@@ -425,7 +421,7 @@
                         </div>
                         <div class="dl-row">
                             <dt class="dl-term-secondary">Duración:</dt>
-                            <dd class="dl-definition">{{ $duracionEnHoras }}</dd>
+                            <dd class="dl-definition">{{ $duracionEnHoras }} </dd>
                         </div>
                     </dl>
                 </td>
@@ -433,7 +429,7 @@
                     <dl class="dl-container">
                         <div class="dl-row">
                             <img style="border-radius: 25px;"
-                                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTl90mjnnqvi6gWjOUEnhQ19WYquDnoOb0bNKIkohv6ObMKACZsn9-DBsGvXb1KjuRJhGM&usqp=CAU"
+                                src="{{$logo_taller}}"
                                 width="300px" alt="">
                         </div>
                     </dl>
@@ -449,25 +445,33 @@
             <tr>
                 <th>Descripción</th>
                 <th>Nº Errores</th>
-                <!-- <th>Nivel de riesgo</th>
-                <th>Medida correcta</th>
-                <th>Tiempo</th> -->
+                <th>Puntaje</th>
+                {{-- <th>Medida correcta</th>
+                <th>Tiempo</th>  --}}
             </tr>
+            @php
+                $sumatoria = 0;
+            @endphp
+
             @foreach ($detail_induction_worker as $key => $data)
-                <tr style="height: 20px;"> <!-- Ajusta la altura según tus preferencias -->
+                @php
+                    $multiplicador = $data->case == 'EPPs' ? 1 : 5;
+                    $resultado = round($data->num_errors, 0) * $multiplicador;
+                    $sumatoria += $resultado;
+                @endphp
+                <tr style="height: 20px;">
                     <td style="text-align: left;">{{ $key + 1 }}. {{ $data->case }}</td>
                     <td>{{ round($data->num_errors, 0) }}</td>
-                    <!-- <td>{{ $data->risk_level }}</td>
-                <td>{{ $data->correct_measure }}</td>
-                <td>{{ date('H:i', strtotime($data->time)) }}</td> -->
+                    <td>{{ $resultado }}</td>
                 </tr>
             @endforeach
+
             <tr>
+                <th></th>
                 <th>TOTAL</th>
-                <th>{{ round($detail_induction_worker->sum('num_errors')) }}</th>
-                <!-- <th>{{ $detail_induction_worker->sum('risk_level') }}</th>
-                <th>{{ $detail_induction_worker->sum('correct_measure') }}</th>
-                <th>-</th> -->
+                <th>{{ $sumatoria }}</th>
+                {{-- <th>{{ $detail_induction_worker->sum('correct_measure') }}</th>
+                <th>-</th> --}}
             </tr>
         </table>
         <br>
@@ -478,11 +482,11 @@
                 </td>
                 <td>
                     @php
-                        $total_errores = round($detail_induction_worker->sum('num_errors'));
+                        $total_errores = $sumatoria;
                     @endphp
                     <table style="border-collapse: collapse; border: 1px solid black;">
                         <tr style="border-collapse: collapse; border: 1px solid black;">
-                            <td style="border-collapse: collapse; border: 1px solid black;" class="text-bold">Total de
+                            <td style="border-collapse: collapse; border: 1px solid black;" class="text-bold">Puntaje de
                                 Errores:
                             </td>
                             <td style="border-collapse: collapse; border: 1px solid black;">

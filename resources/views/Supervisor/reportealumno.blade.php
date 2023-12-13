@@ -148,7 +148,7 @@
                         '<th>Num Intento</th>' +
                         '<th>Fecha Inicio</th>' +
                         '<th>Fecha Fin</th>' +
-                        '<th>Nota Obtenida</th>' +
+                        // '<th>Nota Obtenida</th>' +
                         '<th>Acciones</th>' +
                         '</tr>' +
                         '</thead>' +
@@ -160,7 +160,7 @@
                                 '<td>' + item.intento + '</td>' +
                                 '<td>' + item.date_start + '</td>' +
                                 '<td>' + item.date_end + '</td>' +
-                                '<td>' + item.note + '</td>' +
+                                // '<td>' + item.note + '</td>' +
                                 '<td>' +
                                 '<a href="{{url('view/pdf')}}/' + induccion.id_induction_workers + '/' + item.intento +'" target="_blank" class="btn btn-custom btn-primary text-white me-0">' +
                                 '<span class="mdi mdi-file-download"> Descargar Reporte</span>' +

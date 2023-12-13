@@ -700,7 +700,6 @@ class SupervisorController extends Controller
             'intento' => $intento,
             'intentos' => $induction_worker->num_report,
         ];
-
         $pdf = PDF::loadView('ReportesFormatos.asistenciaPDF', $data);
         $data_report = json_decode($induction_worker->data_report, true);
         $isValid = isset($data_report) && is_array($data_report) && array_key_exists($intento, $data_report);
@@ -714,12 +713,25 @@ class SupervisorController extends Controller
                 $data['nota'] = $aciertos;
                 $data['imagen'] = "https://quickchart.io/chart?c={type:'doughnut', data:{datasets:[{data:[$aciertos,$errores],backgroundColor:['rgb(32,164,81)','rgb(255,0,0)'],}],labels:['Puntaje Inicial', 'Nº Errores'],},options:{title:{display:false},plugins: { datalabels: { color: 'white' } },},}";
 
-                if ($induction->alias == "ANÁLISIS DE FALLAS") {
+                if (strtolower($induction->alias) == "análisis de fallas") {
                     $data['json'] = json_decode($detail_induction_worker[0]->json, true);
                     $pdf = PDF::loadView('ReportesFormatos.ConfipetrolAnalisisFallas', $data);
+                } elseif (strtolower($induction->alias) == "seguridad de procesos") {
+                    $data['imagen'] = "https://quickchart.io/chart?c={type:'doughnut', data:{datasets:[{data:[$aciertos,$errores],backgroundColor:['rgb(32,164,81)','rgb(255,0,0)'],}],labels:['Puntaje Inicial', 'Puntaje de Errores'],},options:{title:{display:false},plugins: { datalabels: { color: 'white' } },},}";
+
+                    $errores = 0;
+                    foreach ($detail_induction_worker as $detail) {
+                        $multiplicador = $detail->case == 'EPPs' ? 1 : 5;
+                        $errores += round($detail->num_errors) * $multiplicador;
+                    }
+                    $aciertos = $induction_worker->puntaje - $errores;
+                    $data['nota'] = $aciertos;
+                    $pdf = PDF::loadView('ReportesFormatos.ConfipetrolSeguridadProcesos', $data);
                 } else {
                     $pdf = PDF::loadView('ReportesFormatos.ConfipetrolNotaPdf', $data);
                 }
+
+                return $pdf->stream('reporte.pdf');
             } else if ($induction->id_company == 3) {
                 $errores = round($detail_induction_worker->sum('num_errors'));
                 $aciertos = $induction_worker->puntaje - $errores;
