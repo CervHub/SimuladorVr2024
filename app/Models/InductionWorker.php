@@ -23,6 +23,12 @@ class InductionWorker extends Model
         return $this->hasMany(DetailInductionWorker::class, 'induction_worker_id');
     }
 
+    public function notaConfipetrol()
+    {
+        $detail = $this->detail()->first();
+
+        return $detail ? intval($detail->note) : '-';
+    }
     public function detailsByReport($reportValue)
     {
         return $this->hasMany(DetailInductionWorker::class, 'induction_worker_id')
@@ -43,4 +49,6 @@ class InductionWorker extends Model
 
         return !empty($detailsCount) ? strval(intval(max($detailsCount))) : "-";
     }
+
+
 }

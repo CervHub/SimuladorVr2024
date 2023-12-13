@@ -97,7 +97,7 @@
                         </span>
                     </td>
                     <td colspan="11">
-                        {{$induction->worker->user->name}} {{$induction->worker->user->last_name}}
+                        {{$induction->worker->nombre}} {{$induction->worker->apellido}}
                     </td>
                 </tr>
                 <tr>
@@ -178,7 +178,7 @@
                     <td class="column__key--black text-center">{{ $data->worker->nombre }} {{ $data->worker->apellido }}</td>
                     <td class="column__key--black text-center">{{ $data->worker->position }}</td>
                     <td class="text-center" style="width: 100px;">{{$data->worker->service->name}}</td>
-                    <td class="text-center">-</td>
+                    <td class="text-center">{{$data->notaConfipetrol()}}</td>
                 </tr>
                 <?php $rowNumber++; ?>
                 @endif
