@@ -14,6 +14,8 @@ use App\Http\Controllers\Administrator\SupervisorController;
 // Controladores para User
 use App\Http\Controllers\User\UserController;
 
+use App\Http\Controllers\DepartamentoController;
+
 //Authentication
 use App\Http\Controllers\AuthenticationController;
 use PhpOffice\PhpSpreadsheet\Style\Supervisor;
@@ -74,6 +76,16 @@ Route::middleware(['admin', 'auth'])->group(function () {
     // MOdificacion para actualizar rutas de los talleres desde el administrador
     Route::get('administrador/talleres', [AdminController::class, 'talleres'])->name('administrador.talleres');
     Route::post('administrador/talleres/update', [AdminController::class, 'updateTalleres'])->name('administrador.talleres.update');
+
+    // Rutas para los departamentos
+    Route::get('departamentos', [DepartamentoController::class, 'departamento'])->name('departamentos');
+    Route::post('departamentos/create', [DepartamentoController::class, 'store'])->name('administrador.departamentos.store');
+    // Route::get('administrador/departamentos/{id}/editar', [DepartamentoController::class, 'edit'])->name('administrador.departamentos.editar');
+    // Route::post('administrador/departamentos/{id}', [DepartamentoController::class, 'update'])->name('administrador.departamentos.actualizar');
+
+    // // Rutas para las áreas de los departamentos
+    Route::get('administrador/departamentos/{id}/areas', [DepartamentoController::class, 'areas'])->name('administrador.departamentos.areas');
+    Route::post('administrador/areas/store', [DepartamentoController::class, 'agregarArea'])->name('administrador.area.store');
 });
 
 //BEGIN Rutas para Entrenador
@@ -119,6 +131,8 @@ Route::middleware(['entrenador', 'auth'])->group(function () {
 
     Route::get('reporte/alumno', [SupervisorController::class, 'reportealumno'])->name('reporte.alumno');
     Route::post('reporte/alumno/detail', [SupervisorController::class, 'reportealumnodetail'])->name('reportealumnodetail');
+
+    Route::get('/getAreas/{id}', [DepartamentoController::class, 'getAreas']);
 });
 
 Route::get('profile', [ProfileController::class, 'perfil'])->name('perfil');

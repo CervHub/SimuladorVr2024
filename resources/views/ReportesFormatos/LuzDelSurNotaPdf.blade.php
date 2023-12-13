@@ -133,7 +133,7 @@
                 </td>
             </tr>
             <tr>
-                <td style=" padding: 0;" class="text-center text-small text-bold">
+                <td style=" padding: 0;" class="text-center text-small text-bold"> 1
                 </td>
             </tr>
         </tbody>
@@ -145,7 +145,7 @@
             Evento: {{ $induction->alias }}
             Sesión 1: Fecha : {{ \Carbon\Carbon::parse($induction->date_start)->format('d/m/Y') }}
             SALA DE CAPACITACION SAN JUAN
-            Expositor : {{ $induction->worker->user->name }} {{ $induction->worker->user->last_name }}
+            Expositor : {{ $induction->worker->nombre }} {{ $induction->worker->apellido }}
         </h3>
     </section>
 
@@ -171,19 +171,27 @@
                 <tr>
                     <td class="text-bold" style="width: 25%;">Documento de Identidad:</td>
                     <td style="width: 25%;">{{ $worker->user->doi }}</td>
-                    <td rowspan="5" style="width: 50%; text-align: center; vertical-align: middle;">
+                    <td rowspan="6" style="width: 50%; text-align: center; vertical-align: middle;">
                         <div style="padding-left: 20px;">
                             <dl class="dl-container bg-light mt-2 mb-2"
                                 style="border-radius: 25px; text-align: center;">
+                                @php
+                                    $total = 0;
+                                    foreach ($detail_induction_worker as $data) {
+                                        $total += $data->identified == 1 ? 10 : 0;
+                                    }
+                                    $maxScore = 10 * count($detail_induction_worker);
+                                    $notaPonderada = ($total / $maxScore) * $induction_worker->puntaje;
+                                @endphp
                                 <div class="dl-row">
-                                    @php $notaPonderada=$nota; @endphp
-                                    <dt class="dl-term fs-20 line-height-12" style="font-weight: bold; margin: 0;">
+                                    <dt class="dl-term fs-20 line-height-12"
+                                        style="font-weight: bold; margin: 0; font-size:22px;">
                                         {{ number_format($notaPonderada, 0) }}/{{ $induction_worker->puntaje }}
                                     </dt>
                                 </div>
                                 <div class="dl-row">
                                     <dt class="dl-term fs-20 line-height-12"
-                                        style="font-weight: bold; margin: 0; padding: 5px;">
+                                        style="font-weight: bold; margin: 0; padding: 5px; font-size:17px;">
                                         @if ($notaPonderada > 75)
                                             <span style="color: green;">Aprobado</span>
                                         @else
@@ -197,19 +205,23 @@
                 </tr>
                 <tr>
                     <td class="text-bold">Nombre:</td>
-                    <td>{{ $worker->user->name }}</td>
+                    <td>{{ $worker->nombre}}</td>
                 </tr>
                 <tr>
                     <td class="text-bold">Apellidos:</td>
-                    <td>{{ $worker->user->last_name }}</td>
+                    <td>{{ $worker->apellido }}</td>
                 </tr>
                 <tr>
-                    <td class="text-bold">Fecha:</td>
-                    <td>{{ \Carbon\Carbon::now()->format('Y-m-d H:i:s') }}</td>
+                    <td class="text-bold">Fecha Inicio:</td>
+                    <td>{{ date('d/m/Y H:i', strtotime($data->start_date)) }}</td>
                 </tr>
                 <tr>
-                    <td class="text-bold">Duración:</td>
+                    <td class="text-bold">Duración(Min):</td>
                     <td>{{ $duracionEnHoras }}</td>
+                </tr>
+                <tr>
+                    <td class="text-bold">Número de reporte:</td>
+                    <td>{{$intento}}/{{ $intentos }}</td>
                 </tr>
             </tbody>
         </table>
@@ -223,25 +235,35 @@
                 <tr>
                     <th class="text-small2" style="width: 5%">ITEM</th>
                     <th class="text-small2" style="width: 50%">DESCRIPCIÓN</th>
-                    <th class="text-small2" style="width: 15%">DURACIÓN</th>
+                    <th class="text-small2" style="width: 15%">DURACIÓN(MIN)</th>
                     <th class="text-small2" style="width: 15%">PUNTAJE</th>
                 </tr>
             </thead>
             <tbody>
+                @php
+                    $total = 0;
+                @endphp
                 @foreach ($detail_induction_worker as $key => $data)
+                    @php
+                        $total += $data->identified == 1 ? 10 : 0;
+                    @endphp
                     <tr style="height: 20px;">
-                        <td style="text-align: left;">{{ $key + 1 }}</td>
-                        <td>{{ $data->description }}</td>
-                        <td>{{ $data->duration }}</td>
-                        <td>{{ $data->score }}</td>
+                        <td style="text-align: center;">{{ $key + 1 }}</td>
+                        <td style="text-align: left;">{{ $data->case }}</td>
+                        <td style="text-align: center;">{{ $data->time }}</td>
+                        <td style="text-align: center;">{{ $data->identified == 1 ? 10 : 0 }}</td>
                     </tr>
                 @endforeach
+                <tr>
+                    <td colspan="3" style="text-align: right;">Total:</td>
+                    <td style="text-align: center;">{{ $total }}</td>
+                </tr>
                 <!-- Add more rows as needed -->
             </tbody>
         </table>
 
         <br>
-        <table class="no-border" style="width: 100%; border: 1px solid white; !important">
+        {{-- <table class="no-border" style="width: 100%; border: 1px solid white; !important">
             <tr style="background-color: white;">
                 <td style="vertical-align: top; width: 300px; border: none !important;">
                     <img src="{{ $imagen }}" width="300px" alt="">
@@ -274,7 +296,7 @@
 
                 </td>
             </tr>
-        </table>
+        </table> --}}
 
 
     </section>

@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Session;
 use App\Models\Service;
 use App\Models\Worker;
 use App\Models\Workshop;
+use App\Models\Departamento;
 use App\Models\WorkshopCompany;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\InductionWorker;
@@ -149,7 +150,10 @@ class SupervisorController extends Controller
         $nombre_service = Service::find($id_service)->name;
         $workers = Worker::where('id_company', $id_company)->where('id_service', $id_service)->where('status', '1')->get();
 
-        return view('Supervisor.Matricula.matricula', compact('id_service', 'workers', 'nombre_service'));
+        // Recuperar los departamentos de la compañía actual
+        $departamentos = Departamento::where('company_id', $id_company)->get();
+
+        return view('Supervisor.Matricula.matricula', compact('id_service', 'workers', 'nombre_service', 'departamentos'));
     }
 
     public function crearuser(Request $request)
@@ -691,31 +695,56 @@ class SupervisorController extends Controller
             'logo' => $logo,
             'logo_taller' => $induction->workshop->photo,
             'data' => $data,
+            'intento' => $intento,
+            'intentos' => $induction_worker->num_report,
         ];
 
         $pdf = PDF::loadView('ReportesFormatos.asistenciaPDF', $data);
-        // Configura los márgenes directamente en DOMPDF
-        if ($induction->id_company == 2) {
-            $pdf = PDF::loadView('ReportesFormatos.IsemNotaPdf', $data);
-        } else if ($induction->id_company == 4) {
-            $errores = round($detail_induction_worker->sum('num_errors'));
-            $aciertos = $induction_worker->puntaje - $errores;
-            $data['nota'] = $aciertos;
-            $data['imagen'] = "https://quickchart.io/chart?c={type:'doughnut', data:{datasets:[{data:[$aciertos,$errores],backgroundColor:['rgb(32,164,81)','rgb(255,0,0)'],}],labels:['Puntaje Inicial', 'Nº Errores'],},options:{title:{display:false},plugins: { datalabels: { color: 'white' } },},}";
-            if ($induction->alias == "ANÁLISIS DE FALLAS") {
-                $data['json'] = json_decode($detail_induction_worker[0]->json, true);
-                $pdf = PDF::loadView('ReportesFormatos.ConfipetrolAnalisisFallas', $data);
-            } else {
-                $pdf = PDF::loadView('ReportesFormatos.ConfipetrolNotaPdf', $data);
+        $data_report = json_decode($induction_worker->data_report, true);
+        $isValid = isset($data_report) && is_array($data_report) && array_key_exists($intento, $data_report);
+        if (!$isValid) {
+            // Configura los márgenes directamente en DOMPDF
+            if ($induction->id_company == 2) {
+                $pdf = PDF::loadView('ReportesFormatos.IsemNotaPdf', $data);
+            } else if ($induction->id_company == 4) {
+                $errores = round($detail_induction_worker->sum('num_errors'));
+                $aciertos = $induction_worker->puntaje - $errores;
+                $data['nota'] = $aciertos;
+                $data['imagen'] = "https://quickchart.io/chart?c={type:'doughnut', data:{datasets:[{data:[$aciertos,$errores],backgroundColor:['rgb(32,164,81)','rgb(255,0,0)'],}],labels:['Puntaje Inicial', 'Nº Errores'],},options:{title:{display:false},plugins: { datalabels: { color: 'white' } },},}";
+
+                if ($induction->alias == "ANÁLISIS DE FALLAS") {
+                    $data['json'] = json_decode($detail_induction_worker[0]->json, true);
+                    $pdf = PDF::loadView('ReportesFormatos.ConfipetrolAnalisisFallas', $data);
+                } else {
+                    $pdf = PDF::loadView('ReportesFormatos.ConfipetrolNotaPdf', $data);
+                }
+            } else if ($induction->id_company == 3) {
+                $errores = round($detail_induction_worker->sum('num_errors'));
+                $aciertos = $induction_worker->puntaje - $errores;
+                $data['nota'] = $aciertos;
+                $data['imagen'] = "https://quickchart.io/chart?c={type:'doughnut', data:{datasets:[{data:[$aciertos,$errores],backgroundColor:['rgb(32,164,81)','rgb(255,0,0)'],}],labels:['Puntaje Inicial', 'Nº Errores'],},options:{title:{display:false},plugins: { datalabels: { color: 'white' } },},}";
+                $pdf = PDF::loadView('ReportesFormatos.LuzDelSurNotaPdf', $data);
             }
-        } else if ($induction->id_company == 3) {
-            $errores = round($detail_induction_worker->sum('num_errors'));
-            $aciertos = $induction_worker->puntaje - $errores;
-            $data['nota'] = $aciertos;
-            $data['imagen'] = "https://quickchart.io/chart?c={type:'doughnut', data:{datasets:[{data:[$aciertos,$errores],backgroundColor:['rgb(32,164,81)','rgb(255,0,0)'],}],labels:['Puntaje Inicial', 'Nº Errores'],},options:{title:{display:false},plugins: { datalabels: { color: 'white' } },},}";
-            $pdf = PDF::loadView('ReportesFormatos.LuzDelSurNotaPdf', $data);
+        } else {
+            $dataPdfDecoded = base64_decode($data_report[$intento]);
+            // Crea una respuesta con el PDF decodificado y haz un stream de ella
+            return response($dataPdfDecoded, 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="reporte_recuperado.pdf"',
+            ]);
         }
-        return $pdf->stream('reporte.pdf');
+
+        // Codifica el PDF en base64
+        $output = $pdf->output();
+        $base64Pdf = base64_encode($output);
+
+        $data_report = json_decode($induction_worker->data_report, true);
+        $data_report[$intento] = $base64Pdf;
+        $induction_worker->data_report = json_encode($data_report);
+
+        $induction_worker->save();
+
+        return $pdf->download('reporte.pdf');
     }
     public function descargar_asistencia($id_induction, $fecha_inicio = null, $fecha_fin = null, $id_service)
     {
@@ -738,15 +767,15 @@ class SupervisorController extends Controller
         }
 
         $induction = Induction::find($id_induction);
-        $result = InductionWorker::join('workers', 'workers.id', '=', 'induction_workers.id_worker')
-            ->join('services as s', 's.id', '=', 'workers.id_service')
-            ->join('users as u', 'u.id', '=', 'workers.id_user')
-            ->where('induction_workers.id_induction', $id_induction)
-            ->select('workers.position', 'workers.department', 'workers.employee_code', 's.name as servicio', 's.id as id_service', 'workers.nombre', 'u.doi', 'workers.apellido')
-            ->get();
+        $result = InductionWorker::where('induction_workers.id_induction', $id_induction)->get();
         $logo = Company::find($induction->id_company)->url_image_desktop;
-        $dataImage = file_get_contents(public_path($induction->worker->user->signature));
-        $base64 = 'data:image/' . pathinfo($induction->worker->user->signature, PATHINFO_EXTENSION) . ';base64,' . base64_encode($dataImage);
+        if ($induction->worker->user->signature != null) {
+            $dataImage = file_get_contents(public_path($induction->worker->user->signature));
+            $base64 = 'data:image/' . pathinfo($induction->worker->user->signature, PATHINFO_EXTENSION) . ';base64,' . base64_encode($dataImage);
+        } else {
+            $dataImage = null;
+            $base64 = null;
+        }
         $data = [
             'induction_worker' => $induction_worker,
             'induction' => $induction,
@@ -832,94 +861,45 @@ class SupervisorController extends Controller
     public function reportealumnodetail(Request $request)
     {
 
-        // $worker = Worker::where('code_worker', 'LIKE', '%' . '-' . $request->doi)
-        //     ->where('id_company', session('id_company'))
-        //     ->first();
-        // $inductions = InductionWorker::join('inductions', 'induction_workers.id_induction', '=', 'inductions.id')
-        //     ->join('workshops as w', 'inductions.id_workshop', '=', 'w.id') // Inner join con workshops
-        //     ->where('induction_workers.id_worker', $worker->id)
-        //     ->where('induction_workers.status', '1')
-        //     ->orderBy('induction_workers.id', 'desc')
-        //     ->select(
-        //         'induction_workers.id',
-        //         'induction_workers.id_worker',
-        //         'inductions.id as induction_id',
-        //         'w.id as id_workshop',
-        //         'induction_workers.id as induction_workers',
-        //         'inductions.date_start',
-        //         'inductions.date_end',
-        //         'inductions.time_start',
-        //         'inductions.time_end',
-        //         'w.name as name',
-        //         'inductions.alias',
-        //         'induction_workers.note'
-        //     )->get();
-        // $responseData = [
-        //     'name' => $worker->user->name,
-        //     'last_name' => $worker->user->last_name,
-        //     'doi' => $worker->user->doi,
-        //     'inductions' => $inductions,
-        // ];
+        try {
+            $workerIds = Worker::where('code_worker', 'LIKE', '%' . '-' . $request->doi)
+                ->where('id_company', session('id_company'))
+                ->pluck('id');
 
-        // return response()->json($responseData);
-        // $workerIds = Worker::where('code_worker', 'LIKE', '%' . '-' . $request->doi)
-        //     ->where('id_company', session('id_company'))
-        //     ->pluck('id');
+            $inductions = InductionWorker::whereIn('id_worker', $workerIds)->get();
 
-        // $inductions = InductionWorker::join('inductions', 'induction_workers.id_induction', '=', 'inductions.id')
-        //     ->join('workshops as w', 'inductions.id_workshop', '=', 'w.id') // Inner join con workshops
-        //     ->whereIn('induction_workers.id_worker', $workerIds) // Usar WHERE IN
-        //     ->where('induction_workers.status', '1')
-        //     ->orderBy('induction_workers.id', 'desc')
-        //     ->select(
-        //         'induction_workers.id',
-        //         'induction_workers.id_worker',
-        //         'inductions.id as induction_id',
-        //         'w.id as id_workshop',
-        //         'induction_workers.id as induction_workers',
-        //         'inductions.date_start',
-        //         'inductions.date_end',
-        //         'inductions.time_start',
-        //         'inductions.time_end',
-        //         'w.name as name',
-        //         'inductions.alias',
-        //         'induction_workers.num_report'
-        //     )->get();
-        $workerIds = Worker::where('code_worker', 'LIKE', '%' . '-' . $request->doi)
-            ->where('id_company', session('id_company'))
-            ->pluck('id');
+            $inductionsData = [];
 
-        $inductions = InductionWorker::whereIn('id_worker', $workerIds)->get();
-
-        $inductionsData = [];
-
-        foreach ($inductions as $induction) {
-            $inductionData = [
-                'id_induction_workers' => $induction->id,
-                'date_start' => $induction->induction->date_start . ' ' . $induction->induction->time_start,
-                'date_end' => $induction->induction->date_end . ' ' . $induction->induction->time_end,
-                'num_report' => $induction->num_report,
-                'name_taller' => $induction->induction->alias,
-            ];
-            $intentos = [];
-            for ($i = 1; $i <= $induction->num_report; $i++) {
-                $data = $induction->detailsByReport($i)->first();
-                $intentos[] = [
-                    'intento' => $data->report,
-                    'note' => $data->note,
-                    'note_reference' => $data->note_reference,
-                    'date_start' => $data->start_date,
-                    'date_end' => $data->end_date,
+            foreach ($inductions as $induction) {
+                $inductionData = [
+                    'id_induction_workers' => $induction->id,
+                    'date_start' => $induction->induction->date_start . ' ' . $induction->induction->time_start,
+                    'date_end' => $induction->induction->date_end . ' ' . $induction->induction->time_end,
+                    'num_report' => $induction->num_report,
+                    'name_taller' => $induction->induction->alias,
                 ];
+                $intentos = [];
+                for ($i = 1; $i <= $induction->num_report; $i++) {
+                    $data = $induction->detailsByReport($i)->first();
+                    $intentos[] = [
+                        'intento' => $data->report,
+                        'note' => $data->note,
+                        'note_reference' => $data->note_reference,
+                        'date_start' => $data->start_date,
+                        'date_end' => $data->end_date,
+                    ];
+                }
+                $inductionData['intentos'] = $intentos;
+                $inductionsData[] = $inductionData;
             }
-            $inductionData['intentos'] = $intentos;
-            $inductionsData[] = $inductionData;
-        }
-        $responseData = [
-            'workers' => $workerIds,
-            'inductions' => $inductionsData,
-        ];
+            $responseData = [
+                'workers' => $workerIds,
+                'inductions' => $inductionsData,
+            ];
 
-        return response()->json($responseData);
+            return response()->json($responseData);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 }

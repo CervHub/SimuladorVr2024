@@ -2,7 +2,9 @@
 
 @section('js')
 <script>
-    const iconSuperAdmin = document.querySelector('#dashboard-administrador');
-    iconSuperAdmin.classList.add('active');
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const iconSuperAdmin = document.querySelector('#departamentos');
+        iconSuperAdmin.classList.add('active');
+    });
 </script>
 @endsection

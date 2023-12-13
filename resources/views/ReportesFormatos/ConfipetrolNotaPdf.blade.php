@@ -105,7 +105,6 @@
                     <dt class="dl-term-secondary">Duración:</dt>
                     <dd class="dl-definition">{{$duracionEnHoras}}</dd>
                 </div>
-
                 </dl>
                 </td>
                 <td class="col-5 align-left align-top" style="text-align: right;">

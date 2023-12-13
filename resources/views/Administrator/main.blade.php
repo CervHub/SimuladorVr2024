@@ -29,6 +29,11 @@
                 <span class="menu-title">Taller - Notas</span>
             </a>
         </li>
-
+        <li class="nav-item" id="departamento">
+            <a class="nav-link" href="{{ route('departamentos') }}">
+                <i class="mdi mdi-domain menu-icon"></i>
+                <span class="menu-title">Departamentos</span>
+            </a>
+        </li>
     </ul>
 @endsection

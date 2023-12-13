@@ -164,12 +164,12 @@
             @foreach ($result as $item)
                 <tr>
                     <td>{{ $loop->iteration }}</td>
-                    <td>{{$item->employee_code}}</td>
-                    <td>{{$item->nombre}}</td>
-                    <td>{{$item->apellido}}</td>
-                    <td>{{$item->doi}}</td>
-                    <td>{{$item->department}}</td>
-                    <td>-</td>
+                    <td>{{$item->worker->employee_code}}</td>
+                    <td>{{$item->worker->nombre}}</td>
+                    <td>{{$item->worker->apellido}}</td>
+                    <td>{{$item->worker->user->doi}}</td>
+                    <td>{{$item->worker->department}}</td>
+                    <td>{{$item->nota()}}</td>
                 </tr>
             @endforeach
             <!-- Add more rows as needed -->

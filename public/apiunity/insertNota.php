@@ -35,7 +35,7 @@ try {
       $stmtUpdate->execute();
 
       if ($stmtUpdate->rowCount() > 0) {
-        echo "Bandera Cabecera<br>";
+        // echo "Bandera Cabecera<br>";
 
         // La actualización se realizó con éxito
         // Inicializa una variable para contar los casos insertados
@@ -51,11 +51,10 @@ try {
         $count = $stmtCheck->fetch(PDO::FETCH_ASSOC);
 
         foreach ($jsonData as $item) {
-          echo "Iteración del bucle para el caso: " . $item['case'] . "<br>";
 
           if ($count['count'] == 0) {
             // No existe un registro, puedes insertarlo
-            $stmtInsert = $db->prepare('INSERT INTO detail_induction_workers (induction_worker_id, "case", identified, risk_level, correct_measure, "time", difficulty, report, note, note_reference, "start_date", end_date, num_errors,"json",rol, created_at, updated_at) VALUES (:induction_worker_id, :case, :identified, :risk_level, :correct_measure, :time, :difficulty, :report, :note, :note_reference, :start_date, :end_date, :num_errors,:json,:rol, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)');            
+            $stmtInsert = $db->prepare('INSERT INTO detail_induction_workers (induction_worker_id, "case", identified, risk_level, correct_measure, "time", difficulty, report, note, note_reference, "start_date", end_date, num_errors,"json",rol, created_at, updated_at) VALUES (:induction_worker_id, :case, :identified, :risk_level, :correct_measure, :time, :difficulty, :report, :note, :note_reference, :start_date, :end_date, :num_errors,:json,:rol, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)');
             $stmtInsert->bindParam(':induction_worker_id', $cabecera_id);
             $stmtInsert->bindParam(':case', $item['case']);
             $stmtInsert->bindParam(':identified', $item['identified']);
@@ -73,11 +72,11 @@ try {
             $stmtInsert->bindParam(':num_errors', $item['num_errors']); // Reemplaza $num_errors con el valor que desees insertar
 
             if ($stmtInsert->execute()) {
-              echo "Inserción exitosa para el caso: " . $item['case'] . "<br>";
+            //   echo "Inserción exitosa para el caso: " . $item['case'] . "<br>";
             } else {
               // Se encontró un error en la inserción
               $error = true;
-              echo "Error en la inserción para el caso: " . $item['case'] . "<br>";
+            //   echo "Error en la inserción para el caso: " . $item['case'] . "<br>";
               break; // Salir del bucle para evitar más inserciones
             }
             $totalCasosInsertados++;

@@ -25,8 +25,24 @@
                     </div>
                     <div class="form-group">
                         <label for="department">Departamento o Área: (Opcional)</label>
-                        <input type="text" class="form-control" name="department"
-                            placeholder="Ingrese su departamento o área">
+                        <select class="form-control" id="department" name="department">
+                            <option value="">Seleccione un departamento</option>
+                            @foreach ($departamentos as $departamento)
+                                <option value="{{ $departamento->id }}">{{ $departamento->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="areaDiv" style="display: none;">
+                        <label for="area">Área:</label>
+                        <select class="form-control" id="area" name="area">
+                            <!-- Las áreas se llenarán aquí con jQuery -->
+                        </select>
+
+                        <!-- Elemento de carga -->
+                        <div id="loading" style="display: none;">
+                            <p>Cargando áreas...</p>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="employee_code">Código de Trabajador:</label>
@@ -49,3 +65,39 @@
         </div>
     </div>
 </div>
+
+@section('js')
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#department').change(function() {
+                var departmentId = $(this).val();
+                $('#area').empty();
+                if (departmentId) {
+                    // Mostrar el elemento de carga
+                    $('#loading').show();
+
+                    $.ajax({
+                        url: '/getAreas/' + departmentId,
+                        type: 'GET',
+                        success: function(data) {
+                            $('#area').empty();
+                            $('#area').append('<option value="">Seleccione una área</option>');
+                            $.each(data, function(key, value) {
+                                $('#area').append('<option value="' + key + '">' +
+                                    value + '</option>');
+                            });
+                            $('#areaDiv').show();
+
+                            // Ocultar el elemento de carga
+                            $('#loading').hide();
+                        }
+                    });
+                } else {
+                    $('#area').empty();
+                    $('#areaDiv').hide();
+                }
+            });
+        });
+    </script>
+@endsection
