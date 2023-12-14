@@ -10,16 +10,18 @@ $start_date = $_POST['start_date'];
 $end_date = $_POST['end_date'];
 $rol = $_POST['rol'];
 $jsonData = $_POST['json']; // Esto ya contiene el JSON decodificado
-$entrenamiento = isset($jsonData['entrenamiento']) && !empty($jsonData['entrenamiento']) ? 1 : 0;
+$entrenamiento = isset($_POST['entrenamiento']) && !empty($_POST['entrenamiento']) ? 1 : 0;
 
 $intentoEntrenamiento = 0;
 if ($entrenamiento == 1) {
-  $stmt = $db->prepare("SELECT COALESCE(MAX(report) + 1, 1) AS result FROM detail_induction_workers WHERE induction_worker_id = :id AND entrenamiento = '0'");
+  $stmt = $db->prepare("SELECT COALESCE(MAX(report) + 1, 1) AS result FROM detail_induction_workers WHERE induction_worker_id = :id AND entrenamiento = '1'");
   $stmt->bindParam(':id', $cabecera_id);
   $stmt->execute();
   $result = $stmt->fetch(PDO::FETCH_ASSOC);
   $intentoEntrenamiento = $result['result'];
 }
+
+echo $entrenamiento;
 
 $jsonData = json_decode($jsonData, true); // Convertirlo en un arreglo asociativo si lo deseas
 
@@ -37,10 +39,10 @@ try {
     // Iniciar una transacción
     $db->beginTransaction();
 
-    if ($intentoEntrenamiento > 0) {
+    if ($intentoEntrenamiento != 0) {
       $nuevoIntento = $nuevoIntento - 1;
     }
-
+    echo "nuevo intento" . $nuevoIntento;
     try {
       // Actualizar Intento
       $stmtUpdate = $db->prepare("UPDATE induction_workers SET num_report = :intento, updated_at = CURRENT_TIMESTAMP WHERE id = :cabecera_id");
@@ -48,8 +50,9 @@ try {
       $stmtUpdate->bindParam(':cabecera_id', $cabecera_id);
       $stmtUpdate->execute();
 
+      echo "Intento Actalizado";
       if ($stmtUpdate->rowCount() > 0) {
-        // echo "Bandera Cabecera<br>";
+        echo "Bandera Cabecera<br>";
 
         // La actualización se realizó con éxito
         // Inicializa una variable para contar los casos insertados
@@ -58,17 +61,19 @@ try {
 
         // Recorrer el JSON y validar los registros en detail_induction_workers
         // Verificar si ya existe un registro en detail_induction_workers
+        if ($intentoEntrenamiento > 0) {
+          $nuevoIntento = $intentoEntrenamiento;
+        }
+
         $stmtCheck = $db->prepare("SELECT COUNT(*) as count FROM detail_induction_workers WHERE induction_worker_id = :cabecera_id AND report = :nuevoIntento");
         $stmtCheck->bindParam(':cabecera_id', $cabecera_id);
         $stmtCheck->bindParam(':nuevoIntento', $nuevoIntento);
         $stmtCheck->execute();
         $count = $stmtCheck->fetch(PDO::FETCH_ASSOC);
-        if ($intentoEntrenamiento > 0) {
-          $nuevoIntento = $intentoEntrenamiento;
-        }
+        echo "Intento Entrenamiento: " . $nuevoIntento;
         foreach ($jsonData as $item) {
 
-          if ($count['count'] == 0) {
+          if ($count['count'] == 0 or $intentoEntrenamiento != 0) {
             // No existe un registro, puedes insertarlo
             $stmtInsert = $db->prepare('INSERT INTO detail_induction_workers (induction_worker_id, "case", identified, risk_level, correct_measure, "time", difficulty, report, note, note_reference, "start_date", end_date, num_errors,"json",rol, created_at, updated_at, entrenamiento) VALUES (:induction_worker_id, :case, :identified, :risk_level, :correct_measure, :time, :difficulty, :report, :note, :note_reference, :start_date, :end_date, :num_errors,:json,:rol, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, :entrenamiento)');
             $stmtInsert->bindParam(':induction_worker_id', $cabecera_id);
@@ -89,11 +94,11 @@ try {
             $stmtInsert->bindParam(':entrenamiento', $entrenamiento, PDO::PARAM_STR);
 
             if ($stmtInsert->execute()) {
-              //   echo "Inserción exitosa para el caso: " . $item['case'] . "<br>";
+              echo "Inserción exitosa para el caso: " . $item['case'] . "<br>";
             } else {
-              // Se encontró un error en la inserción
+              //   Se encontró un error en la inserción
               $error = true;
-              //   echo "Error en la inserción para el caso: " . $item['case'] . "<br>";
+              echo "Error en la inserción para el caso: " . $item['case'] . "<br>";
               break; // Salir del bucle para evitar más inserciones
             }
             $totalCasosInsertados++;
