@@ -11,7 +11,16 @@ $end_date = $_POST['end_date'];
 $rol = $_POST['rol'];
 $jsonData = $_POST['json']; // Esto ya contiene el JSON decodificado
 $entrenamiento = isset($jsonData['entrenamiento']) && !empty($jsonData['entrenamiento']) ? 1 : 0;
-// Puedes acceder a los elementos del JSON directamente
+
+$intentoEntrenamiento = 0;
+if ($entrenamiento == 1) {
+  $stmt = $db->prepare("SELECT COALESCE(MAX(report) + 1, 1) AS result FROM detail_induction_workers WHERE induction_worker_id = :id AND entrenamiento = '0'");
+  $stmt->bindParam(':id', $cabecera_id);
+  $stmt->execute();
+  $result = $stmt->fetch(PDO::FETCH_ASSOC);
+  $intentoEntrenamiento = $result['result'];
+}
+
 $jsonData = json_decode($jsonData, true); // Convertirlo en un arreglo asociativo si lo deseas
 
 // Imprimir el JSON en formato legible
@@ -27,6 +36,10 @@ try {
   if ($intentos['num_report'] < $nuevoIntento) {
     // Iniciar una transacción
     $db->beginTransaction();
+
+    if ($intentoEntrenamiento > 0) {
+      $nuevoIntento = $nuevoIntento - 1;
+    }
 
     try {
       // Actualizar Intento
@@ -50,7 +63,9 @@ try {
         $stmtCheck->bindParam(':nuevoIntento', $nuevoIntento);
         $stmtCheck->execute();
         $count = $stmtCheck->fetch(PDO::FETCH_ASSOC);
-
+        if ($intentoEntrenamiento > 0) {
+          $nuevoIntento = $intentoEntrenamiento;
+        }
         foreach ($jsonData as $item) {
 
           if ($count['count'] == 0) {
