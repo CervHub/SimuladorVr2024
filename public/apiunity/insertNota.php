@@ -10,7 +10,7 @@ $start_date = $_POST['start_date'];
 $end_date = $_POST['end_date'];
 $rol = $_POST['rol'];
 $jsonData = $_POST['json']; // Esto ya contiene el JSON decodificado
-$entrenamiento = isset($_POST['entrenamiento']) && !empty($_POST['entrenamiento']) ? 1 : 0;
+$entrenamiento = intval($_POST['entrenamiento']);
 
 $intentoEntrenamiento = 0;
 if ($entrenamiento == 1) {
