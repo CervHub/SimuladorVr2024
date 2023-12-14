@@ -21,7 +21,7 @@ if ($entrenamiento == 1) {
   $intentoEntrenamiento = $result['result'];
 }
 
-echo $entrenamiento;
+// echo $entrenamiento;
 
 $jsonData = json_decode($jsonData, true); // Convertirlo en un arreglo asociativo si lo deseas
 
@@ -42,7 +42,7 @@ try {
     if ($intentoEntrenamiento != 0) {
       $nuevoIntento = $nuevoIntento - 1;
     }
-    echo "nuevo intento" . $nuevoIntento;
+    // echo "nuevo intento" . $nuevoIntento;
     try {
       // Actualizar Intento
       $stmtUpdate = $db->prepare("UPDATE induction_workers SET num_report = :intento, updated_at = CURRENT_TIMESTAMP WHERE id = :cabecera_id");
@@ -50,9 +50,9 @@ try {
       $stmtUpdate->bindParam(':cabecera_id', $cabecera_id);
       $stmtUpdate->execute();
 
-      echo "Intento Actalizado";
+      // echo "Intento Actalizado";
       if ($stmtUpdate->rowCount() > 0) {
-        echo "Bandera Cabecera<br>";
+        // echo "Bandera Cabecera<br>";
 
         // La actualización se realizó con éxito
         // Inicializa una variable para contar los casos insertados
@@ -70,7 +70,7 @@ try {
         $stmtCheck->bindParam(':nuevoIntento', $nuevoIntento);
         $stmtCheck->execute();
         $count = $stmtCheck->fetch(PDO::FETCH_ASSOC);
-        echo "Intento Entrenamiento: " . $nuevoIntento;
+        // echo "Intento Entrenamiento: " . $nuevoIntento;
         foreach ($jsonData as $item) {
 
           if ($count['count'] == 0 or $intentoEntrenamiento != 0) {
@@ -94,11 +94,11 @@ try {
             $stmtInsert->bindParam(':entrenamiento', $entrenamiento, PDO::PARAM_STR);
 
             if ($stmtInsert->execute()) {
-              echo "Inserción exitosa para el caso: " . $item['case'] . "<br>";
+              // echo "Inserción exitosa para el caso: " . $item['case'] . "<br>";
             } else {
               //   Se encontró un error en la inserción
               $error = true;
-              echo "Error en la inserción para el caso: " . $item['case'] . "<br>";
+              // echo "Error en la inserción para el caso: " . $item['case'] . "<br>";
               break; // Salir del bucle para evitar más inserciones
             }
             $totalCasosInsertados++;
