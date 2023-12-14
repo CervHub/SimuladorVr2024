@@ -71,7 +71,7 @@ try {
             $stmtInsert->bindParam(':start_date', $start_date, PDO::PARAM_STR); // Asegúrate de que $start_date sea un string con formato de fecha válido
             $stmtInsert->bindParam(':end_date', $end_date, PDO::PARAM_STR); // Asegúrate de que $end_date sea un string con formato de fecha válido
             $stmtInsert->bindParam(':num_errors', $item['num_errors']); // Reemplaza $num_errors con el valor que desees insertar
-            $stmtUpdate->bindParam(':entrenamiento', $entrenamiento);
+            $stmtInsert->bindParam(':entrenamiento', $entrenamiento, PDO::PARAM_STR);
 
             if ($stmtInsert->execute()) {
               //   echo "Inserción exitosa para el caso: " . $item['case'] . "<br>";
