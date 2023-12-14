@@ -656,17 +656,21 @@ class SupervisorController extends Controller
         ];
     }
 
-    public function visualizar_reporte_notas($id_induction_worker, $intento)
+    public function visualizar_reporte_notas($id_induction_worker, $intento, $modo)
     {
-
         $induction_worker = InductionWorker::find($id_induction_worker);
         $worker = Worker::find($induction_worker->id_worker);
         $induction = Induction::find($induction_worker->id_induction);
         $detail_induction_worker = DetailInductionWorker::where('induction_worker_id', $induction_worker->id)
-            ->where('report', $intento)
-            ->orderBy('time', 'asc')
-            ->get();
+            ->where('report', $intento);
 
+        if ($modo == 'Entrenamiento') {
+            $detail_induction_worker = $detail_induction_worker->where('entrenamiento', 1);
+        } else {
+            $detail_induction_worker = $detail_induction_worker->where('entrenamiento', '<>', 1);
+        }
+
+        $detail_induction_worker = $detail_induction_worker->orderBy('time', 'asc')->get();
         // Cargar los datos necesarios para el PDF en el arreglo $data
         $casosTotales = $induction_worker->case_count;
         $casosBuenos = count($detail_induction_worker);
@@ -681,6 +685,17 @@ class SupervisorController extends Controller
         $porcentaje = $result['porcentaje'];
         $categoria = $result['categoria'];
 
+        $consulta = DB::table('detail_induction_workers')
+            ->select(DB::raw('COALESCE(MAX(report) , 0) AS resultado'))
+            ->where('induction_worker_id', $id_induction_worker);
+
+        if ($modo == 'Entrenamiento') {
+            $resultado = $consulta->where('entrenamiento', '1')->first();
+        } else {
+            $resultado = $consulta->where('entrenamiento', '<>', '1')->first();
+        }
+
+        $nuevoIntento = $resultado->resultado;
 
         $data = [
             'induction_worker' => $induction_worker,
@@ -699,9 +714,51 @@ class SupervisorController extends Controller
             'data' => $data,
             'intento' => $intento,
             'intentos' => $induction_worker->num_report,
+            'modo' => $modo,
+            'num_reportes' => $nuevoIntento
         ];
+
         $pdf = PDF::loadView('ReportesFormatos.asistenciaPDF', $data);
         $data_report = json_decode($induction_worker->data_report, true);
+
+        // Configura los márgenes directamente en DOMPDF
+        if ($induction->id_company == 2) {
+            $pdf = PDF::loadView('ReportesFormatos.IsemNotaPdf', $data);
+            return $pdf->stream('ISEMReporte.pdf');
+        } else if ($induction->id_company == 4) {
+            $errores = round($detail_induction_worker->sum('num_errors'));
+            $aciertos = $induction_worker->puntaje - $errores;
+            $data['nota'] = $aciertos;
+            $data['imagen'] = "https://quickchart.io/chart?c={type:'doughnut', data:{datasets:[{data:[$aciertos,$errores],backgroundColor:['rgb(32,164,81)','rgb(255,0,0)'],}],labels:['Puntaje Inicial', 'Nº Errores'],},options:{title:{display:false},plugins: { datalabels: { color: 'white' } },},}";
+
+            if (strtolower($induction->alias) == "análisis de fallas") {
+                $data['json'] = json_decode($detail_induction_worker[0]->json, true);
+                $pdf = PDF::loadView('ReportesFormatos.ConfipetrolAnalisisFallas', $data);
+            } elseif (strtolower($induction->alias) == "seguridad de procesos") {
+                $data['imagen'] = "https://quickchart.io/chart?c={type:'doughnut', data:{datasets:[{data:[$aciertos,$errores],backgroundColor:['rgb(32,164,81)','rgb(255,0,0)'],}],labels:['Puntaje Inicial', 'Puntaje de Errores'],},options:{title:{display:false},plugins: { datalabels: { color: 'white' } },},}";
+
+                $errores = 0;
+                foreach ($detail_induction_worker as $detail) {
+                    $multiplicador = $detail->case == 'EPPs' ? 1 : 5;
+                    $errores += round($detail->num_errors) * $multiplicador;
+                }
+                $aciertos = $induction_worker->puntaje - $errores;
+                $data['nota'] = $aciertos;
+                $pdf = PDF::loadView('ReportesFormatos.ConfipetrolSeguridadProcesos', $data);
+            } else {
+                $pdf = PDF::loadView('ReportesFormatos.ConfipetrolNotaPdf', $data);
+            }
+
+            return $pdf->stream('reporteConfiPetrol.pdf');
+        } else if ($induction->id_company == 3) {
+            $errores = round($detail_induction_worker->sum('num_errors'));
+            $aciertos = $induction_worker->puntaje - $errores;
+            $data['nota'] = $aciertos;
+            $data['imagen'] = "https://quickchart.io/chart?c={type:'doughnut', data:{datasets:[{data:[$aciertos,$errores],backgroundColor:['rgb(32,164,81)','rgb(255,0,0)'],}],labels:['Puntaje Inicial', 'Nº Errores'],},options:{title:{display:false},plugins: { datalabels: { color: 'white' } },},}";
+            $pdf = PDF::loadView('ReportesFormatos.LuzDelSurNotaPdf', $data);
+            return $pdf->stream('reporteLuzDelSur.pdf');
+        }
+
         $isValid = isset($data_report) && is_array($data_report) && array_key_exists($intento, $data_report);
         if (!$isValid) {
             // Configura los márgenes directamente en DOMPDF
@@ -738,6 +795,7 @@ class SupervisorController extends Controller
                 $data['nota'] = $aciertos;
                 $data['imagen'] = "https://quickchart.io/chart?c={type:'doughnut', data:{datasets:[{data:[$aciertos,$errores],backgroundColor:['rgb(32,164,81)','rgb(255,0,0)'],}],labels:['Puntaje Inicial', 'Nº Errores'],},options:{title:{display:false},plugins: { datalabels: { color: 'white' } },},}";
                 $pdf = PDF::loadView('ReportesFormatos.LuzDelSurNotaPdf', $data);
+                return $pdf->stream('reporteLuzDelSur.pdf');
             }
         } else {
             $dataPdfDecoded = base64_decode($data_report[$intento]);

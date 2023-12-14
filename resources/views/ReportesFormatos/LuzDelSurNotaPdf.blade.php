@@ -154,8 +154,7 @@
             Marcar con (X) según corresponda:
         </h4>
         <h4 class="text-light" style="padding: 0; margin-top: 15px; text-align:center;">
-            1-Inducción( ) 2-Capacitación( X ) 3-Entrenamiento( ) 4-Jornada( ) 5-Simulacro de Emergencia( )
-        </h4>
+            1-Inducción( ) 2-Capacitación( {{ $modo == 'Entrenamiento' ? ' ' : 'X' }} ) 3-Entrenamiento( {{ $modo == 'Entrenamiento' ? 'X' : ' ' }} ) 4-Jornada( ) 5-Simulacro de Emergencia( )        </h4>
     </section>
     @php
         $fechaInicio = new DateTime($data->start_date);
@@ -221,7 +220,7 @@
                 </tr>
                 <tr>
                     <td class="text-bold">Número de reporte:</td>
-                    <td>{{$intento}}/{{ $intentos }}</td>
+                    <td>{{$intento}}/{{ $num_reportes }}</td>
                 </tr>
             </tbody>
         </table>

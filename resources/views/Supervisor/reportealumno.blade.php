@@ -169,7 +169,7 @@
                                     // '<td>' + item.note + '</td>' +
                                     '<td>' +
                                     '<a href="{{ url('view/pdf') }}/' + induccion
-                                    .id_induction_workers + '/' + item.intento +
+                                    .id_induction_workers + '/' + item.intento + '/' + item.modo +
                                     '" target="_blank" class="btn btn-custom btn-primary text-white me-0">' +
                                     '<span class="mdi mdi-file-download"> Descargar Reporte</span>' +
                                     '</a>' +
