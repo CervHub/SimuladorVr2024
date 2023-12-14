@@ -10,6 +10,7 @@ $start_date = $_POST['start_date'];
 $end_date = $_POST['end_date'];
 $rol = $_POST['rol'];
 $jsonData = $_POST['json']; // Esto ya contiene el JSON decodificado
+$entrenamiento = isset($jsonData['entrenamiento']) && !empty($jsonData['entrenamiento']) ? 1 : 0;
 // Puedes acceder a los elementos del JSON directamente
 $jsonData = json_decode($jsonData, true); // Convertirlo en un arreglo asociativo si lo deseas
 
@@ -54,7 +55,7 @@ try {
 
           if ($count['count'] == 0) {
             // No existe un registro, puedes insertarlo
-            $stmtInsert = $db->prepare('INSERT INTO detail_induction_workers (induction_worker_id, "case", identified, risk_level, correct_measure, "time", difficulty, report, note, note_reference, "start_date", end_date, num_errors,"json",rol, created_at, updated_at) VALUES (:induction_worker_id, :case, :identified, :risk_level, :correct_measure, :time, :difficulty, :report, :note, :note_reference, :start_date, :end_date, :num_errors,:json,:rol, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)');
+            $stmtInsert = $db->prepare('INSERT INTO detail_induction_workers (induction_worker_id, "case", identified, risk_level, correct_measure, "time", difficulty, report, note, note_reference, "start_date", end_date, num_errors,"json",rol, created_at, updated_at, entrenamiento) VALUES (:induction_worker_id, :case, :identified, :risk_level, :correct_measure, :time, :difficulty, :report, :note, :note_reference, :start_date, :end_date, :num_errors,:json,:rol, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, :entrenamiento)');
             $stmtInsert->bindParam(':induction_worker_id', $cabecera_id);
             $stmtInsert->bindParam(':case', $item['case']);
             $stmtInsert->bindParam(':identified', $item['identified']);
@@ -70,13 +71,14 @@ try {
             $stmtInsert->bindParam(':start_date', $start_date, PDO::PARAM_STR); // Asegúrate de que $start_date sea un string con formato de fecha válido
             $stmtInsert->bindParam(':end_date', $end_date, PDO::PARAM_STR); // Asegúrate de que $end_date sea un string con formato de fecha válido
             $stmtInsert->bindParam(':num_errors', $item['num_errors']); // Reemplaza $num_errors con el valor que desees insertar
+            $stmtUpdate->bindParam(':entrenamiento', $entrenamiento);
 
             if ($stmtInsert->execute()) {
-            //   echo "Inserción exitosa para el caso: " . $item['case'] . "<br>";
+              //   echo "Inserción exitosa para el caso: " . $item['case'] . "<br>";
             } else {
               // Se encontró un error en la inserción
               $error = true;
-            //   echo "Error en la inserción para el caso: " . $item['case'] . "<br>";
+              //   echo "Error en la inserción para el caso: " . $item['case'] . "<br>";
               break; // Salir del bucle para evitar más inserciones
             }
             $totalCasosInsertados++;

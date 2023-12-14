@@ -168,7 +168,6 @@
                                 '</td>' +
                                 '</tr>';
                         }
-
                     );
 
                     detailsRow += '</tbody></table></div></td></tr>';
