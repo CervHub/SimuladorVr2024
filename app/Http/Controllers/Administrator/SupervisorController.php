@@ -883,26 +883,48 @@ class SupervisorController extends Controller
             $inductions = InductionWorker::whereIn('id_worker', $workerIds)->get();
 
             $inductionsData = [];
-
             foreach ($inductions as $induction) {
+                $result = DB::table('detail_induction_workers')
+                    ->select(DB::raw('COALESCE(MAX(report) , 0) AS result'))
+                    ->where('induction_worker_id', $induction->id)
+                    ->where('entrenamiento', '1')
+                    ->first();
+
+                $nuevoIntento = $result->result;
                 $inductionData = [
                     'id_induction_workers' => $induction->id,
                     'date_start' => $induction->induction->date_start . ' ' . $induction->induction->time_start,
                     'date_end' => $induction->induction->date_end . ' ' . $induction->induction->time_end,
                     'num_report' => $induction->num_report,
+                    'num_report_entenamiento' =>  $nuevoIntento,
                     'name_taller' => $induction->induction->alias,
                 ];
                 $intentos = [];
                 for ($i = 1; $i <= $induction->num_report; $i++) {
-                    $data = $induction->detailsByReport($i)->first();
+                    $data = $induction->detailsByReportAndTraining($i, 'evaluacion')->first();
                     $intentos[] = [
                         'intento' => $data->report,
                         'note' => $data->note,
                         'note_reference' => $data->note_reference,
                         'date_start' => $data->start_date,
                         'date_end' => $data->end_date,
+                        'modo' => 'Evaluación',
+                        'id' => $data->id
                     ];
                 }
+                for ($i = 1; $i <= $nuevoIntento; $i++) {
+                    $data = $induction->detailsByReportAndTraining($i, 'entrenamiento')->first();
+                    $intentos[] = [
+                        'intento' => $data->report,
+                        'note' => $data->note,
+                        'note_reference' => $data->note_reference,
+                        'date_start' => $data->start_date,
+                        'date_end' => $data->end_date,
+                        'modo' => 'Entrenamiento',
+                        'id' => $data->id
+                    ];
+                }
+
                 $inductionData['intentos'] = $intentos;
                 $inductionsData[] = $inductionData;
             }

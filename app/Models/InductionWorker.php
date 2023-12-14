@@ -34,6 +34,19 @@ class InductionWorker extends Model
         return $this->hasMany(DetailInductionWorker::class, 'induction_worker_id')
             ->where('report', $reportValue);
     }
+
+    public function detailsByReportAndTraining($reportValue, $trainingValue)
+    {
+        if ($trainingValue == 'evaluacion') {
+            return $this->hasMany(DetailInductionWorker::class, 'induction_worker_id')
+                ->where('report', $reportValue)
+                ->where('entrenamiento', '<>', 1);
+        } else {
+            return $this->hasMany(DetailInductionWorker::class, 'induction_worker_id')
+                ->where('report', $reportValue)
+                ->where('entrenamiento', 1);
+        }
+    }
     public function nota()
     {
         $numReport = $this->num_report;
@@ -49,6 +62,4 @@ class InductionWorker extends Model
 
         return !empty($detailsCount) ? strval(intval(max($detailsCount))) : "-";
     }
-
-
 }
