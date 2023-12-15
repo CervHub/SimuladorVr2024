@@ -53,11 +53,89 @@ class DepartamentoController extends Controller
         }
     }
 
+    public function search(Request $request)
+    {
+        $data = Departamento::find($request->id);
+        $responseData = [
+            'id' => $data->id,
+            'name' => $data->name
+        ];
+
+        // Responder con el arreglo en formato JSON
+        return response()->json($responseData);
+    }
+    public function areasearch(Request $request)
+    {
+        $data = Area::find($request->id);
+        $responseData = [
+            'id' => $data->id,
+            'name' => $data->name
+        ];
+
+        // Responder con el arreglo en formato JSON
+        return response()->json($responseData);
+    }
     public function areas(Request $request, $id)
     {
         $areas = Area::where('departamento_id', '=', $id)->get();
         $department_id = $id;
         return view('Administrator.Departamento.areas', compact('areas', 'department_id'));
+    }
+
+    public function edit(Request $request)
+    {
+        try {
+            // Encuentra el departamento por su ID
+            $departamento = Departamento::find($request->id);
+
+            if (!$departamento) {
+                // Maneja la situación donde el departamento no se encuentra
+                Session::flash('error', 'Departamento no encontrado');
+                return redirect()->back();
+            }
+
+            // Actualiza el nombre del departamento con el valor recibido en 'name'
+            $departamento->name = $request->name;
+
+            // Guarda los cambios
+            $departamento->save();
+
+            // Redirige de nuevo con un mensaje flash de éxito
+            Session::flash('success', 'Departamento actualizado correctamente');
+            return redirect()->back();
+        } catch (\Exception $e) {
+            // Maneja cualquier excepción que pueda ocurrir durante el proceso de actualización
+            Session::flash('error', 'Error al actualizar el departamento');
+            return redirect()->back();
+        }
+    }
+
+    public function areaedit(Request $request)
+    {
+        try {
+            // Encuentra el departamento por su ID
+            $departamento = Area::find($request->id);
+
+            if (!$departamento) {
+                // Maneja la situación donde el departamento no se encuentra
+                Session::flash('error', 'Departamento no encontrado');
+                return redirect()->back();
+            }
+
+            // Actualiza el nombre del departamento con el valor recibido en 'name'
+            $departamento->name = $request->name;
+
+            // Guarda los cambios
+            $departamento->save();
+
+            // Redirige de nuevo con un mensaje flash de éxito
+            Session::flash('success', 'Departamento actualizado correctamente');
+            return redirect()->back();
+        } catch (\Exception $e) {
+            // Maneja cualquier excepción que pueda ocurrir durante el proceso de actualización
+            Session::flash('error', 'Error al actualizar el departamento');
+            return redirect()->back();
+        }
     }
 
     public function agregarArea(Request $request)

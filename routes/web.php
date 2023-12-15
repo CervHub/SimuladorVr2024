@@ -80,12 +80,16 @@ Route::middleware(['admin', 'auth'])->group(function () {
     // Rutas para los departamentos
     Route::get('departamentos', [DepartamentoController::class, 'departamento'])->name('departamentos');
     Route::post('departamentos/create', [DepartamentoController::class, 'store'])->name('administrador.departamentos.store');
-    // Route::get('administrador/departamentos/{id}/editar', [DepartamentoController::class, 'edit'])->name('administrador.departamentos.editar');
+    Route::post('administrador/departamentos/editar', [DepartamentoController::class, 'edit'])->name('administrador.departamentos.edit');
+    Route::post('administrador/departamentos/search', [DepartamentoController::class, 'search'])->name('administrador.departamentos.search');
+
     // Route::post('administrador/departamentos/{id}', [DepartamentoController::class, 'update'])->name('administrador.departamentos.actualizar');
 
     // // Rutas para las áreas de los departamentos
     Route::get('administrador/departamentos/{id}/areas', [DepartamentoController::class, 'areas'])->name('administrador.departamentos.areas');
     Route::post('administrador/areas/store', [DepartamentoController::class, 'agregarArea'])->name('administrador.area.store');
+    Route::post('administrador/areas/editar', [DepartamentoController::class, 'areaedit'])->name('administrador.areas.edit');
+    Route::post('administrador/areas/search', [DepartamentoController::class, 'areasearch'])->name('administrador.areas.search');
 });
 
 //BEGIN Rutas para Entrenador
