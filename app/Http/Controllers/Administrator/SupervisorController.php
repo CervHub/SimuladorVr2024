@@ -403,7 +403,7 @@ class SupervisorController extends Controller
     {
         $workshops = WorkshopCompany::where('id_company', session('id_company'))->get();
         $inductions = Induction::where('id_company', session('id_company'))
-            ->where('status', '1')
+            // ->where('status', '1')
             ->orderBy('id', 'desc')
             ->get();
 
@@ -960,15 +960,18 @@ class SupervisorController extends Controller
                 $intentos = [];
                 for ($i = 1; $i <= $induction->num_report; $i++) {
                     $data = $induction->detailsByReportAndTraining($i, 'evaluacion')->first();
-                    $intentos[] = [
-                        'intento' => $data->report,
-                        'note' => $data->note,
-                        'note_reference' => $data->note_reference,
-                        'date_start' => $data->start_date,
-                        'date_end' => $data->end_date,
-                        'modo' => 'Evaluación',
-                        'id' => $data->id
-                    ];
+                    if ($data) {
+                        $intentos[] = [
+                            'intento' => $data->report,
+                            'note' => $data->note,
+                            'note_reference' => $data->note_reference,
+                            'date_start' => $data->start_date,
+                            'date_end' => $data->end_date,
+                            'modo' => 'Evaluación',
+                            'id' => $data->id
+                        ];
+                    } else {
+                    }
                 }
                 for ($i = 1; $i <= $nuevoIntento; $i++) {
                     $data = $induction->detailsByReportAndTraining($i, 'entrenamiento')->first();

@@ -37,7 +37,7 @@ class InductionController extends Controller
             return true;
         } catch (\Throwable $th) {
             // Volcar y terminar el script para ver el error
-       
+
 
             Session::flash('error', 'Hubo un error al crear la inducción.');
             return false;

@@ -31,9 +31,10 @@ JOIN workshops AS w ON inductions.id_workshop = w.id
 JOIN workshop_companies AS wc ON wc.id_workshop = w.id
 JOIN workers ON induction_workers.id_worker = workers.id
 JOIN services as s ON s.id = workers.id_service
-WHERE inductions.intentos >= (induction_workers.num_report + 1) 
+WHERE inductions.intentos >= (induction_workers.num_report + 1)
     AND induction_workers.id_worker in (SELECT id FROM workers WHERE code_worker LIKE '%-' || :dni AND id_company = :id_company)
     AND wc.id_company = :id_company
+    AND inductions.status = '1'
     AND (to_timestamp(inductions.date_end || ' ' || inductions.time_end, 'YYYY-MM-DD HH24:MI:SS')) >= CURRENT_TIMESTAMP
     AND (to_timestamp(inductions.date_start || ' ' || inductions.time_start, 'YYYY-MM-DD HH24:MI:SS')) <= CURRENT_TIMESTAMP
 ;";
