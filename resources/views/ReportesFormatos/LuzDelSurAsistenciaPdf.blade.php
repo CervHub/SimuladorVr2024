@@ -169,7 +169,7 @@
                     <td>{{$item->worker->apellido}}</td>
                     <td>{{$item->worker->user->doi}}</td>
                     <td>{{$item->worker->department}}</td>
-                    <td>{{$item->nota()}}</td>
+                    <td>{{$item->nota(0.5)}}</td>
                 </tr>
             @endforeach
             <!-- Add more rows as needed -->

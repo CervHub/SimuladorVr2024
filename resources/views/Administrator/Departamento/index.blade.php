@@ -14,7 +14,7 @@
                     <div>
                         <div class="btn-wrapper">
                             <a href="#" class="btn btn-primary text-white p-3" data-toggle="modal"
-                                data-target="#createModal"><i class="icon-plus"></i> Crear Departamento</a>
+                                data-target="#createModal"><i class="icon-plus"></i> Crear Gerencia</a>
                         </div>
                     </div>
                 </div>
@@ -53,7 +53,7 @@
 
                 <div class="card rounded-0 mt-3">
                     <div class="card-body table-responsive">
-                        <h4 class="card-title">Entrenadores</h4>
+                        <h4 class="card-title">Gerencias</h4>
                         <table id="myTable" class="display dataTable table table-striped">
                             <thead>
                                 <tr>
@@ -74,13 +74,11 @@
                                                 data-target="#editModal" onclick="editar({{ $departamento->id }})">
                                                 <span class="icon icon-pencil"></span> Editar
                                             </button>
-                                            <a href="{{ route('administrador.departamentos.areas', ['id' => $departamento->id]) }}" class="btn btn-custom btn-success text-white me-0">
+                                            <a href="{{ route('administrador.departamentos.areas', ['id' => $departamento->id]) }}"
+                                                class="btn btn-custom btn-success text-white me-0">
                                                 <span class="fas fa-plus-circle"></span> Agregar Área
                                             </a>
-                                            <button class="btn btn-custom btn-danger text-white me-0" data-toggle="modal"
-                                                data-target="#deleteModal" onclick="eliminar({{ $departamento->id }})">
-                                                <span class="icon icon-trash"></span> Eliminar
-                                            </button>
+
                                         </td>
                                     </tr>
                                 @endforeach
@@ -93,9 +91,42 @@
     </div>
 
     @include('Administrator.Departamento.create')
+    @include('Administrator.Departamento.edit')
 @endsection
 
 
 @section('js')
-    <script></script>
+    <!-- Scripts de Bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Editar Entrenador -->
+    <script>
+        function editar(id) {
+
+            console.log(id);
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                }
+            });
+
+            $.ajax({
+                url: '{{ route('administrador.departamentos.search') }}', // Cambia esto a la URL correcta de tu servidor de ping
+                type: 'POST',
+                data: {
+                    id: id // Agrega el ID a los datos que serán enviados
+                },
+                success: function(response) {
+                    console.log(response);
+                    $('#name').val(response.name);
+                    $('#id').val(response.id);
+                    $('#createEdit').modal('show');
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    console.log("Error en la conexión:", xhr.status, thrownError);
+                }
+            });
+        }
+    </script>
 @endsection

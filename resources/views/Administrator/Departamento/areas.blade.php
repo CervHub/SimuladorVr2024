@@ -72,10 +72,10 @@
                                                 data-target="#editModal" onclick="editar({{ $area->id }})">
                                                 <span class="icon icon-pencil"></span> Editar
                                             </button>
-                                            <button class="btn btn-custom btn-danger text-white me-0" data-toggle="modal"
+                                            {{-- <button class="btn btn-custom btn-danger text-white me-0" data-toggle="modal"
                                                 data-target="#deleteModal" onclick="eliminar({{ $area->id }})">
                                                 <span class="icon icon-trash"></span> Eliminar
-                                            </button>
+                                            </button> --}}
                                         </td>
                                     </tr>
                                 @endforeach
@@ -88,6 +88,7 @@
     </div>
 
     @include('Administrator.Departamento.creararea')
+    @include('Administrator.Departamento.areaedit')
 @endsection
 
 
@@ -95,5 +96,32 @@
     <script>
         const iconSuperAdmin = document.querySelector('#departamento');
         iconSuperAdmin.classList.add('active');
+
+        function editar(id) {
+
+            console.log(id);
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                }
+            });
+
+            $.ajax({
+                url: '{{ route('administrador.areas.search') }}', // Cambia esto a la URL correcta de tu servidor de ping
+                type: 'POST',
+                data: {
+                    id: id // Agrega el ID a los datos que serán enviados
+                },
+                success: function(response) {
+                    console.log(response);
+                    $('#name').val(response.name);
+                    $('#id').val(response.id);
+                    $('#createEdit').modal('show');
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    console.log("Error en la conexión:", xhr.status, thrownError);
+                }
+            });
+        }
     </script>
 @endsection

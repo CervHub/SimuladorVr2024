@@ -403,7 +403,7 @@ class SupervisorController extends Controller
     {
         $workshops = WorkshopCompany::where('id_company', session('id_company'))->get();
         $inductions = Induction::where('id_company', session('id_company'))
-            ->where('status', '1')
+            // ->where('status', '1')
             ->orderBy('id', 'desc')
             ->get();
 
@@ -670,7 +670,7 @@ class SupervisorController extends Controller
             $detail_induction_worker = $detail_induction_worker->where('entrenamiento', '<>', 1);
         }
 
-        $detail_induction_worker = $detail_induction_worker->orderBy('time', 'asc')->get();
+        $detail_induction_worker = $detail_induction_worker->orderBy('id', 'asc')->get();
         // Cargar los datos necesarios para el PDF en el arreglo $data
         $casosTotales = $induction_worker->case_count;
         $casosBuenos = count($detail_induction_worker);
@@ -751,10 +751,10 @@ class SupervisorController extends Controller
 
             return $pdf->stream('reporteConfiPetrol.pdf');
         } else if ($induction->id_company == 3) {
-            $errores = round($detail_induction_worker->sum('num_errors'));
-            $aciertos = $induction_worker->puntaje - $errores;
-            $data['nota'] = $aciertos;
-            $data['imagen'] = "https://quickchart.io/chart?c={type:'doughnut', data:{datasets:[{data:[$aciertos,$errores],backgroundColor:['rgb(32,164,81)','rgb(255,0,0)'],}],labels:['Puntaje Inicial', 'Nº Errores'],},options:{title:{display:false},plugins: { datalabels: { color: 'white' } },},}";
+            $tiempoObjetivo = 0.5;
+            $data['tiempoObjetivo'] = $tiempoObjetivo;
+            // dd($induction_worker->notaLuzDelSurIntento($intento,$modo,$tiempoObjetivo));
+            $data['nota'] = $induction_worker->notaLuzDelSurIntento($intento,$modo,$tiempoObjetivo);
             $pdf = PDF::loadView('ReportesFormatos.LuzDelSurNotaPdf', $data);
             return $pdf->stream('reporteLuzDelSur.pdf');
         }
@@ -960,15 +960,18 @@ class SupervisorController extends Controller
                 $intentos = [];
                 for ($i = 1; $i <= $induction->num_report; $i++) {
                     $data = $induction->detailsByReportAndTraining($i, 'evaluacion')->first();
-                    $intentos[] = [
-                        'intento' => $data->report,
-                        'note' => $data->note,
-                        'note_reference' => $data->note_reference,
-                        'date_start' => $data->start_date,
-                        'date_end' => $data->end_date,
-                        'modo' => 'Evaluación',
-                        'id' => $data->id
-                    ];
+                    if ($data) {
+                        $intentos[] = [
+                            'intento' => $data->report,
+                            'note' => $data->note,
+                            'note_reference' => $data->note_reference,
+                            'date_start' => $data->start_date,
+                            'date_end' => $data->end_date,
+                            'modo' => 'Evaluación',
+                            'id' => $data->id
+                        ];
+                    } else {
+                    }
                 }
                 for ($i = 1; $i <= $nuevoIntento; $i++) {
                     $data = $induction->detailsByReportAndTraining($i, 'entrenamiento')->first();

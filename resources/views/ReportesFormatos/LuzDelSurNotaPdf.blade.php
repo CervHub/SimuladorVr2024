@@ -154,7 +154,8 @@
             Marcar con (X) según corresponda:
         </h4>
         <h4 class="text-light" style="padding: 0; margin-top: 15px; text-align:center;">
-            1-Inducción( ) 2-Capacitación( {{ $modo == 'Entrenamiento' ? ' ' : 'X' }} ) 3-Entrenamiento( {{ $modo == 'Entrenamiento' ? 'X' : ' ' }} ) 4-Jornada( ) 5-Simulacro de Emergencia( )        </h4>
+            1-Inducción( ) 2-Capacitación( {{ $modo == 'Entrenamiento' ? ' ' : 'X' }} ) 3-Entrenamiento(
+            {{ $modo == 'Entrenamiento' ? 'X' : ' ' }} ) 4-Jornada( ) 5-Simulacro de Emergencia( ) </h4>
     </section>
     @php
         $fechaInicio = new DateTime($data->start_date);
@@ -175,12 +176,7 @@
                             <dl class="dl-container bg-light mt-2 mb-2"
                                 style="border-radius: 25px; text-align: center;">
                                 @php
-                                    $total = 0;
-                                    foreach ($detail_induction_worker as $data) {
-                                        $total += $data->identified == 1 ? 10 : 0;
-                                    }
-                                    $maxScore = 10 * count($detail_induction_worker);
-                                    $notaPonderada = ($total / $maxScore) * $induction_worker->puntaje;
+                                    $notaPonderada = $nota;
                                 @endphp
                                 <div class="dl-row">
                                     <dt class="dl-term fs-20 line-height-12"
@@ -204,7 +200,7 @@
                 </tr>
                 <tr>
                     <td class="text-bold">Nombre:</td>
-                    <td>{{ $worker->nombre}}</td>
+                    <td>{{ $worker->nombre }}</td>
                 </tr>
                 <tr>
                     <td class="text-bold">Apellidos:</td>
@@ -220,84 +216,91 @@
                 </tr>
                 <tr>
                     <td class="text-bold">Número de reporte:</td>
-                    <td>{{$intento}}/{{ $num_reportes }}</td>
+                    <td>{{ $intento }}/{{ $num_reportes }}</td>
                 </tr>
             </tbody>
         </table>
         <!-- Aquí puedes agregar más contenido dentro de la sección -->
     </section>
 
-    <section id="detalles" style="padding-left: 5px;padding-right: 5px;">
+    <section id="detalles" style="">
         <h3 class="fs-15 title" style="padding:0;">Detalles de evaluación</h3>
         <table border="1" style="width: 100%">
             <thead>
                 <tr>
                     <th class="text-small2" style="width: 5%">ITEM</th>
                     <th class="text-small2" style="width: 50%">DESCRIPCIÓN</th>
-                    <th class="text-small2" style="width: 15%">DURACIÓN(MIN)</th>
-                    <th class="text-small2" style="width: 15%">PUNTAJE</th>
+                    <th class="text-small2" style="width: 10%">TIEMPO OBJETIVO (MIN)</th>
+                    <th class="text-small2" style="width: 10%">TIEMPO REAL (MIN)</th>
+                    <th class="text-small2" style="width: 10%">ERRORES</th>
+                    <th class="text-small2" style="width: 10%">PUNTAJE</th>
                 </tr>
             </thead>
             <tbody>
                 @php
                     $total = 0;
+                    $finalErrors = 0;
+                    $primera = true;
+
                 @endphp
+
                 @foreach ($detail_induction_worker as $key => $data)
                     @php
-                        $total += $data->identified == 1 ? 10 : 0;
+                        $tiempoReal = $data->time; // Assuming $data->time contains the actual time in minutes
+                        // Verificar si el caso está identificado y el tiempo objetivo es mayor al tiempo real
+                        if ($data->identified == 1 && $tiempoObjetivo * 60 > $tiempoReal) {
+                            // Ambas condiciones se cumplen, asignar 10 puntos
+                            $puntaje = 10; // Asegúrate de que $errores esté definido antes de usarlo
+                        } else {
+                            // Al menos una de las condiciones no se cumple, asignar 0 puntos
+                            $puntaje = 0;
+                        }
+                        $finalErrors = $data->note_reference - $data->note;
+                        $total += $puntaje;
                     @endphp
-                    <tr style="height: 20px;">
-                        <td style="text-align: center;">{{ $key + 1 }}</td>
-                        <td style="text-align: left;">{{ $data->case }}</td>
-                        <td style="text-align: center;">{{ $data->time }}</td>
-                        <td style="text-align: center;">{{ $data->identified == 1 ? 10 : 0 }}</td>
-                    </tr>
-                @endforeach
-                <tr>
-                    <td colspan="3" style="text-align: right;">Total:</td>
-                    <td style="text-align: center;">{{ $total }}</td>
-                </tr>
-                <!-- Add more rows as needed -->
-            </tbody>
-        </table>
-
-        <br>
-        {{-- <table class="no-border" style="width: 100%; border: 1px solid white; !important">
-            <tr style="background-color: white;">
-                <td style="vertical-align: top; width: 300px; border: none !important;">
-                    <img src="{{ $imagen }}" width="300px" alt="">
-                </td>
-                <td style="padding: 10px; background-color: white;">
-                    @php
-                        $total_errores = round($detail_induction_worker->sum('num_errors'));
-                    @endphp
-                    <table style="width: 100%; border-collapse: collapse; border: 1px solid black;">
+                    @if ($primera)
+                        <!-- EPPS Row -->
                         <tr>
-                            <td class="text-bold" style="border: 1px solid black;">Total de Errores:</td>
-                            <td style="border: 1px solid black;">{{ $total_errores }}</td>
-                        </tr>
-                        <tr>
-                            <td class="text-bold" style="border: 1px solid black;">Puntaje Inicial:</td>
-                            <td style="border: 1px solid black;">{{ $induction_worker->puntaje }}</td>
-                        </tr>
-                        <tr>
-                            <td class="text-bold" style="border: 1px solid black;">Puntaje Final:</td>
-                            <td style="border: 1px solid black;">
-                                @if ($induction_worker->puntaje - $total_errores < 0)
-                                    0
+                            <td style="text-align: center;">{{ 1 }}</td>
+                            <td style="text-align: left;">EPPS</td>
+                            <td style="text-align: center;"> - </td>
+                            <td style="text-align: center;"> - </td>
+                            <td style="text-align: center;">{{ $finalErrors }}</td>
+                            <td style="text-align: center;">
+                                @if ($finalErrors > 0)
+                                    -{{ $finalErrors }}
                                 @else
-                                    {{ $induction_worker->puntaje - $total_errores }}
+                                    0
                                 @endif
                             </td>
                         </tr>
-                        <!-- Agrega más filas de datos según sea necesario -->
-                    </table>
+                    @endif
+                    @php
+                        $primera = false;
+                    @endphp
+                    <tr style="height: 20px;">
+                        <td style="text-align: center;">{{ $key + 2 }}</td>
+                        <td style="text-align: left;">{{ $data->case }}</td>
+                        <td style="text-align: center;">{{ gmdate('i:s', $tiempoObjetivo * 60) }}</td>
+                        <td style="text-align: center;">{{ gmdate('i:s', $tiempoReal) }}</td>
+                        <td style="text-align: center;"> - </td>
+                        <td style="text-align: center;">{{ $puntaje }}</td>
+                    </tr>
+                @endforeach
 
-                </td>
-            </tr>
-        </table> --}}
-
-
+                @php
+                    $total = $total + $finalErrors;
+                    if ($total < 0) {
+                        $total = 0;
+                    }
+                @endphp
+                <tr>
+                    <td colspan="5" style="text-align: right;">Total:</td>
+                    <td style="text-align: center;">{{ $total }}</td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
     </section>
 
 </body>
