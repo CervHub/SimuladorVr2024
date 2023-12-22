@@ -670,7 +670,7 @@ class SupervisorController extends Controller
             $detail_induction_worker = $detail_induction_worker->where('entrenamiento', '<>', 1);
         }
 
-        $detail_induction_worker = $detail_induction_worker->orderBy('time', 'asc')->get();
+        $detail_induction_worker = $detail_induction_worker->orderBy('id', 'asc')->get();
         // Cargar los datos necesarios para el PDF en el arreglo $data
         $casosTotales = $induction_worker->case_count;
         $casosBuenos = count($detail_induction_worker);
@@ -751,10 +751,10 @@ class SupervisorController extends Controller
 
             return $pdf->stream('reporteConfiPetrol.pdf');
         } else if ($induction->id_company == 3) {
-            $errores = round($detail_induction_worker->sum('num_errors'));
-            $aciertos = $induction_worker->puntaje - $errores;
-            $data['nota'] = $aciertos;
-            $data['imagen'] = "https://quickchart.io/chart?c={type:'doughnut', data:{datasets:[{data:[$aciertos,$errores],backgroundColor:['rgb(32,164,81)','rgb(255,0,0)'],}],labels:['Puntaje Inicial', 'Nº Errores'],},options:{title:{display:false},plugins: { datalabels: { color: 'white' } },},}";
+            $tiempoObjetivo = 0.5;
+            $data['tiempoObjetivo'] = $tiempoObjetivo;
+            // dd($induction_worker->notaLuzDelSurIntento($intento,$modo,$tiempoObjetivo));
+            $data['nota'] = $induction_worker->notaLuzDelSurIntento($intento,$modo,$tiempoObjetivo);
             $pdf = PDF::loadView('ReportesFormatos.LuzDelSurNotaPdf', $data);
             return $pdf->stream('reporteLuzDelSur.pdf');
         }

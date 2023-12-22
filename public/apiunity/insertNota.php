@@ -12,6 +12,17 @@ $rol = $_POST['rol'];
 $jsonData = $_POST['json']; // Esto ya contiene el JSON decodificado
 $entrenamiento = intval($_POST['entrenamiento']);
 
+// Imprimir los valores recibidos
+// echo "cabecera_id: " . $cabecera_id . "<br>";
+// echo "nuevoIntento: " . $nuevoIntento . "<br>";
+// echo "note: " . $note . "<br>";
+// echo "note_reference: " . $note_reference . "<br>";
+// echo "start_date: " . $start_date . "<br>";
+// echo "end_date: " . $end_date . "<br>";
+// echo "rol: " . $rol . "<br>";
+// echo "jsonData: " . $jsonData . "<br>";
+// echo "entrenamiento: " . $entrenamiento . "<br>";
+
 $intentoEntrenamiento = 0;
 if ($entrenamiento == 1) {
   $stmt = $db->prepare("SELECT COALESCE(MAX(report) + 1, 1) AS result FROM detail_induction_workers WHERE induction_worker_id = :id AND entrenamiento = '1'");
