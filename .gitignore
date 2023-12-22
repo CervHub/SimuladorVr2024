@@ -19,3 +19,5 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+/public/apiunity/conexion.php
+/public/apiunity/conexionisem.php
