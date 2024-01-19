@@ -131,5 +131,60 @@ class InductionWorker extends Model
         return strval($puntajeFinal);
     }
 
+    public function getPonderadoAttribute()
+    {
+        $nota = 0;
+
+        // Verificar si hay al menos un registro en la relación 'detail'
+        if ($this->detail->count() > 0) {
+            // Obtener el primer registro de 'detail'
+            $primerDetalle = $this->detail->first();
+
+            // Calcular el valor ponderado
+            $nota = ($primerDetalle->note_reference != 0) ? (number_format($primerDetalle->note, 0) / $primerDetalle->note_reference) * 20 : 0;
+        }
+
+        return number_format($nota, 0);
+    }
+
+
+    public function getPorcentajeAttribute()
+    {
+        $nota = $this->getPonderadoAttribute();
+        if ($nota >= 2 && $nota <= 6) {
+            $porcentaje = 25;
+        } elseif ($nota >= 7 && $nota <= 11) {
+            $porcentaje = 59;
+        } elseif ($nota >= 12 && $nota <= 16) {
+            $porcentaje = 75;
+        } elseif ($nota >= 17 && $nota <= 20) {
+            $porcentaje = 100;
+        } else {
+            $porcentaje = 0; // Otra categoría o porcentaje por defecto si no coincide con ninguna condición
+        }
+        return $porcentaje;
+    }
+
+    public function getCategoriaAttribute()
+    {
+        $nota = $this->getPonderadoAttribute();
+        if ($nota >= 2 && $nota <= 6) {
+            $categoria = 'Seguimiento';
+        } elseif ($nota >= 7 && $nota <= 11) {
+            $categoria = 'En Proceso';
+        } elseif ($nota >= 12 && $nota <= 16) {
+            $categoria = 'Competente';
+        } elseif ($nota >= 17 && $nota <= 20) {
+            $categoria = 'Muy Competente';
+        } else {
+            $categoria = 'Desconocido';
+        }
+        return $categoria;
+    }
+
+
+    // Nueva función para obtener la nota de un trabajador en un reporte específico
+
+
 
 }

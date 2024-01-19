@@ -158,12 +158,12 @@
                 @foreach($result as $data)
                 <tr style="background-color: {{ $rowNumber % 2 == 0 ? '#c9c9c9' : '#ffffff' }}">
                     <td class="text-center">{{ $rowNumber }}</td>
-                    <td class="column__key--black text-center">{{ $data->doi }}</td>
-                    <td class="column__key--black text-center">{{ $data->nombre }} {{ $data->apellido }}</td>
+                    <td class="column__key--black text-center">{{ $data->worker->user->doi }}</td>
+                    <td class="column__key--black text-center">{{ $data->worker->nombre }} {{ $data->worker->apellido }}</td>
                     <!-- <td class="column__key--black text-center">{{ $data->position }}</td> -->
                     <td class="text-center">
-                        @if(isset($data->servicio))
-                        {{ $data->servicio }}
+                        @if(isset($data->worker->service->name))
+                        {{ $data->worker->service->name }}
                         @else
                         No se encontró empresa
                         @endif

@@ -485,7 +485,7 @@
                         </tr>
                         <tr style="border-collapse: collapse; border: 1px solid black;">
                             <td style="border-collapse: collapse; border: 1px solid black;"> Nota Obetenida:</td>
-                            <td style="border-collapse: collapse; border: 1px solid black;">{{number_format($data->note,0)}}</td>
+                            <td style="border-collapse: collapse; border: 1px solid black;">{{number_format($nota,0)}}</td>
                         </tr>
                         <tr style="border-collapse: collapse; border: 1px solid black;">
                             <td style="border-collapse: collapse; border: 1px solid black;">Nota ponderada:</td>

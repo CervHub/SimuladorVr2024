@@ -147,8 +147,7 @@ Route::get('isem/v1/insertnota/{json}', [ApiIsemController::class, 'insertnota']
 Route::get('isem/v1/insertcasos/{json}', [ApiIsemController::class, 'insertcasos']);
 Route::get('isem/v1/{dni}', [ApiIsemController::class, 'induction']);
 
-Route::get('view/pdf/{id_induction_worker}/{intento}/{entrenamiento}', [SupervisorController::class, 'visualizar_reporte_notas'])
-    ->name('view.pdf');
+Route::get('view/pdf/{id_induction_worker}/{intento}/{entrenamiento}', [SupervisorController::class, 'visualizar_reporte_notas'])->name('view.pdf');
 
 
 use App\Http\Controllers\ReporteController;

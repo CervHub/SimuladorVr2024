@@ -21,6 +21,8 @@ use App\Models\InductionWorker;
 use Dompdf\Dompdf;
 use PDF; // Importar el facade de PDF
 use App\Exports\InductionExcelReportExport;
+use App\Exports\ExcelGeneralConfipetrol;
+
 use App\Models\Company;
 use App\Models\User;
 use Illuminate\Support\Carbon;
@@ -684,6 +686,7 @@ class SupervisorController extends Controller
         $ponderado = $result['ponderado'];
         $porcentaje = $result['porcentaje'];
         $categoria = $result['categoria'];
+        $note_reference = $data->note_reference;
 
         $consulta = DB::table('detail_induction_workers')
             ->select(DB::raw('COALESCE(MAX(report) , 0) AS resultado'))
@@ -723,9 +726,21 @@ class SupervisorController extends Controller
 
         // Configura los márgenes directamente en DOMPDF
         if ($induction->id_company == 2) {
+            $NotaObtenida = 0;
+
+            foreach ($detail_induction_worker as $worker) {
+                $NotaObtenida += $worker['identified'] + $worker['risk_level'] + $worker['correct_measure'];
+            }
+            $result = $this->calcularPonderadoPorcentajeYCategoria($note_reference, $NotaObtenida);
+            $data['ponderado'] = $result['ponderado'];
+            $data['porcentaje'] = $result['porcentaje'];
+            $data['categoria'] = $result['categoria'];
+            $data['nota'] = $NotaObtenida;
             $pdf = PDF::loadView('ReportesFormatos.IsemNotaPdf', $data);
             return $pdf->stream('ISEMReporte.pdf');
         } else if ($induction->id_company == 4) {
+
+
             $errores = round($detail_induction_worker->sum('num_errors'));
             $aciertos = $induction_worker->puntaje - $errores;
             $data['nota'] = $aciertos;
@@ -754,7 +769,7 @@ class SupervisorController extends Controller
             $tiempoObjetivo = 0.5;
             $data['tiempoObjetivo'] = $tiempoObjetivo;
             // dd($induction_worker->notaLuzDelSurIntento($intento,$modo,$tiempoObjetivo));
-            $data['nota'] = $induction_worker->notaLuzDelSurIntento($intento,$modo,$tiempoObjetivo);
+            $data['nota'] = $induction_worker->notaLuzDelSurIntento($intento, $modo, $tiempoObjetivo);
             $pdf = PDF::loadView('ReportesFormatos.LuzDelSurNotaPdf', $data);
             return $pdf->stream('reporteLuzDelSur.pdf');
         }
@@ -859,6 +874,7 @@ class SupervisorController extends Controller
         // Configura los márgenes directamente en DOMPDF
         if ($induction->id_company == 2) {
             $pdf = PDF::loadView('ReportesFormatos.IsemAsistenciaPdf', $data);
+            // dd($result[0]->worker);
         } else if ($induction->id_company == 4) {
             $pdf = PDF::loadView('ReportesFormatos.ConfipetrolAsistenciaPdf', $data);
         } else if ($induction->id_company == 3) {
@@ -897,30 +913,65 @@ class SupervisorController extends Controller
         // Crear un arreglo vacío para los datos a exportar
         $data = [];
         // Iterar sobre los registros y construir el arreglo de datos
-        foreach ($inductionWorkers as $worker) {
 
-            if ($worker->worker->user->name == $worker->worker->user->last_name) {
-                $name = $worker->worker->user->name;
-            } else {
-                $name = $worker->worker->user->name . ' ' . $worker->worker->user->last_name;
+        foreach ($inductionWorkers as $worker) {
+            // Verificar si el status es igual a 1
+            if ($worker->status == 1) {
+                if ($worker->worker->user->name == $worker->worker->user->last_name) {
+                    $name = $worker->worker->user->name;
+                } else {
+                    $name = $worker->worker->user->name . ' ' . $worker->worker->user->last_name;
+                }
+                $data[] = [
+                    'doi' => $worker->worker->user->doi,
+                    'name' => $name,
+                    'nota' => $worker->Ponderado,
+                    'categoria' => $worker->Categoria,
+                    'porcentaje' => number_format($worker->Porcentaje, 0) . '%',
+                ];
             }
-            $data[] = [
-                'doi' => $worker->worker->user->doi,
-                'name' => $name,
-                'nota' => $worker->Ponderado,
-                'categoria' => $worker->Categoria,
-                'porcentaje' => number_format($worker->Porcentaje, 0) . '%',
-            ];
         }
 
+        // Crear una instancia de la clase de exportación y pasar los datos
         $cabecera = [
             'simulador' => $induction->alias,
             'instructor' => $induction->worker->user->name . ' ' . $induction->worker->user->last_name,
             'fecha' => Carbon::now()->format('d/m/Y'),
         ];
 
-        // Crear una instancia de la clase de exportación y pasar los datos
-        $export = new InductionExcelReportExport(collect($data), collect($cabecera));
+        $id_company = session('id_company');
+
+        switch ($id_company) {
+            case 2:
+                $export = new InductionExcelReportExport(collect($data), collect($cabecera));
+                break;
+            case 3:
+                $export = new InductionExcelReportExport(collect($data), collect($cabecera));
+                break;
+            case 4:
+                $data = [];
+                // Iterar sobre los registros y construir el arreglo de datos
+
+                foreach ($inductionWorkers as $worker) {
+                    // Verificar si el status es igual a 1
+                    if ($worker->status == 1) {
+                        if ($worker->worker->user->name == $worker->worker->user->last_name) {
+                            $name = $worker->worker->user->name;
+                        } else {
+                            $name = $worker->worker->user->name . ' ' . $worker->worker->user->last_name;
+                        }
+                        $data[] = [
+                            'doi' => $worker->worker->user->doi,
+                            'name' => $name,
+                            'nota' => $worker->notaConfipetrol(),
+                        ];
+                    }
+                }
+                $export = new ExcelGeneralConfipetrol(collect($data), collect($cabecera));
+                break;
+            default:
+                break;
+        }
 
         // Descargar el archivo Excel utilizando la instancia de exportación
         return Excel::download($export, 'reporte_por_curso.xlsx');
