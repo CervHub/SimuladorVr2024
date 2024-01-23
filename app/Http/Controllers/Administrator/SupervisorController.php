@@ -724,20 +724,17 @@ class SupervisorController extends Controller
 
         // Configura los márgenes directamente en DOMPDF
         if ($induction->id_company == 2) {
-            $NotaObtenida = 0;
 
-            foreach ($detail_induction_worker as $worker) {
-                $NotaObtenida += $worker['identified'] + $worker['risk_level'] + $worker['correct_measure'];
-            }
-            $result = $this->calcularPonderadoPorcentajeYCategoria($note_reference, $NotaObtenida);
-            $data['ponderado'] = $result['ponderado'];
-            $data['porcentaje'] = $result['porcentaje'];
-            $data['categoria'] = $result['categoria'];
-            $data['nota'] = $NotaObtenida;
+            $datas = $induction_worker->notaIsemByIntento($intento);
+
+            $data['ponderado'] = 1;
+            $data['porcentaje'] = $datas['porcentaje'];
+            $data['categoria'] = $datas['categoria'];
+            $data['nota'] = $datas['total_sum'];
+            $data['extra'] = $datas;
             $pdf = PDF::loadView('ReportesFormatos.IsemNotaPdf', $data);
             return $pdf->stream('ISEMReporte.pdf');
         } else if ($induction->id_company == 4) {
-
 
             $errores = round($detail_induction_worker->sum('num_errors'));
             $aciertos = $induction_worker->puntaje - $errores;
@@ -852,7 +849,10 @@ class SupervisorController extends Controller
         }
 
         $induction = Induction::find($id_induction);
-        $result = InductionWorker::where('induction_workers.id_induction', $id_induction)->get();
+        $result = InductionWorker::where('induction_workers.id_induction', $id_induction)
+            ->orderBy('id', 'asc')
+            ->get();
+
         $logo = Company::find($induction->id_company)->url_image_desktop;
         if ($induction->worker->user->signature != null) {
             $dataImage = file_get_contents(public_path($induction->worker->user->signature));
@@ -891,14 +891,17 @@ class SupervisorController extends Controller
         // Verifica si al menos una de las fechas es "0000-00-00"
         if ($fecha_inicio === '0000-00-00' || $fecha_fin === '0000-00-00') {
             // No apliques ningún filtro de fecha
-            $inductionWorkers = InductionWorker::where('id_induction', $id_induction)->get();
+            $inductionWorkers = InductionWorker::where('id_induction', $id_induction)
+                ->orderBy('id', 'asc')
+                ->get();
         } else {
             // Añade la hora correspondiente a las fechas
             $fecha_inicio .= ' 00:00:00';
             $fecha_fin .= ' 23:59:59';
 
             // Aplica el filtro de fechas solo si ambas fechas son válidas
-            $query = InductionWorker::where('id_induction', $id_induction);
+            $query = InductionWorker::where('id_induction', $id_induction)
+                ->orderBy('id', 'asc');
             if ($fecha_inicio && $fecha_fin) {
                 $query->where('start_date', '>=', $fecha_inicio)
                     ->where('end_date', '<=', $fecha_fin);
@@ -907,6 +910,8 @@ class SupervisorController extends Controller
         }
 
         $induction = Induction::find($id_induction);
+
+
 
         // Crear un arreglo vacío para los datos a exportar
         $data = [];
@@ -941,6 +946,30 @@ class SupervisorController extends Controller
 
         switch ($id_company) {
             case 2:
+                // dd($data, $cabecera, $inductionWorkers[16]->notaIsemByAllIntentos(), $inductionWorkers[16]);
+                $data = [];
+                // Iterar sobre los registros y construir el arreglo de datos
+
+                foreach ($inductionWorkers as $worker) {
+                    // Verificar si el status es igual a 1
+                    if ($worker->status == 1) {
+                        if ($worker->worker->user->name == $worker->worker->user->last_name) {
+                            $name = $worker->worker->user->name;
+                        } else {
+                            $name = $worker->worker->user->name . ' ' . $worker->worker->user->last_name;
+                        }
+
+                        $notaIsemData = $worker->notaIsemByAllIntentos();
+
+                        $data[] = [
+                            'doi' => $worker->worker->user->doi,
+                            'name' => $name,
+                            'nota' => $notaIsemData['total_sum'] == 0.0 ? '0' : $notaIsemData['total_sum'],
+                            'categoria' => $notaIsemData['categoria'],
+                            'porcentaje' => number_format($notaIsemData['porcentaje'], 0) . '%',
+                        ];
+                    }
+                }
                 $export = new InductionExcelReportExport(collect($data), collect($cabecera));
                 break;
             case 3:
@@ -971,8 +1000,8 @@ class SupervisorController extends Controller
                 break;
         }
 
-        // Descargar el archivo Excel utilizando la instancia de exportación
-        return Excel::download($export, 'reporte_por_curso.xlsx');
+        $filename = $cabecera['simulador'] . '_' . date('Y-m-d_H-i-s') . '.xlsx';
+        return Excel::download($export, $filename);
     }
 
     public function reportealumno(Request $request)

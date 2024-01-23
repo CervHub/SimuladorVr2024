@@ -312,7 +312,7 @@
         <tr style="padding:0; margin:0;">
             <td style="width: 100px;  padding:0;">
                 <div class="">
-                    <img src="{{$logo}}" width="64px" alt="Logo">
+                    <img src="{{ $logo }}" width="64px" alt="Logo">
                 </div>
             </td>
             <td style="  padding:0;">
@@ -330,19 +330,20 @@
                 <td class="col-6 align-left align-top">
                     <dl class="dl-container ">
                         <div class="dl-row">
-                            <dt class="dl-term title fs-15" style="padding:0; padding-bottom:15px;">Datos del usuario</dt>
+                            <dt class="dl-term title fs-15" style="padding:0; padding-bottom:15px;">Datos del usuario
+                            </dt>
                         </div>
                         <div class="dl-row">
                             <dt class="dl-term-secondary">DNI:</dt>
-                            <dd class="dl-definition">{{$worker->user->doi}}</dd>
+                            <dd class="dl-definition">{{ $worker->user->doi }}</dd>
                         </div>
                         <div class="dl-row">
                             <dt class="dl-term-secondary">Nombre:</dt>
-                            <dd class="dl-definition">{{$worker->user->name}}</dd>
+                            <dd class="dl-definition">{{ $worker->user->name }}</dd>
                         </div>
                         <div class="dl-row">
                             <dt class="dl-term-secondary">Apellidos:</dt>
-                            <dd class="dl-definition">{{$worker->user->last_name}}</dd>
+                            <dd class="dl-definition">{{ $worker->user->last_name }}</dd>
                         </div>
                         <div class="dl-row">
                             <dt class="dl-term-secondary">Fecha:</dt>
@@ -356,22 +357,23 @@
                             <dl class="dl-container bg-light mt-2 mb-2" style="border-radius: 25px; width: 120px;">
                                 <div class="dl-row">
                                     @php
-                                    $notaPonderada = $nota;
+                                        $notaPonderada = $extra['total_sum'];
                                     @endphp
-                                    <dt class="dl-term fs-20 line-height-12" style="font-weight: bold;">{{ number_format($notaPonderada, 0) }}/20</dt>
+                                    <dt class="dl-term fs-20 line-height-12" style="font-weight: bold;">
+                                        {{ number_format($notaPonderada, 0) }}/20</dt>
                                 </div>
                                 <div class="dl-row">
                                     <dt class="dl-term fs-20 line-height-12" style="font-weight: bold;">
-                                        @if($notaPonderada > 12)
-                                        Aprobado
+                                        @if ($notaPonderada > 12)
+                                            Aprobado
                                         @else
-                                        Desaprobado
+                                            Desaprobado
                                         @endif
                                     </dt>
                                 </div>
                                 <div class="dl-row">
                                     <dt class="dl-term fs-20 line-height-12" style="font-weight: bold;">
-                                        {{$categoria}}
+                                        {{ $extra['categoria'] }}
                                     </dt>
                                 </div>
                             </dl>
@@ -391,15 +393,16 @@
                 <td class="col-7 align-left align-top">
                     <dl class="dl-container">
                         <div class="dl-row">
-                            <dt class="dl-term title fs-15" style="padding:0; padding-bottom: 10px;">Datos de evaluación</dt>
+                            <dt class="dl-term title fs-15" style="padding:0; padding-bottom: 10px;">Datos de evaluación
+                            </dt>
                         </div>
                         <div class="dl-row">
                             <dt class="dl-term-secondary">Escenario:</dt>
-                            <dd class="dl-definition">{{$induction->alias}}</dd>
+                            <dd class="dl-definition">{{ $induction->alias }}</dd>
                         </div>
                         <!-- <div class="dl-row">
                             <dt class="dl-term-secondary">Total de Casos:</dt>
-                            <dd class="dl-definition">{{$casosTotales}}</dd>
+                            <dd class="dl-definition">{{ $casosTotales }}</dd>
                         </div> -->
                         <div class="dl-row">
                             <dt class="dl-term-secondary">Casos Asignados:</dt>
@@ -407,35 +410,35 @@
                         </div>
                         <div class="dl-row">
                             <dt class="dl-term-secondary">Casos Encontrados:</dt>
-                            <dd class="dl-definition">{{$casosBuenos}}</dd>
+                            <dd class="dl-definition">{{ $casosBuenos }}</dd>
                         </div>
 
                         @php
-                        $fechaInicio = new DateTime($data->start_date);
-                        $fechaFin = new DateTime($data->end_date);
-                        $diferencia = $fechaInicio->diff($fechaFin);
+                            $fechaInicio = new DateTime($data->start_date);
+                            $fechaFin = new DateTime($data->end_date);
+                            $diferencia = $fechaInicio->diff($fechaFin);
 
-                        $duracionEnHoras = $diferencia->format('%I:%S');
+                            $duracionEnHoras = $diferencia->format('%I:%S');
                         @endphp
 
                         <div class="dl-row">
                             <dt class="dl-term-secondary">Fecha inicio:</dt>
-                            <dd class="dl-definition">{{$data->start_date}}</dd>
+                            <dd class="dl-definition">{{ $data->start_date }}</dd>
                         </div>
                         <div class="dl-row">
                             <dt class="dl-term-secondary">Fecha fin:</dt>
-                            <dd class="dl-definition">{{$data->end_date}}</dd>
+                            <dd class="dl-definition">{{ $data->end_date }}</dd>
                         </div>
                         <div class="dl-row">
                             <dt class="dl-term-secondary">Duración:</dt>
-                            <dd class="dl-definition">{{$duracionEnHoras}}</dd>
+                            <dd class="dl-definition">{{ $duracionEnHoras }}</dd>
                         </div>
                     </dl>
                 </td>
                 <td class="col-5 align-left align-top" style="text-align: right;">
                     <dl class="dl-container">
                         <div class="dl-row">
-                            <img style="border-radius: 25px;" src="{{$logo_taller}}" width="300px" alt="">
+                            <img style="border-radius: 25px;" src="{{ $logo_taller }}" width="300px" alt="">
                         </div>
                     </dl>
                 </td>
@@ -454,42 +457,47 @@
                 <th>Medida correcta</th>
                 <th>Tiempo</th>
             </tr>
-            @foreach($detail_induction_worker as $key => $data)
-            <tr style="height: 20px;"> <!-- Ajusta la altura según tus preferencias -->
-                <td style="text-align: left;">{{$key + 1}}. {{$data->case}}</td>
-                <td>{{$data->identified}}</td>
-                <td>{{$data->risk_level}}</td>
-                <td>{{$data->correct_measure}}</td>
-                <td>{{date("H:i", strtotime($data->time))}}</td>
-            </tr>
+            @foreach ($detail_induction_worker as $key => $data)
+                <tr style="height: 20px;"> <!-- Ajusta la altura según tus preferencias -->
+                    <td style="text-align: left;">{{ $key + 1 }}. {{ $data->case }}</td>
+                    <td>{{ $data->identified }}</td>
+                    <td>{{ $data->risk_level }}</td>
+                    <td>{{ $data->correct_measure }}</td>
+                    <td>{{ date('H:i', strtotime($data->time)) }}</td>
+                </tr>
             @endforeach
+            @php
+                $totalSum = round($extra['identified_sum'] + $extra['risk_level_sum'] + $extra['correct_measure_sum']);
+            @endphp
             <tr>
                 <th>TOTAL</th>
-                <th>{{$detail_induction_worker->sum('identified')}}</th>
-                <th>{{$detail_induction_worker->sum('risk_level')}}</th>
-                <th>{{$detail_induction_worker->sum('correct_measure')}}</th>
-                <th>-</th>
+                <th>{{ $extra['identified_sum'] }}</th>
+                <th>{{ $extra['risk_level_sum'] }}</th>
+                <th>{{ $extra['correct_measure_sum'] }}</th>
+                <th></th>
             </tr>
         </table>
         <br>
         <table class="no-border">
             <tr>
                 <td style="vertical-align: top; width: 300px; border: none;">
-                    <img src="{{$imagen}}" width="300px" alt="">
+                    <img src="{{ $imagen }}" width="300px" alt="">
                 </td>
                 <td>
                     <table style="border-collapse: collapse; border: 1px solid black;">
                         <tr style="border-collapse: collapse; border: 1px solid black;">
                             <td style="border-collapse: collapse; border: 1px solid black;">Nota de Referencia:</td>
-                            <td style="border-collapse: collapse; border: 1px solid black;">{{number_format($data->note_reference,0)}}</td>
+                            <td style="border-collapse: collapse; border: 1px solid black;">
+                                {{ number_format($data->note_reference, 0) }}</td>
                         </tr>
                         <tr style="border-collapse: collapse; border: 1px solid black;">
                             <td style="border-collapse: collapse; border: 1px solid black;"> Nota Obetenida:</td>
-                            <td style="border-collapse: collapse; border: 1px solid black;">{{number_format($nota,0)}}</td>
+                            <td style="border-collapse: collapse; border: 1px solid black;">{{ $totalSum }}</td>
                         </tr>
                         <tr style="border-collapse: collapse; border: 1px solid black;">
                             <td style="border-collapse: collapse; border: 1px solid black;">Nota ponderada:</td>
-                            <td style="border-collapse: collapse; border: 1px solid black;">{{$nota}}/20</td>
+                            <td style="border-collapse: collapse; border: 1px solid black;">
+                                {{ $extra['total_sum'] }}/20</td>
                         </tr>
                         <!-- Agrega más filas de datos según sea necesario -->
                     </table>
