@@ -329,7 +329,6 @@ class SupervisorController extends Controller
 
                 // Iterar sobre las filas y ejecutar el método createTrabajadorMasivo
                 $primerFila = true; // Bandera para omitir la primera fila (encabezado)
-
                 foreach ($datos as $hoja) {
                     foreach ($hoja as $fila) {
                         if ($primerFila) {
@@ -340,8 +339,8 @@ class SupervisorController extends Controller
                         $worker = null;
 
                         if ($fila[1]) {
-                            $service = Service::where('name', $fila[1])->first();
-                        }
+                            $id_company = session('id_company');
+                            $service = Service::where('name', $fila[1])->where('id_company', $id_company)->first();                        }
 
                         if ($fila[0]) {
                             $worker = Worker::where('code_worker', 'LIKE', '%' . $fila[0] . '%')
@@ -349,7 +348,6 @@ class SupervisorController extends Controller
                                 ->where('id_service', optional($service)->id) // Use optional() to handle null service
                                 ->first();
                         }
-
                         if (!$service) {
                             // Agregar esta fila al array de filas con problemas
                             $filasConProblemas[] = 'El servicio no existe para la fila ' . $filaActual;

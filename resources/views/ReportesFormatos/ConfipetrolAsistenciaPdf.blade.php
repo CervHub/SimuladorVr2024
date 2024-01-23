@@ -142,7 +142,7 @@
                         N°
                     </td>
                     <td class="text-center" style="font-weight: bold; padding-top: 0px; padding-bottom: 0px; width: 20%;">
-                        CODIDO
+                        CODIGO
                     </td>
                     <td class="text-center" style="font-weight: bold;">
                         NOMBRES Y APELLIDOS

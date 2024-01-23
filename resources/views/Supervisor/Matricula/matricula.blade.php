@@ -18,21 +18,21 @@
                                 <i class="icon-plus"></i> <!-- Icono de agregar aquí -->
                                 Registrar Trabajador
                             </a>
-                            {{-- <a href="{{ route('induction.formato.masivo') }}" class="btn btn-success text-white p-3 btn-sm">
+                            <a href="{{ route('induction.formato.masivo') }}" class="btn btn-success text-white p-3 btn-sm">
                                 <i class="mdi mdi-arrow-down-bold-circle-outline"></i> <!-- Icono de descarga aquí -->
                                 Descargar Formato
-                            </a> --}}
+                            </a>
                         </div>
                     </div>
                     <div class="">
-                        {{-- <form action="{{ route('matricula.cargamasiva') }}" method="POST" enctype="multipart/form-data">
+                        <form action="{{ route('matricula.cargamasiva') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <input type="hidden" value="{{ $id_service }}" name="id_service">
                             <input type="file" name="archivo_trabajadores" class="form-control-file btn btn-sm mt-2"
                                 accept=".xlsx" required>
                             <button type="submit" class="btn btn-success btn-sm mt-2 "><i class="fas fa-upload"></i>
                                 Importar trabajadores</button>
-                        </form> --}}
+                        </form>
                     </div>
                 </div>
 
