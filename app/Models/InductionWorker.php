@@ -23,6 +23,107 @@ class InductionWorker extends Model
         return $this->hasMany(DetailInductionWorker::class, 'induction_worker_id');
     }
 
+
+    //ISEM NOTAS
+
+    public function notaIsemByIntento($intento)
+    {
+        $details = $this->detailsByReport($intento)->get();
+
+        if ($details->isEmpty()) {
+            return [
+                'note_reference' => null,
+                'identified_sum' => 0,
+                'risk_level_sum' => 0,
+                'correct_measure_sum' => 0,
+                'total_sum' => '-',
+                'porcentaje' => 0,
+                'categoria' => 'Desconocido',
+                'num_report' => $this->num_report,
+            ];
+        }
+
+        $noteReference = null;
+        $identifiedSum = 0;
+        $riskLevelSum = 0;
+        $correctMeasureSum = 0;
+
+        foreach ($details as $detail) {
+            if ($noteReference === null) {
+                $noteReference = $detail->note_reference;
+            }
+
+            $identifiedSum += $detail->identified;
+            $riskLevelSum += $detail->risk_level;
+            $correctMeasureSum += $detail->correct_measure;
+        }
+
+        $totalSum = $identifiedSum + $riskLevelSum + $correctMeasureSum;
+
+        if ($noteReference != 0) {
+            $totalSum = ($totalSum / $noteReference) * 20;
+        } else {
+            $totalSum = 0;
+        }
+
+        $porcentaje = 0;
+        $categoria = 'Desconocido';
+
+        if ($totalSum >= 2 && $totalSum <= 6) {
+            $porcentaje = 25;
+            $categoria = 'Seguimiento';
+        } elseif ($totalSum > 6 && $totalSum <= 11) {
+            $porcentaje = 59;
+            $categoria = 'En Proceso';
+        } elseif ($totalSum > 11 && $totalSum <= 16) {
+            $porcentaje = 75;
+            $categoria = 'Competente';
+        } elseif ($totalSum > 16 && $totalSum <= 20) {
+            $porcentaje = 100;
+            $categoria = 'Muy Competente';
+        }
+
+        return [
+            'note_reference' => $noteReference,
+            'identified_sum' => $identifiedSum,
+            'risk_level_sum' => $riskLevelSum,
+            'correct_measure_sum' => $correctMeasureSum,
+            'total_sum' => round($totalSum),
+            'porcentaje' => $porcentaje,
+            'categoria' => $categoria,
+            'num_report' => $this->num_report,
+        ];
+    }
+
+    public function notaIsemByAllIntentos()
+    {
+        $results = [];
+
+        for ($intento = 1; $intento <= $this->num_report; $intento++) {
+            $results[$intento] = $this->notaIsemByIntento($intento);
+        }
+
+        $maxTotalSum = '-';
+        $maxIntentoData = [
+            'note_reference' => null,
+            'identified_sum' => 0,
+            'risk_level_sum' => 0,
+            'correct_measure_sum' => 0,
+            'total_sum' => '-',
+            'porcentaje' => 0,
+            'categoria' => 'Desconocido',
+            'num_report' => $this->num_report,
+        ];
+        foreach ($results as $intento => $result) {
+            if ($result['total_sum'] !== '-' && ($maxTotalSum === '-' || $result['total_sum'] > $maxTotalSum)) {
+                $maxTotalSum = $result['total_sum'];
+                $maxIntentoData = $result;
+            }
+        }
+
+        return $maxIntentoData;
+    }
+
     public function notaConfipetrol()
     {
         $detail = $this->detail()->first();
