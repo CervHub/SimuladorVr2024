@@ -2,7 +2,7 @@
 
 $host = 'localhost'; // Cambia esto al nombre o dirección IP de tu servidor PostgreSQL
 $port = '5432'; // Cambia esto al puerto de tu servidor PostgreSQL (por defecto, 5432)
-$dbname = 'simuladorvrproduccion'; // Cambia esto al nombre de tu base de datos PostgreSQL
+$dbname = 'simuladorvrtest'; // Cambia esto al nombre de tu base de datos PostgreSQL
 $username = 'postgres'; // Cambia esto a tu nombre de usuario de PostgreSQL
 $password = 'admin@c3rv'; // Cambia esto a tu contraseña de PostgreSQL
 
