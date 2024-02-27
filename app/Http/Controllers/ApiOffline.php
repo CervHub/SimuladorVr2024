@@ -29,26 +29,29 @@ class ApiOffline extends Controller
                 $induction_workers = InductionWorker::where('id_induction', $induction->id)->get();
 
                 foreach ($induction_workers as $induction_worker) {
-                    $inductionsArray[] = [
-                        'dni' => $induction_worker->worker->user->doi,
-                        'intento' => $induction_worker->num_report,
-                        'induction' => [
-                            'induction_id' => $induction->id,
-                            'id_workshop' => $induction->id_workshop,
+                    if ($induction_worker->num_report < $induction->intentos) {
+                        $inductionsArray[] = [
+                            'dni' => $induction_worker->worker->user->doi,
+                            'intento' => $induction_worker->num_report + 1,
                             'cabecera_id' => $induction_worker->id,
-                            'intento' => $induction_worker->num_report,
-                            'intentos' => $induction->intentos,
-                            'fecha_inicio' => $induction->date_start . ' ' . $induction->time_start,
-                            'fecha_fin' => $induction->date_end . ' ' . $induction->time_end,
-                            'taller' => $induction->alias,
-                            'nombre' => $induction_worker->worker->nombre,
-                            'apellido' => $induction_worker->worker->apellido,
-                            'cargo' => $induction_worker->worker->position,
-                            'celular' => $induction_worker->worker->celular,
-                            'nombre_servicio' => $induction_worker->worker->service->name,
-                            'id_service' => $induction_worker->worker->id_service,
-                        ]
-                    ];
+                            'induction' => [
+                                'induction_id' => $induction->id,
+                                'id_workshop' => $induction->id_workshop,
+                                'cabecera_id' => $induction_worker->id,
+                                'intento' => $induction_worker->num_report + 1,
+                                'intentos' => $induction->intentos,
+                                'fecha_inicio' => $induction->date_start . ' ' . $induction->time_start,
+                                'fecha_fin' => $induction->date_end . ' ' . $induction->time_end,
+                                'taller' => $induction->alias,
+                                'nombre' => $induction_worker->worker->nombre,
+                                'apellido' => $induction_worker->worker->apellido,
+                                'cargo' => $induction_worker->worker->position,
+                                'celular' => $induction_worker->worker->celular,
+                                'nombre_servicio' => $induction_worker->worker->service->name,
+                                'id_service' => $induction_worker->worker->id_service,
+                            ]
+                        ];
+                    }
                 }
             }
 
