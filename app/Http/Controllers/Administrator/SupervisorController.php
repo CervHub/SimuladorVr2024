@@ -27,7 +27,8 @@ use App\Models\Company;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-
+use ZipArchive;
+use Illuminate\Support\Facades\Storage;
 
 class SupervisorController extends Controller
 {
@@ -96,8 +97,10 @@ class SupervisorController extends Controller
     public function reporte(Request $request)
     {
         $inductions = Induction::where('id_company', session('id_company'))
+            ->where('status', '1')
             ->orderBy('id', 'desc')
             ->get();
+            // Cambio del 2/14/2024
         $services = Service::where('id_company', session('id_company'))->get();
         return view('Supervisor.reporte', compact('inductions', 'services'));
     }
@@ -340,7 +343,8 @@ class SupervisorController extends Controller
 
                         if ($fila[1]) {
                             $id_company = session('id_company');
-                            $service = Service::where('name', $fila[1])->where('id_company', $id_company)->first();                        }
+                            $service = Service::where('name', $fila[1])->where('id_company', $id_company)->first();
+                        }
 
                         if ($fila[0]) {
                             $worker = Worker::where('code_worker', 'LIKE', '%' . $fila[0] . '%')
@@ -882,8 +886,80 @@ class SupervisorController extends Controller
         return $pdf->stream('reporte.pdf');
     }
 
+    public function generarReportePDF($id_induction_worker)
+    {
+        $induction_worker = InductionWorker::find($id_induction_worker);
+        $worker = Worker::find($induction_worker->id_worker);
+        $induction = Induction::find($induction_worker->id_induction);
+        $detail_induction_worker = DetailInductionWorker::where('induction_worker_id', $induction_worker->id)
+            ->orderBy('time', 'asc')
+            ->get();
 
+        // Cargar los datos necesarios para el PDF en el arreglo $data
+        $casosTotales = $induction_worker->case_count;
+        $casosBuenos = count($detail_induction_worker);
+        $casosMalos = 8 - $casosBuenos;
 
+        $data = [
+            'induction_worker' => $induction_worker,
+            'worker' => $worker,
+            'induction' => $induction,
+            'imagen' => "https://quickchart.io/chart?c={type:'doughnut', data:{datasets:[{data:[$casosBuenos,$casosMalos],backgroundColor:['rgb(32,164,81)','rgb(255,0,0)'],}],labels:['Encontrado', 'No encontrados'],},options:{title:{display:false},plugins: { datalabels: { color: 'white' } },},}",
+            'detail_induction_worker' => $detail_induction_worker,
+            'casosTotales' => $casosTotales,
+            'casosBuenos' => $casosBuenos,
+            'casosMalos' => $casosMalos,
+            'nota' => $induction_worker->Ponderado,
+            'categoria' => $induction_worker->Categoria,
+            'porcentaje' => $induction_worker->Porcentaje,
+        ];
+
+        // Generate PDF
+        $pdf = PDF::loadView('ReportesFormatos.asistenciaPDF', $data);
+
+        return $pdf;
+    }
+
+    public function descargar_asistencia_zip(Request $request, $id_induction)
+    {
+        // Recupera los trabajadores de la inducción para la inducción dada
+        $induction_workers = InductionWorker::where('id_induction', $id_induction)->get();
+
+        // Crea el directorio principal para almacenar los informes
+        $reportDir = 'reportes';
+        Storage::makeDirectory($reportDir);
+
+        // Crea un directorio para la inducción específica
+        $inductionDir = $reportDir . '/' . $id_induction;
+        Storage::makeDirectory($inductionDir);
+
+        // Genera y almacena los PDFs para cada trabajador de la inducción
+        foreach ($induction_workers as $induction_worker) {
+            $pdf = $this->generarReportePDF($induction_worker->id);
+            $pdfFileName = 'reporte_' . $induction_worker->worker->user->doi . '.pdf';
+            Storage::put($inductionDir . '/' . $pdfFileName, $pdf->output());
+        }
+
+        // Crea un archivo ZIP
+        $zipFileName = 'reportes.zip';
+        $zipFilePath = storage_path('app/' . $reportDir . '/' . $zipFileName);
+
+        $zip = new ZipArchive;
+        if ($zip->open($zipFilePath, ZipArchive::CREATE) === true) {
+            // Añade cada PDF al archivo ZIP
+            foreach (Storage::files($inductionDir) as $file) {
+                $zip->addFile(Storage::path($file), basename($file));
+            }
+
+            $zip->close();
+        }
+
+        // Elimina el directorio de la inducción
+        Storage::deleteDirectory($inductionDir);
+
+        // Descarga el archivo ZIP
+        return response()->download($zipFilePath);
+    }
 
     public function descargar_asistencia_excel(Request $request, $id_induction, $fecha_inicio = null, $fecha_fin = null)
     {
