@@ -66,10 +66,10 @@
             <tbody>
                 <tr>
                     <td class="text-center" style="padding-top: 0px; padding-bottom: 0px; width: 20%;">
-                        <img src="{{$logo}}" width="64px" alt="Logo">
+                        <img src="{{$logo}}" width="128px" alt="Logo">
                     </td>
                     <td nowrap colspan="4" style="padding-top: 0px; padding-bottom: 0px;">
-                        <h3 class="title">REPORTE DE EVALUACIÓN</h3>
+                        <h3 class="title">REPORTE DE EVALUACIÓN </h3>
                     </td>
                     <td class="text-center" style="padding-top: 0px; padding-bottom: 0px; width: 20%;">
                         {{ \Carbon\Carbon::now('America/Lima')->format('Y-m-d H:i:s') }}

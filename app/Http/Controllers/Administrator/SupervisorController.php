@@ -865,6 +865,7 @@ class SupervisorController extends Controller
             $dataImage = null;
             $base64 = null;
         }
+
         $data = [
             'induction_worker' => $induction_worker,
             'induction' => $induction,

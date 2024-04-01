@@ -218,9 +218,9 @@
     <table class="table">
         <tbody>
             <tr>
-                <th rowspan="2" style="width:60px !important;"> <img src="{{ $logo }}" width="64px"
-                        alt="Logo">
-                </th>
+                <<th rowspan="2" style="width:60px !important;">
+    <img src="{{ $logo }}" alt="Logo" style="width: 100%; height: auto;">
+</th>
                 <th class="text-center">CONFIPETROL </th>
                 <th rowspan="2" style="width:60px !important;"> Código:
                     O&M-IMC1-F-3 Versión: 2 Fecha: {{ now()->format('d-m-Y') }} Página 1 de 5
@@ -492,7 +492,7 @@
         <tbody>
             <tr>
                 <th rowspan="2" style="width:60px !important;">
-                    <img src="{{ $logo }}" width="64px" alt="Logo">
+                    <img src="{{ $logo }}" alt="Logo" style="width: 100%; height: auto;">
                 </th>
                 <th class="text-center">CONFIPETROL</th>
                 <th rowspan="2" style="width:60px !important;">
@@ -586,7 +586,7 @@
         <tbody>
             <tr>
                 <th rowspan="2" style="width:60px !important;">
-                    <img src="{{ $logo }}" width="64px" alt="Logo">
+                    <img src="{{ $logo }}" alt="Logo" style="width: 100%; height: auto;">
                 </th>
                 <th class="text-center">CONFIPETROL</th>
                 <th rowspan="2" style="width:60px !important;">
@@ -646,7 +646,7 @@
         <tbody>
             <tr>
                 <th rowspan="2" style="width:60px !important;">
-                    <img src="{{ $logo }}" width="64px" alt="Logo">
+                    <img src="{{ $logo }}" alt="Logo" style="width: 100%; height: auto;">
                 </th>
                 <th class="text-center">CONFIPETROL</th>
                 <th rowspan="2" style="width:60px !important;">
@@ -846,7 +846,7 @@
         <tbody>
             <tr>
                 <th rowspan="2" style="width:60px !important;">
-                    <img src="{{ $logo }}" width="64px" alt="Logo">
+                    <img src="{{ $logo }}" alt="Logo" style="width: 100%; height: auto;">
                 </th>
                 <th class="text-center">CONFIPETROL</th>
                 <th rowspan="2" style="width:60px !important;">

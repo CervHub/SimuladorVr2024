@@ -197,10 +197,10 @@
     <table class="table">
         <tbody>
             <tr>
-                <th rowspan="2" style="width:60px !important;">
-                    <img src="{{$logo}}" width="64px" alt="Logo">
+                <th rowspan="2" style="width:120px !important; background:red">
+                    <img src="{{$logo}}" width="128px" alt="Logo">
                 </th>
-                <th class="text-center">CONFIPETROL</th>
+                <th class="text-center">CONFIPETROL1</th>
                 <th rowspan="2" style="width:60px !important;">
                     Código: O&M-IMC1-F-3
                     Versión: 2
@@ -385,7 +385,7 @@
                 <td class="text-center" style="width: 50px;"></td>
                 <td class="text-center" style="width: 50px;"></td>
             </tr>
-            
+
         </tbody>
     </table>
     <section id="datos_usuario">
