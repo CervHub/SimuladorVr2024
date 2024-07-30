@@ -289,7 +289,7 @@
                 @endforeach
 
                 @php
-                    $total = $total + $finalErrors;
+                    $total = $total - $finalErrors;
                     if ($total < 0) {
                         $total = 0;
                     }

@@ -167,6 +167,32 @@
                 </tr> -->
             </tbody>
         </table>
+        <table style="width: 100%; border: 1px solid black;">
+            <thead>
+                <tr>
+                    <th colspan="12" class="text-center" style="background-color: #D6DBDF; color: #000000;">
+                        <strong>Leyenda</strong>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="background-color: #FADBD8; color: #000000; width: 1%;">IT</td>
+                    <td style="width: 12%;">Intento</td>
+                    <td style="background-color: #D5F5E3; color: #000000; width: 1%;">EE</td>
+                    <td style="width: 12%;">Errores Epp</td>
+                    <td style="background-color: #D6EAF8; color: #000000; width: 1%;">EA</td>
+                    <td style="width: 12%;">Errores Aislamiento</td>
+                    <td style="background-color: #FCF3CF; color: #000000; width: 1%;">EB</td>
+                    <td style="width: 12%;">Errores Bloqueo</td>
+                    <td style="background-color: #E8DAEF; color: #000000; width: 2%;">ET</td>
+                    <td style="width: 10%;">Errores Tarjeteo</td>
+                    <td style="background-color: #FADBD8; color: #000000; width: 1%;"></td>
+                    <td style="width: 12%;"></td>
+                </tr>
+            </tbody>
+        </table>
+
 
         <table style="width: 100%">
             <tbody>
@@ -190,13 +216,28 @@
                     </td>
                     <td class="text-center"
                         style="font-weight: bold;padding-top: 0px; padding-bottom: 0px; width: 10%;">
-                        FECHA
+                        Fecha
                     </td>
                     <td class="text-center"
-                        style="font-weight: bold; padding-top: 0px; padding-bottom: 0px; width: 3%;">
-                        INTENTO
+                        style="font-weight: bold; padding-top: 0px; padding-bottom: 0px; width: 3%; background-color: #FADBD8; color: #000000;">
+                        IT
                     </td>
-
+                    <td class="text-center"
+                        style="font-weight: bold; padding-top: 0px; padding-bottom: 0px; width: 3%; background-color: #D5F5E3; color: #000000;">
+                        EE
+                    </td>
+                    <td class="text-center"
+                        style="font-weight: bold; padding-top: 0px; padding-bottom: 0px; width: 3%; background-color: #D6EAF8; color: #000000;">
+                        EA
+                    </td>
+                    <td class="text-center"
+                        style="font-weight: bold; padding-top: 0px; padding-bottom: 0px; width: 3%; background-color: #FCF3CF; color: #000000;">
+                        EB
+                    </td>
+                    <td class="text-center"
+                        style="font-weight: bold; padding-top: 0px; padding-bottom: 0px; width: 3%; background-color: #E8DAEF; color: #000000;">
+                        ET
+                    </td>
                     <td class="text-center"
                         style="font-weight: bold; padding-top: 0px; padding-bottom: 0px; width: 3%;">
                         NOTA
@@ -212,7 +253,7 @@
                         @if ($num_reports > 0)
                             @for ($i = 1; $i <= $num_reports; $i++)
                                 @php
-                                    $details = $data->notaConfipetrolAnalisis($i);
+                                    $details = $data->notaConfipetrolMax($i);
                                     $start_date = \Carbon\Carbon::parse($details['start_date']);
                                 @endphp
                                 @if ($fechaInicio == null || $fechaFin == null || ($fechaInicio <= $start_date && $start_date <= $fechaFin))
@@ -235,6 +276,13 @@
                                             {{ isset($details['start_date']) ? date('d-m-Y', strtotime($details['start_date'])) : '-' }}
                                         </td> <!-- Fecha -->
                                         <td class="text-center">{{ $i . '/' . $num_reports }}</td> <!-- Intento -->
+                                        <td class="text-center">{{ $details['EPPs'] ?? '-' }}</td> <!-- Errores Epp -->
+                                        <td class="text-center">{{ $details['Aislamiento'] ?? '-' }}</td>
+                                        <!-- Errores Aislamiento -->
+                                        <td class="text-center">{{ $details['Equipos de bloqueo'] ?? '-' }}</td>
+                                        <!-- Errores Bloqueo -->
+                                        <td class="text-center">{{ $details['Bloqueo y tarjeteo'] ?? '-' }}</td>
+                                        <!-- Errores Tarjeteo -->
                                         <td class="text-center">{{ $details['maxNota'] ?? '-' }}</td>
                                     </tr>
                                 @endif
@@ -251,6 +299,10 @@
                                     </td>
                                     <td class="text-center">-</td> <!-- Fecha -->
                                     <td class="text-center">-</td> <!-- Intento -->
+                                    <td class="text-center">-</td> <!-- Errores Epp -->
+                                    <td class="text-center">-</td> <!-- Errores Aislamiento -->
+                                    <td class="text-center">-</td> <!-- Errores Bloqueo -->
+                                    <td class="text-center">-</td> <!-- Errores Tarjeteo -->
                                     <td class="text-center">-</td> <!-- Nota -->
                                 </tr>
                             @endif

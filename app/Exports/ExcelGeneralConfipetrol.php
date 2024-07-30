@@ -17,11 +17,14 @@ class ExcelGeneralConfipetrol implements FromCollection, WithHeadings, WithColum
 {
     protected $data;
     protected $cabecera;
-
-    public function __construct(Collection $data, Collection $cabecera)
+    protected $headerMap;
+    protected $detailMap;
+    public function __construct(Collection $data, Collection $cabecera, Collection $headerMap, Collection $detailMap)
     {
         $this->data = $data;
         $this->cabecera = $cabecera;
+        $this->headerMap = $headerMap;
+        $this->detailMap = $detailMap;
     }
 
     public function collection()
@@ -67,17 +70,57 @@ class ExcelGeneralConfipetrol implements FromCollection, WithHeadings, WithColum
                 $event->sheet->getDelegate()->setCellValue('A4', 'FECHA')->mergeCells('A4:B4');
                 $event->sheet->getDelegate()->setCellValue('C4', $this->cabecera['fecha'])->mergeCells('C4:E4');
 
-                $event->sheet->getDelegate()->fromArray(['DOCUMENTO DE IDENTIDAD', 'DATOS DEL TRABAJADOR', 'NOTA'], null, 'A5');
+                $event->sheet->getDelegate()->fromArray(array_merge($this->headerMap->toArray(), ['Intento'], $this->detailMap->toArray()), null, 'A5');
 
-                // Agrega los datos directamente en las filas siguientes
-                $row = 6;
+                $row = 6; // +1 si tu cabecera comienza en
                 foreach ($this->data as $item) {
-                    $event->sheet->getDelegate()->fromArray([$item['doi'], $item['name'], $item['nota']], null, 'A' . $row);
-                    $row++;
+                    $rowData = [];
+                    foreach ($this->headerMap->keys() as $key) {
+                        $rowData[$key] = $item[$key] ?? '-';
+                    }
+
+                    if (isset($item['detalle'])) {
+                        $totalAttempts = count($item['detalle']);
+                        foreach ($item['detalle'] as $attemptIndex => $detail) {
+                            $detailData = [];
+                            foreach ($this->detailMap->keys() as $key) {
+                                if (isset($detail[$key])) {
+                                    if ($detail[$key] === 0) {
+                                        $detailData[$key] = '0';
+                                    } else {
+                                        $detailData[$key] = $detail[$key];
+                                    }
+                                } else {
+                                    $detailData[$key] = '-';
+                                }
+                            }
+                            $attemptData = [($attemptIndex + 1) . '/' . $totalAttempts];
+                            $columnLetterHeader = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($this->headerMap->count() + 1);
+                            $columnLetterDetail = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($this->headerMap->count() + 2);
+                            $columnLetterDetailEnd = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($this->headerMap->count() + 1 + count($detailData));
+
+                            if ($attemptIndex == 0) { // If it's the first iteration
+                                $event->sheet->getDelegate()->fromArray(array_merge($rowData, $attemptData), null, 'A' . $row);
+                                $event->sheet->getDelegate()->fromArray($detailData, null, $columnLetterDetail . $row);
+                            } else { // If it's not the first iteration
+                                $event->sheet->getDelegate()->fromArray($attemptData, null, $columnLetterHeader . $row);
+                                $event->sheet->getDelegate()->fromArray($detailData, null, $columnLetterDetail . $row);
+                            }
+
+                            $row++;
+                        }
+                    } else {
+                        $event->sheet->getDelegate()->fromArray($rowData, null, 'A' . $row);
+                        $event->sheet->getDelegate()->getStyle('A' . $row)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+                        $row++;
+                    }
+
+                    $rowData = []; // Clear the rowData for the next item
                 }
 
                 // Agrega bordes a todas las celdas
-                $event->sheet->getDelegate()->getStyle('A1:E' . ($row - 1))->applyFromArray([
+                $highestColumn = $event->sheet->getDelegate()->getHighestColumn();
+                $event->sheet->getDelegate()->getStyle('A1:' . $highestColumn . ($row - 1))->applyFromArray([
                     'borders' => [
                         'allBorders' => [
                             'borderStyle' => Border::BORDER_THIN,
@@ -87,10 +130,10 @@ class ExcelGeneralConfipetrol implements FromCollection, WithHeadings, WithColum
                 ]);
 
                 // Centra el contenido de todas las celdas
-                $event->sheet->getDelegate()->getStyle('A1:E' . ($row - 1))->getAlignment()->applyFromArray([
-                    'horizontal' => Alignment::HORIZONTAL_CENTER,
-                    'vertical' => Alignment::VERTICAL_CENTER,
-                ]);
+                // $event->sheet->getDelegate()->getStyle('A1:E' . ($row - 1))->getAlignment()->applyFromArray([
+                //     'horizontal' => Alignment::HORIZONTAL_CENTER,
+                //     'vertical' => Alignment::VERTICAL_CENTER,
+                // ]);
             },
         ];
     }

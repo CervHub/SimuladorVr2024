@@ -167,6 +167,59 @@
                 </tr> -->
             </tbody>
         </table>
+        <table style="width: 100%; border: 1px solid black;">
+            <thead>
+                <tr>
+                    <th colspan="12" class="text-center" style="background-color: #D6DBDF; color: #000000;">
+                        <strong>Leyenda</strong>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr colspan="12">
+                    <td style="background-color: #FADBD8; color: #000000; width: 1%;">IT</td>
+                    <td>Intento</td>
+                    <td style="background-color: #D5F5E3; color: #000000; width: 1%;">EP</td>
+                    <td>EPPs</td>
+                    <td style="background-color: #D6EAF8; color: #000000; width: 1%;">EB</td>
+                    <td>Equipos de bloqueo</td>
+                    <td style="background-color: #FCF3CF; color: #000000; width: 1%;">AI</td>
+                    <td>Aislamiento</td>
+                    <td style="background-color: #E8DAEF; color: #000000; width: 1%;">BT</td>
+                    <td>Bloqueo y tarjeteo</td>
+                    <td style="background-color: #FADBD8; color: #000000; width: 1%;">DC</td>
+                    <td>Derrame de crudo</td>
+                </tr>
+                <tr colspan="12">
+                    <td style="background-color: #D5F5E3; color: #000000; width: 1%;">FA</td>
+                    <td>Fuga de agua</td>
+                    <td style="background-color: #D6EAF8; color: #000000; width: 1%;">DT</td>
+                    <td>Deterioro de tuberías</td>
+                    <td style="background-color: #FCF3CF; color: #000000; width: 1%;">DE</td>
+                    <td>Desgaste de estructuras</td>
+                    <td style="background-color: #E8DAEF; color: #000000; width: 1%;">PC</td>
+                    <td>Personaje de caída</td>
+                    <td style="background-color: #FADBD8; color: #000000; width: 1%;">DB</td>
+                    <td>Derrame de barriles</td>
+                    <td style="background-color: #D5F5E3; color: #000000; width: 1%;">CG</td>
+                    <td>Camión de grua</td>
+                </tr>
+                <tr colspan="12">
+                    <td style="background-color: #D6EAF8; color: #000000; width: 1%;">IAT</td>
+                    <td>Ingreso al tanque</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
 
         <table style="width: 100%">
             <tbody>
@@ -176,7 +229,7 @@
                         N°
                     </td>
                     <td class="text-center"
-                        style="font-weight: bold; padding-top: 0px; padding-bottom: 0px; width: 10%;">
+                        style="font-weight: bold; padding-top: 0px; padding-bottom: 0px; width: 8%;">
                         CODIGO
                     </td>
                     <td class="text-center" style="font-weight: bold;">
@@ -189,14 +242,61 @@
                         EMPRESA
                     </td>
                     <td class="text-center"
-                        style="font-weight: bold;padding-top: 0px; padding-bottom: 0px; width: 10%;">
-                        FECHA
+                        style="font-weight: bold;padding-top: 0px; padding-bottom: 0px; width: 7%;">
+                        Fecha
                     </td>
                     <td class="text-center"
-                        style="font-weight: bold; padding-top: 0px; padding-bottom: 0px; width: 3%;">
-                        INTENTO
+                        style="font-weight: bold; padding-top: 0px; padding-bottom: 0px; width: 3%; background-color: #FADBD8; color: #000000;">
+                        IT
                     </td>
-
+                    <td class="text-center"
+                        style="font-weight: bold; padding-top: 0px; padding-bottom: 0px; width: 3%; background-color: #D5F5E3; color: #000000;">
+                        EP
+                    </td>
+                    <td class="text-center"
+                        style="font-weight: bold; padding-top: 0px; padding-bottom: 0px; width: 3%; background-color: #D6EAF8; color: #000000;">
+                        EB
+                    </td>
+                    <td class="text-center"
+                        style="font-weight: bold; padding-top: 0px; padding-bottom: 0px; width: 3%; background-color: #FCF3CF; color: #000000;">
+                        AI
+                    </td>
+                    <td class="text-center"
+                        style="font-weight: bold; padding-top: 0px; padding-bottom: 0px; width: 3%; background-color: #E8DAEF; color: #000000;">
+                        BT
+                    </td>
+                    <td class="text-center"
+                        style="font-weight: bold; padding-top: 0px; padding-bottom: 0px; width: 3%; background-color: #FADBD8; color: #000000;">
+                        DC
+                    </td>
+                    <td class="text-center"
+                        style="font-weight: bold; padding-top: 0px; padding-bottom: 0px; width: 3%; background-color: #D5F5E3; color: #000000;">
+                        FA
+                    </td>
+                    <td class="text-center"
+                        style="font-weight: bold; padding-top: 0px; padding-bottom: 0px; width: 3%; background-color: #D6EAF8; color: #000000;">
+                        DT
+                    </td>
+                    <td class="text-center"
+                        style="font-weight: bold; padding-top: 0px; padding-bottom: 0px; width: 3%; background-color: #FCF3CF; color: #000000;">
+                        DE
+                    </td>
+                    <td class="text-center"
+                        style="font-weight: bold; padding-top: 0px; padding-bottom: 0px; width: 3%; background-color: #E8DAEF; color: #000000;">
+                        PC
+                    </td>
+                    <td class="text-center"
+                        style="font-weight: bold; padding-top: 0px; padding-bottom: 0px; width: 3%; background-color: #FADBD8; color: #000000;">
+                        DB
+                    </td>
+                    <td class="text-center"
+                        style="font-weight: bold; padding-top: 0px; padding-bottom: 0px; width: 3%; background-color: #D5F5E3; color: #000000;">
+                        CG
+                    </td>
+                    <td class="text-center"
+                        style="font-weight: bold; padding-top: 0px; padding-bottom: 0px; width: 3%; background-color: #D6EAF8; color: #000000;">
+                        IAT
+                    </td>
                     <td class="text-center"
                         style="font-weight: bold; padding-top: 0px; padding-bottom: 0px; width: 3%;">
                         NOTA
@@ -212,12 +312,12 @@
                         @if ($num_reports > 0)
                             @for ($i = 1; $i <= $num_reports; $i++)
                                 @php
-                                    $details = $data->notaConfipetrolAnalisis($i);
+                                    $details = $data->notaConfipetrolProcesos($i);
                                     $start_date = \Carbon\Carbon::parse($details['start_date']);
                                 @endphp
                                 @if ($fechaInicio == null || $fechaFin == null || ($fechaInicio <= $start_date && $start_date <= $fechaFin))
                                     <tr
-                                        style="background-color: {{ $loop->iteration % 2 == 0 ? '#c9c9c9' : '#ffffff' }}">
+                                        style="background-color: {{ $loop->iteration % 2 == 0 ? '#c9c9c9' : '#ffffff' }}; font-size:10px;">
                                         @if ($i == 1)
                                             <td class="text-center" rowspan="{{ $num_reports }}">
                                                 {{ $loop->iteration }}</td>
@@ -235,6 +335,19 @@
                                             {{ isset($details['start_date']) ? date('d-m-Y', strtotime($details['start_date'])) : '-' }}
                                         </td> <!-- Fecha -->
                                         <td class="text-center">{{ $i . '/' . $num_reports }}</td> <!-- Intento -->
+                                        <td class="text-center">{{ ($details['EPPs'] ?? 0)  }}</td> <!-- EPPs -->
+                                        <td class="text-center">{{ ($details['Equipos de bloqueo'] ?? 0) * 1 }}</td> <!-- Equipos de bloqueo -->
+                                        <td class="text-center">{{ ($details['Aislamiento'] ?? 0) * 1 }}</td> <!-- Aislamiento -->
+                                        <td class="text-center">{{ ($details['Bloqueo y tarjeteo'] ?? 0) * 1 }}</td> <!-- Bloqueo y tarjeteo -->
+                                        <td class="text-center">{{ ($details['Derrame de crudo'] ?? 0) * 1 }}</td> <!-- Derrame de crudo -->
+                                        <td class="text-center">{{ ($details['Fuga de agua'] ?? 0) * 1 }}</td> <!-- Fuga de agua -->
+                                        <td class="text-center">{{ ($details['Deterioro de tuberías'] ?? 0) * 1 }}</td> <!-- Deterioro de tuberías -->
+                                        <td class="text-center">{{ ($details['Desgaste de estructuras'] ?? 0) * 1 }}</td> <!-- Desgaste de estructuras -->
+                                        <td class="text-center">{{ ($details['Personaje de caída'] ?? 0) * 1 }}</td> <!-- Personaje de caída -->
+                                        <td class="text-center">{{ ($details['Derrame de barriles'] ?? 0) * 1 }}</td> <!-- Derrame de barriles -->
+                                        <td class="text-center">{{ ($details['Camión de grua'] ?? 0) * 1 }}</td> <!-- Camión de grua -->
+                                        <td class="text-center">{{ ($details['Ingreso al tanque'] ?? 0) * 1 }}</td> <!-- Ingreso al tanque -->
+                                        <!-- Errores Tarjeteo -->
                                         <td class="text-center">{{ $details['maxNota'] ?? '-' }}</td>
                                     </tr>
                                 @endif
@@ -251,6 +364,18 @@
                                     </td>
                                     <td class="text-center">-</td> <!-- Fecha -->
                                     <td class="text-center">-</td> <!-- Intento -->
+                                    <td class="text-center">-</td> <!-- EPPs -->
+                                    <td class="text-center">-</td> <!-- Equipos de bloqueo -->
+                                    <td class="text-center">-</td> <!-- Aislamiento -->
+                                    <td class="text-center">-</td> <!-- Bloqueo y tarjeteo -->
+                                    <td class="text-center">-</td> <!-- Derrame de crudo -->
+                                    <td class="text-center">-</td> <!-- Fuga de agua -->
+                                    <td class="text-center">-</td> <!-- Deterioro de tuberías -->
+                                    <td class="text-center">-</td> <!-- Desgaste de estructuras -->
+                                    <td class="text-center">-</td> <!-- Personaje de caída -->
+                                    <td class="text-center">-</td> <!-- Derrame de barriles -->
+                                    <td class="text-center">-</td> <!-- Camión de grua -->
+                                    <td class="text-center">-</td> <!-- Ingreso al tanque -->
                                     <td class="text-center">-</td> <!-- Nota -->
                                 </tr>
                             @endif

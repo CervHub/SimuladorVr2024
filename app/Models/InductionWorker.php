@@ -127,9 +127,148 @@ class InductionWorker extends Model
     public function notaConfipetrol()
     {
         $detail = $this->detail()->first();
-
         return $detail ? intval($detail->note) : '-';
     }
+
+    public function notaIsemDashboard()
+    {
+        $maxNota = -1; // Inicializar la nota máxima como -1
+        for ($i = 1; $i <= $this->num_report; $i++) {
+            $nota = $this->notaIsemByIntento($i)['total_sum'];
+            if ($nota > $maxNota) {
+                $maxNota = $nota; // Actualizar la nota máxima si la nota actual es mayor
+            }
+        }
+        return $maxNota; // Devolver la nota máxima
+    }
+
+    public function notaConfipetrolIntento($intento)
+    {
+        $detail = $this->detailsByReportAndTraining($intento, 'evaluacion')->first();
+        return $detail ? intval($detail->note) : '-';
+    }
+    public function notaConfipetrolMax($intento)
+    {
+        // Obtén la nota para el intento dado
+        $nota = $this->notaConfipetrolIntento($intento);
+        $maxNota = $nota != '-' ? $nota : '-';
+        $intentoMaxNota = $nota != '-' ? $intento : '-';
+
+        // Obtén los detalles para el intento dado
+        $details = $nota != '-' ? $this->detailsByReportAndTraining($intento, 'evaluacion')->get() : collect();
+
+        // Mapea los detalles
+        $mappedDetails = $details->map(function ($detail) {
+            return [
+                'id' => $detail->id,
+                'case' => $detail->case,
+                'num_errors' => $detail->num_errors,
+                'start_date' => $detail->start_date ?? null, // Agrega start_date solo si existe
+            ];
+        })->toArray(); // Convierte la colección en un array
+
+        // Estructura los detalles en un formato específico
+        $structuredDetails = [
+            'EPPs' => 0,
+            'Equipos de bloqueo' => 0,
+            'Aislamiento' => 0,
+            'Bloqueo y tarjeteo' => 0,
+        ];
+        foreach ($mappedDetails as $detail) {
+            if (array_key_exists($detail['case'], $structuredDetails)) {
+                $structuredDetails[$detail['case']] = $detail['num_errors'];
+            }
+        }
+
+        // Agrega más información
+        $name = $this->worker->nombre . ' ' . $this->worker->apellido;
+        $empresa = $this->worker->service->name;
+        $codigo = $this->worker->user->doi;
+        $cargo = $this->worker->position;
+        $id_service = $this->worker->service->id;
+        $startDate = $mappedDetails[0]['start_date'] ?? null; // Obtiene start_date del primer detalle si existe
+
+        // Retorna los detalles mapeados, la nota máxima, el intento y la información adicional
+        return array_merge(['maxNota' => $maxNota, 'intento' => $intentoMaxNota, 'nombre' => $name, 'empresa' => $empresa, 'codigo' => $codigo, 'cargo' => $cargo, 'start_date' => $startDate, 'id_service' => $id_service], $structuredDetails);
+    }
+    public function notaConfipetrolAnalisis($intento)
+    {
+        // Obtén la nota para el intento dado
+        $nota = $this->notaConfipetrolIntento($intento);
+        $maxNota = $nota != '-' ? $nota : '-';
+        $intentoMaxNota = $nota != '-' ? $intento : '-';
+        $details = $nota != '-' ? $this->detailsByReportAndTraining($intento, 'evaluacion')->first() : collect();
+
+        // Agrega más información
+        $name = $this->worker->nombre . ' ' . $this->worker->apellido;
+        $empresa = $this->worker->service->name;
+        $codigo = $this->worker->user->doi;
+        $cargo = $this->worker->position;
+        $id_service = $this->worker->service->id;
+        $start_date = isset($details->start_date) ? $details->start_date : null;
+        // Retorna la nota máxima, el intento y la información adicional
+        return ['maxNota' => $maxNota, 'intento' => $intentoMaxNota, 'nombre' => $name, 'empresa' => $empresa, 'codigo' => $codigo, 'cargo' => $cargo, 'id_service' => $id_service, 'start_date' => $start_date];
+    }
+    public function notaConfipetrolProcesos($intento)
+    {
+        // Obtén la nota para el intento dado
+        $nota = $this->notaConfipetrolIntento($intento);
+        $maxNota = $nota != '-' ? $nota : '-';
+        $intentoMaxNota = $nota != '-' ? $intento : '-';
+
+        // Obtén los detalles para el intento dado
+        $details = $nota != '-' ? $this->detailsByReportAndTraining($intento, 'evaluacion')->get() : collect();
+
+        // Mapea los detalles
+        $mappedDetails = $details->map(function ($detail) {
+            return [
+                'id' => $detail->id,
+                'case' => $detail->case,
+                'num_errors' => $detail->num_errors,
+                'start_date' => $detail->start_date ?? null, // Agrega start_date solo si existe
+            ];
+        })->toArray(); // Convierte la colección en un array
+
+        // Estructura los detalles en un formato específico
+        $structuredDetails = [
+            'EPPs' => 0,
+            'Equipos de bloqueo' => 0,
+            'Aislamiento' => 0,
+            'Bloqueo y tarjeteo' => 0,
+            'Derrame de crudo' => 0,
+            'Fuga de agua' => 0,
+            'Deterioro de tuberías' => 0,
+            'Desgaste de estructuras' => 0,
+            'Personaje de caída' => 0,
+            'Derrame de barriles' => 0,
+            'Camión de grua' => 0,
+            'Ingreso al tanque' => 0,
+        ];
+
+        foreach ($mappedDetails as $detail) {
+            if (array_key_exists($detail['case'], $structuredDetails)) {
+                $structuredDetails[$detail['case']] = $detail['num_errors'];
+            }
+        }
+
+        foreach ($structuredDetails as $key => $value) {
+            if ($key != 'EPPs') {
+                $structuredDetails[$key] = $value * 5;
+            }
+        }
+
+        // Agrega más información
+        $name = $this->worker->nombre . ' ' . $this->worker->apellido;
+        $empresa = $this->worker->service->name;
+        $codigo = $this->worker->user->doi;
+        $cargo = $this->worker->position;
+        $id_service = $this->worker->service->id;
+        $startDate = $mappedDetails[0]['start_date'] ?? null; // Obtiene start_date del primer detalle si existe
+
+        // Retorna los detalles mapeados, la nota máxima, el intento y la información adicional
+        return array_merge(['maxNota' => $maxNota, 'intento' => $intentoMaxNota, 'nombre' => $name, 'empresa' => $empresa, 'codigo' => $codigo, 'cargo' => $cargo, 'start_date' => $startDate, 'id_service' => $id_service], $structuredDetails);
+    }
+
     public function detailsByReport($reportValue)
     {
         return $this->hasMany(DetailInductionWorker::class, 'induction_worker_id')

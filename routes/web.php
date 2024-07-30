@@ -123,8 +123,11 @@ Route::middleware(['entrenador', 'auth'])->group(function () {
     Route::post('induction/eliminar', [SupervisorController::class, 'eliminarinductionworker'])->name('entrenador.eliminar.induction.worker');
     // Ruta para descargar asistencia
     Route::get('descargar_asistencia/{id_induction}/{fecha_inicio}/{fecha_fin}/{id_service}', [SupervisorController::class, 'descargar_asistencia'])->name('descargar_asistencia_pdf');
-    Route::get('descargar_asistencia_excel/{id_induction}/{fecha_inicio}/{fecha_fin}', [SupervisorController::class, 'descargar_asistencia_excel'])->name('descargar_asistencia_excel');
+    Route::get('descargar_asistencia_excel/{id_induction}/{fecha_inicio}/{fecha_fin}/{id_service}', [SupervisorController::class, 'descargar_asistencia_excel'])->name('descargar_asistencia_excel');
     Route::get('descargar_asistencia_zip/{id_induction}', [SupervisorController::class, 'descargar_asistencia_zip'])->name('descargar_asistencia_zip');
+
+    //Reporte general
+    Route::get('reporte/general/', [SupervisorController::class, 'reporteGeneral'])->name('reporte.general.descargar');
 
     // Ruta para descargar Zip de reportes de notas individuales
     Route::get('descargar_zip_notas/{id_induction}', [SupervisorController::class, 'descargar_zip_notas'])

@@ -64,8 +64,8 @@
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Nombres</th>
-                                <th>Descripcion</th>
+                                <th>Servicio</th>
+                                <th>Descripción</th>
                                 <th>Estado</th>
                                 <th>Creado</th>
                                 <th>N° de Trabajadores</th>

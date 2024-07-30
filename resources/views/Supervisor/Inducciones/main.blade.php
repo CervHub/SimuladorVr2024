@@ -2,17 +2,21 @@
 
 @section('css')
     <style>
-        .table th,
         .table td {
             padding-top: 0 !important;
             padding-bottom: 0 !important;
         }
 
-        .table th {
-            padding-bottom: 15px !important;
+        .btn-custom {
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
     </style>
+    <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 @endsection
+
 
 @section('content')
     <div class="row">
@@ -79,12 +83,22 @@
                                     <tr>
                                         <td>{{ $induction->id }}</td>
                                         <td>{{ $induction->alias }}</td>
-                                        <td>{{ $induction->date_start }} {{ $induction->time_start }}</td>
-                                        <td>{{ $induction->date_end }} {{ $induction->time_end }}</td>
-                                        <td>{{ count($induction->workers) }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($induction->date_start)->format('d/m/Y') }}
+                                            {{ $induction->time_start }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($induction->date_end)->format('d/m/Y') }}
+                                            {{ $induction->time_end }}</td>
+                                        <td>{{ $induction->workers->filter(function ($worker) {return $worker->status == 1;})->count() }}
                                         <td>
-                                            @if ($induction->status == '0')
-                                                <label class="badge badge-danger">No Activo</label>
+                                            @php
+                                                $startDateTime = \Carbon\Carbon::parse(
+                                                    $induction->date_start . ' ' . $induction->time_start,
+                                                );
+                                                $endDateTime = \Carbon\Carbon::parse(
+                                                    $induction->date_end . ' ' . $induction->time_end,
+                                                );
+                                            @endphp
+                                            @if (now()->lessThan($startDateTime) || now()->greaterThan($endDateTime))
+                                                <label class="badge badge-danger">Inactivo</label>
                                             @else
                                                 <label class="badge badge-primary">Activo</label>
                                             @endif
@@ -135,7 +149,30 @@
         const iconSuperAdmin = document.querySelector('#taller-supervisor');
         iconSuperAdmin.classList.add('active');
     </script>
+    <!-- Activar DataTables -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
+
+
+    <script>
+        $(document).ready(function() {
+            let table = $('#myTable').DataTable();
+
+            // Obtén el input personalizado y el select para registros por página
+            let customSearchInput = $('#customSearchInput');
+            let recordsPerPageSelect = $('#recordsPerPage');
+
+            // Aplica la búsqueda personalizada cuando el input cambie
+            customSearchInput.on('keyup', function() {
+                table.search(this.value).draw();
+            });
+
+            // Cambia el número de registros por página cuando el select cambie
+            recordsPerPageSelect.on('change', function() {
+                table.page.len(this.value).draw();
+            });
+        });
+    </script>
 
     <!-- Editar Modal -->
     <script>

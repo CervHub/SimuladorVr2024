@@ -2,16 +2,20 @@
 
 @section('css')
     <style>
-        .table th,
         .table td {
             padding-top: 0 !important;
             padding-bottom: 0 !important;
         }
 
-        .table th {
-            padding-bottom: 15px !important;
+        .btn-custom {
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
     </style>
+    <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
 @endsection
 
@@ -24,6 +28,12 @@
                         <div class="btn-wrapper">
                             <a href="{{ route('reporte.alumno') }}" class="btn btn-primary text-white p-3"><i
                                     class="icon-people"></i> Reporte Por Alumno</a>
+
+                            @if (Session('id_company') == 4)
+                                <a href="{{ route('reporte.general.descargar') }}" class="btn btn-success text-white p-3"><i
+                                        class="icon-download"></i> Descargar Reportes Generales</a>
+                            @endif
+
                         </div>
                     </div>
                 </div>
@@ -108,12 +118,23 @@
                                     <tr>
                                         <td>{{ $induction->id }}</td>
                                         <td>{{ $induction->alias }}</td>
-                                        <td>{{ $induction->date_start }} {{ $induction->time_start }}</td>
-                                        <td>{{ $induction->date_end }} {{ $induction->time_end }}</td>
-                                        <td>{{ count($induction->workers) }}</td>
+                                        <td>{{ date('d-m-Y H:i', strtotime($induction->date_start . ' ' . $induction->time_start)) }}
+                                        </td>
+                                        <td>{{ date('d-m-Y H:i', strtotime($induction->date_end . ' ' . $induction->time_end)) }}
+                                        </td>
+                                        <td>{{ $induction->workers->filter(function ($worker) {return $worker->status == 1;})->count() }}
+                                        </td>
                                         <td>
-                                            @if ($induction->status == '0')
-                                                <label class="badge badge-danger">No Activo</label>
+                                            @php
+                                                $startDateTime = \Carbon\Carbon::parse(
+                                                    $induction->date_start . ' ' . $induction->time_start,
+                                                );
+                                                $endDateTime = \Carbon\Carbon::parse(
+                                                    $induction->date_end . ' ' . $induction->time_end,
+                                                );
+                                            @endphp
+                                            @if (now()->lessThan($startDateTime) || now()->greaterThan($endDateTime))
+                                                <label class="badge badge-danger">Inactivo</label>
                                             @else
                                                 <label class="badge badge-primary">Activo</label>
                                             @endif
@@ -128,10 +149,10 @@
                                                     onclick="modificarEnlace(this, '{{ route('descargar_asistencia_excel', ['id_induction' => $induction->id, 'fecha_inicio' => '0000-00-00', 'fecha_fin' => '0000-00-00', 'id_service' => 0]) }}')">
                                                     <i class="fas fa-file-excel"></i>
                                                 </a>
-                                                @if(session('id_company') == 2)
+                                                @if (session('id_company') == 2)
                                                     <a href="{{ route('descargar_asistencia_zip', ['id_induction' => $induction->id]) }}"
-                                                       class="btn btn-custom btn-warning text-white me-0">
-                                                       <i class="fas fa-file-archive"></i>
+                                                        class="btn btn-custom btn-warning text-white me-0">
+                                                        <i class="fas fa-file-archive"></i>
                                                     </a>
                                                 @endif
                                             </div>
@@ -148,6 +169,30 @@
 @endsection
 
 @section('js')
+    <!-- Activar DataTables -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+
+
+    <script>
+        $(document).ready(function() {
+            let table = $('#myTable').DataTable();
+
+            // Obtén el input personalizado y el select para registros por página
+            let customSearchInput = $('#customSearchInput');
+            let recordsPerPageSelect = $('#recordsPerPage');
+
+            // Aplica la búsqueda personalizada cuando el input cambie
+            customSearchInput.on('keyup', function() {
+                table.search(this.value).draw();
+            });
+
+            // Cambia el número de registros por página cuando el select cambie
+            recordsPerPageSelect.on('change', function() {
+                table.page.len(this.value).draw();
+            });
+        });
+    </script>
     <script>
         const iconSuperAdmin = document.querySelector('#reporte-supervisor');
         iconSuperAdmin.classList.add('active');
@@ -165,17 +210,18 @@
             ruta = ruta.replace(/\/0$/, '/' + id_service);
 
             // Verificar si ambos campos de fecha están llenos
-            if (fechaInicio !== '' && fechaFin !== '') {
+            if (fechaInicio != '' && fechaFin != '') {
                 // Reemplazar las dos últimas fechas por las fechas de los campos de entrada en la ruta
-                ruta = ruta.replace(/\/\d{4}-\d{2}-\d{2}\/\d{4}-\d{2}-\d{2}$/, '/' + fechaInicio + '/' + fechaFin);
+                ruta = ruta.replace(/\/\d{4}-\d{2}-\d{2}\/\d{4}-\d{2}-\d{2}\/\d+$/, '/' + fechaInicio + '/' + fechaFin +
+                    '/' + id_service);
             }
 
             // Agregar "/" al final de la URL
             ruta = ruta + '/';
 
             // Abrir el enlace en una nueva ventana o pestaña (_blank)
+            console.log(ruta, fechaInicio, fechaFin, id_service);
             window.open(ruta, '_blank');
-
             // Evitar que el enlace se siga al hacer clic
             return false;
         }

@@ -491,7 +491,7 @@
                                 {{ number_format($data->note_reference, 0) }}</td>
                         </tr>
                         <tr style="border-collapse: collapse; border: 1px solid black;">
-                            <td style="border-collapse: collapse; border: 1px solid black;"> Nota Obetenida:</td>
+                            <td style="border-collapse: collapse; border: 1px solid black;"> Nota Obtenida:</td>
                             <td style="border-collapse: collapse; border: 1px solid black;">{{ $totalSum }}</td>
                         </tr>
                         <tr style="border-collapse: collapse; border: 1px solid black;">

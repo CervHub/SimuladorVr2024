@@ -44,47 +44,86 @@ class SupervisorController extends Controller
     }
 
 
+    private function dataDashboard($id_company)
+    {
+        $services = Service::where('id_company', $id_company)->withCount('workers')->get();
+
+        $servicesData = $services->map(function ($service) {
+            return [
+                'name' => $service->name,
+                'numero_workers' => $service->workers_count
+            ];
+        });
+
+        $inductions = Induction::where('id_company', $id_company)->with('workers')
+            ->where('status', '1')
+            ->get();
+
+        $inductionsData = [];
+
+        foreach ($inductions as $induction) {
+            $min_nota = $induction->minimum_passing_note;
+            $sinNota = 0;
+            $aprovados = 0;
+            $reprobados = 0;
+            if ($id_company == 4) {
+                foreach ($induction->workers as $worker) {
+                    if ($worker->notaConfipetrol() == '-') {
+                        $sinNota++;
+                    } else if ($worker->notaConfipetrol() >= $min_nota) {
+                        $aprovados++;
+                    } else {
+                        $reprobados++;
+                    }
+                }
+            } else if ($id_company == 2) {
+                foreach ($induction->workers as $worker) {
+
+                    if ($worker->num_report == 0) {
+                        $sinNota++;
+                    } else {
+                        $nota = $worker->notaIsemDashboard();
+
+                        if ($nota >= $min_nota) {
+                            $aprovados++;
+                        } else {
+                            $reprobados++;
+                        }
+                    }
+                }
+            } else if ($id_company == 3) {
+                foreach ($induction->workers as $worker) {
+                    if ($worker->num_report == 0) {
+                        $sinNota++;
+                    } else {
+                        $nota = $worker->notaLuzDelSur();
+                        if ($nota >= $min_nota) {
+                            $aprovados++;
+                        } else {
+                            $reprobados++;
+                        }
+                    }
+                }
+            }
+            $inductionsData[] = [
+                'alias' => $induction->alias,
+                'status' => $induction->status,
+                'workers_count' => $induction->workers->count(),
+                'month' => Carbon::parse($induction->date_start)->locale('es')->isoFormat('MMMM'),
+                'year' => Carbon::parse($induction->date_start)->format('Y'),
+                'aprovados' => $aprovados,
+                'reprobados' => $reprobados,
+                'sinNota' => $sinNota,
+            ];
+        }
+        return ['servicios' => $servicesData->toArray(), 'inducciones' => $inductionsData];
+    }
     public function index(Request $request)
     {
         $id_company = session('id_company');
+        $data = $this->dataDashboard($id_company);
 
-        $induccionesPorMes = DB::table(DB::raw('generate_series(1,12) as month'))
-            ->leftJoin('inductions', function ($join) use ($id_company) {
-                $join->on(DB::raw('EXTRACT(MONTH FROM date_start)'), '=', 'month')
-                    ->where('inductions.id_company', '=', $id_company);
-            })
-            ->select(
-                DB::raw('month as mes'),
-                DB::raw('COALESCE(ARRAY_AGG(inductions.id), ARRAY[]::integer[]) as ids_inducciones')
-            )
-            ->groupBy('month')
-            ->orderBy('month')
-            ->get();
-        foreach ($induccionesPorMes as $induccionesDelMes) {
-            $idsInducciones = explode(',', trim($induccionesDelMes->ids_inducciones, '{}'));
-
-            $estadoTrabajadoresPorMes = [
-                'approved' => 0,
-                'disapproved' => 0,
-                'pending' => 0,
-            ];
-
-            foreach ($idsInducciones as $idInduccion) {
-                if ($idInduccion === 'NULL') {
-                    continue;
-                }
-
-                $induccion = Induction::find($idInduccion);
-                $estadoTrabajadores = $induccion->workersStatus();
-
-                $estadoTrabajadoresPorMes['approved'] += $estadoTrabajadores['approved'];
-                $estadoTrabajadoresPorMes['disapproved'] += $estadoTrabajadores['disapproved'];
-                $estadoTrabajadoresPorMes['pending'] += $estadoTrabajadores['pending'];
-            }
-
-            $induccionesDelMes->estadoTrabajadores = $estadoTrabajadoresPorMes;
-        }
-        return view('Supervisor.index', compact('induccionesPorMes'));
+        return view('Supervisor.index', compact('data'));
     }
 
     public function servicio(Request $request)
@@ -100,10 +139,11 @@ class SupervisorController extends Controller
             ->where('status', '1')
             ->orderBy('id', 'desc')
             ->get();
-            // Cambio del 2/14/2024
+        // Cambio del 2/14/2024
         $services = Service::where('id_company', session('id_company'))->get();
         return view('Supervisor.reporte', compact('inductions', 'services'));
     }
+
     public function crearservicio(Request $request)
     {
         $id_company = session('id_company');
@@ -115,6 +155,7 @@ class SupervisorController extends Controller
         }
         return redirect()->back();
     }
+
     public function detalle(Request $request)
     {
         // Crear un arreglo asociativo con los datos que deseas incluir en el JSON
@@ -338,6 +379,12 @@ class SupervisorController extends Controller
                             $primerFila = false; // Se marca la primera fila como leída (encabezado)
                             continue; // Se omite la primera fila (encabezado)
                         }
+
+                        // Si fila[0] es null o una cadena vacía, se omite esta iteración
+                        if ($fila[0] === null || $fila[0] === '') {
+                            continue;
+                        }
+
                         $service = null;
                         $worker = null;
 
@@ -354,33 +401,57 @@ class SupervisorController extends Controller
                         }
                         if (!$service) {
                             // Agregar esta fila al array de filas con problemas
-                            $filasConProblemas[] = 'El servicio no existe para la fila ' . $filaActual;
+                            $filasConProblemas[] = 'El servicio no existe en la fila ' . $filaActual . '. Por favor, verifica el servicio.';
                         }
                         if (!$worker) {
                             // Agregar esta fila al array de filas con problemas
-                            $filasConProblemas[] = 'El trabajador no existe para la fila ' . $filaActual;
+                            $filasConProblemas[] = 'El trabajador no existe en la fila ' . $fila[0] . '. Por favor, verifica el trabajador.';
                         }
 
                         if ($worker) {
-                            // Validar que no exista otro registro con la misma inducción y usuario
-                            $existingRecord = InductionWorker::where('id_induction', $id_induction)
-                                ->where('id_worker', $worker->id)
-                                ->first();
+                            // Validar que el trabajador no esté en otra inducción que se cruce con esta
+                            $induction = Induction::find($id_induction);
+                            $induction_afters = Induction::where('id_company', $induction->id_company)
+                                ->where('status', '1')
+                                ->where('alias', 'like', '%' . $induction->alias . '%')
+                                ->where('id', '!=', $induction->id)
+                                ->where('date_start', '<=', $induction->date_end)
+                                ->where('date_end', '>=', $induction->date_start)
+                                ->get();
 
-                            if (!$existingRecord) {
-                                $new_induction = new InductionWorker();
-                                $new_induction->id_induction = $id_induction;
-                                $new_induction->id_worker = $worker->id;
-                                $new_induction->status = '1';
-                                $new_induction->save();
-                            } else {
-                                if ($existingRecord->status == '0') {
-                                    $existingRecord->status = '1';
-                                    $existingRecord->save();
-                                    $filasConProblemas[] = 'Se activo al trabajador de la fila ' . $filaActual;
+                            $validar = true;
+
+                            foreach ($induction_afters as $induction_after) {
+                                $existingRecordInAfter = InductionWorker::where('id_induction', $induction_after->id)
+                                    ->where('id_worker', $worker->id)
+                                    ->first();
+                                if ($existingRecordInAfter) {
+                                    $filasConProblemas[] = 'El trabajador con DOI ' . $worker->user->doi . ' ya está inscrito en otro taller activo. El taller con el que se cruza es: "' . $induction_after->alias . '", programado del ' . date('d-m-Y', strtotime($induction_after->date_start)) . ' al ' . date('d-m-Y', strtotime($induction_after->date_end)) . ' (ID: ' . $induction_after->id . ').';
+                                    $validar = false;
+                                    break; // Termina el bucle foreach
+                                }
+                            }
+
+                            if ($validar) {
+                                // Validar que no exista otro registro con la misma inducción y usuario
+                                $existingRecord = InductionWorker::where('id_induction', $id_induction)
+                                    ->where('id_worker', $worker->id)
+                                    ->first();
+
+                                if (!$existingRecord) {
+                                    $new_induction = new InductionWorker();
+                                    $new_induction->id_induction = $id_induction;
+                                    $new_induction->id_worker = $worker->id;
+                                    $new_induction->status = '1';
+                                    $new_induction->save();
                                 } else {
-
-                                    $filasConProblemas[] = 'Ya esta registrado el trabajador de la fila ' . $filaActual;
+                                    if ($existingRecord->status == '0') {
+                                        $existingRecord->status = '1';
+                                        $existingRecord->save();
+                                        $filasConProblemas[] = 'El trabajador con DOI ' . $worker->user->doi . ' ha sido activado.';
+                                    } else {
+                                        $filasConProblemas[] = 'El trabajador con DOI ' . $worker->user->doi . ' ya está registrado.';
+                                    }
                                 }
                             }
                         }
@@ -407,7 +478,7 @@ class SupervisorController extends Controller
     {
         $workshops = WorkshopCompany::where('id_company', session('id_company'))->get();
         $inductions = Induction::where('id_company', session('id_company'))
-            // ->where('status', '1')
+            ->where('status', '1')
             ->orderBy('id', 'desc')
             ->get();
 
@@ -573,6 +644,23 @@ class SupervisorController extends Controller
             $existingRecord = InductionWorker::where('id_induction', $request->id_induction)
                 ->where('id_worker', $request->id_worker)
                 ->first();
+            $induction = Induction::find($request->id_induction);
+            $induction_afters = Induction::where('id_company', $induction->id_company)
+                ->where('status', '1')
+                ->where('alias', 'like', '%' . $induction->alias . '%')
+                ->where('id', '!=', $induction->id)
+                ->where('date_start', '<=', $induction->date_end)
+                ->where('date_end', '>=', $induction->date_start)
+                ->get();
+
+            foreach ($induction_afters as $induction_after) {
+                $existingRecordInAfter = InductionWorker::where('id_induction', $induction_after->id)
+                    ->where('id_worker', $request->id_worker)
+                    ->first();
+                if ($existingRecordInAfter) {
+                    return redirect()->back()->with('error', 'El usuario ya está inscrito en otro taller activo. El taller con el que se cruza es: "' . $induction_after->alias . '", programado del ' . date('d-m-Y', strtotime($induction_after->date_start)) . ' al ' . date('d-m-Y', strtotime($induction_after->date_end)) . ' (ID: ' . $induction_after->id . ').');
+                }
+            }
 
             if ($existingRecord) {
                 if ($existingRecord->status == '0') {
@@ -660,6 +748,80 @@ class SupervisorController extends Controller
         ];
     }
 
+    public function generarPDFISem($id_induction_worker, $intento, $modo = 'Evaluación')
+    {
+        $induction_worker = InductionWorker::find($id_induction_worker);
+        $worker = Worker::find($induction_worker->id_worker);
+        $induction = Induction::find($induction_worker->id_induction);
+        $detail_induction_worker = DetailInductionWorker::where('induction_worker_id', $induction_worker->id)
+            ->where('report', $intento);
+
+        if ($modo == 'Entrenamiento') {
+            $detail_induction_worker = $detail_induction_worker->where('entrenamiento', 1);
+        } else {
+            $detail_induction_worker = $detail_induction_worker->where('entrenamiento', '<>', 1);
+        }
+
+        $detail_induction_worker = $detail_induction_worker->orderBy('id', 'asc')->get();
+        $casosTotales = $induction_worker->case_count;
+        $casosBuenos = $detail_induction_worker->filter(function ($detail) {
+            return floatval($detail->identified) != 0.0;
+        })->count();
+        $casosMalos = 8 - $casosBuenos;
+        $data = $detail_induction_worker[0];
+        $logo = Company::find($induction->id_company)->url_image_desktop;
+
+        $result = $this->calcularPonderadoPorcentajeYCategoria($data->note_reference, $data->note);
+        $ponderado = $result['ponderado'];
+        $porcentaje = $result['porcentaje'];
+        $categoria = $result['categoria'];
+        $note_reference = $data->note_reference;
+
+        $consulta = DB::table('detail_induction_workers')
+            ->select(DB::raw('COALESCE(MAX(report) , 0) AS resultado'))
+            ->where('induction_worker_id', $id_induction_worker);
+
+        if ($modo == 'Entrenamiento') {
+            $resultado = $consulta->where('entrenamiento', '1')->first();
+        } else {
+            $resultado = $consulta->where('entrenamiento', '<>', '1')->first();
+        }
+
+        $nuevoIntento = $resultado->resultado;
+
+        $data = [
+            'induction_worker' => $induction_worker,
+            'worker' => $worker,
+            'induction' => $induction,
+            'imagen' => "https://quickchart.io/chart?c={type:'doughnut', data:{datasets:[{data:[$casosBuenos,$casosMalos],backgroundColor:['rgb(32,164,81)','rgb(255,0,0)'],}],labels:['Encontrado', 'No encontrados'],},options:{title:{display:false},plugins: { datalabels: { color: 'white' } },},}",
+            'detail_induction_worker' => $detail_induction_worker,
+            'casosTotales' => $casosTotales,
+            'casosBuenos' => $casosBuenos,
+            'casosMalos' => $casosMalos,
+            'nota' => $ponderado,
+            'categoria' => $categoria,
+            'porcentaje' => $porcentaje,
+            'logo' => $logo,
+            'logo_taller' => $induction->workshop->photo,
+            'data' => $data,
+            'intento' => $intento,
+            'intentos' => $induction_worker->num_report,
+            'modo' => $modo,
+            'num_reportes' => $nuevoIntento
+        ];
+        $datas = $induction_worker->notaIsemByIntento($intento);
+
+        $data['ponderado'] = 1;
+        $data['porcentaje'] = $datas['porcentaje'];
+        $data['categoria'] = $datas['categoria'];
+        $data['nota'] = $datas['total_sum'];
+        $data['extra'] = $datas;
+
+
+        $pdf = PDF::loadView('ReportesFormatos.IsemNotaPdf', $data);
+        return $pdf;
+    }
+
     public function visualizar_reporte_notas($id_induction_worker, $intento, $modo)
     {
         $induction_worker = InductionWorker::find($id_induction_worker);
@@ -677,7 +839,9 @@ class SupervisorController extends Controller
         $detail_induction_worker = $detail_induction_worker->orderBy('id', 'asc')->get();
         // Cargar los datos necesarios para el PDF en el arreglo $data
         $casosTotales = $induction_worker->case_count;
-        $casosBuenos = count($detail_induction_worker);
+        $casosBuenos = $detail_induction_worker->filter(function ($detail) {
+            return floatval($detail->identified) != 0.0;
+        })->count();
         $casosMalos = 8 - $casosBuenos;
         // $logo = Worker::where('id_company', $induction->id_company)->first()->user->photo;
         $data = $detail_induction_worker[0];
@@ -834,27 +998,14 @@ class SupervisorController extends Controller
     }
     public function descargar_asistencia($id_induction, $fecha_inicio = null, $fecha_fin = null, $id_service)
     {
-        // Verifica si al menos una de las fechas es "0000-00-00"
-        if ($fecha_inicio === '0000-00-00' || $fecha_fin === '0000-00-00') {
-            // No apliques ningún filtro de fecha
-            $induction_worker = InductionWorker::where('id_induction', $id_induction)->get();
-        } else {
-            // Añade la hora correspondiente a las fechas
-            $fecha_inicio .= ' 00:00:00';
-            $fecha_fin .= ' 23:59:59';
-
-            // Aplica el filtro de fechas solo si ambas fechas son válidas
-            $query = InductionWorker::where('id_induction', $id_induction);
-            if ($fecha_inicio && $fecha_fin) {
-                $query->where('start_date', '>=', $fecha_inicio)
-                    ->where('end_date', '<=', $fecha_fin);
-            }
-            $induction_worker = $query->get();
-        }
-
+        $induction_worker = InductionWorker::where('id_induction', $id_induction)
+            ->orderBy('id', 'asc')
+            ->where('status', '1')
+            ->get();
         $induction = Induction::find($id_induction);
         $result = InductionWorker::where('induction_workers.id_induction', $id_induction)
             ->orderBy('id', 'asc')
+            ->where('status', '1')
             ->get();
 
         $logo = Company::find($induction->id_company)->url_image_desktop;
@@ -872,14 +1023,24 @@ class SupervisorController extends Controller
             'result' => $result,
             'logo' => $logo,
             'id_service' => $id_service,
-            'signature' => $base64
+            'signature' => $base64,
+            'fecha_inicio' => $fecha_inicio,
+            'fecha_fin' => $fecha_fin,
         ];
         // Configura los márgenes directamente en DOMPDF
         if ($induction->id_company == 2) {
             $pdf = PDF::loadView('ReportesFormatos.IsemAsistenciaPdf', $data);
             // dd($result[0]->worker);
         } else if ($induction->id_company == 4) {
-            $pdf = PDF::loadView('ReportesFormatos.ConfipetrolAsistenciaPdf', $data);
+            if ($induction->alias == 'Aislamiento y bloqueo de energías') {
+                $pdf = PDF::loadView('ReportesFormatos.ConfipetrolAsistenciaAislamientoPdf', $data)
+                    ->setPaper('a4', 'landscape');
+            } elseif ($induction->alias == 'Seguridad de Procesos') {
+                // Aquí puedes cargar la vista que corresponda a 'Seguridad de Procesos'
+                $pdf = PDF::loadView('ReportesFormatos.ConfipetrolAsistenciaSeguridadPdf', $data)->setPaper('a4', 'landscape');
+            } else {
+                $pdf = PDF::loadView('ReportesFormatos.ConfipetrolAsistenciaPdf', $data)->setPaper('a4', 'landscape');
+            }
         } else if ($induction->id_company == 3) {
             $pdf = PDF::loadView('ReportesFormatos.LuzDelSurAsistenciaPdf', $data);
         }
@@ -887,62 +1048,170 @@ class SupervisorController extends Controller
         return $pdf->stream('reporte.pdf');
     }
 
-    public function generarReportePDF($id_induction_worker)
+    private function generarDataGeneral($ids_induction, $id_induction, $fecha_inicio, $fecha_fin, $path)
     {
-        $induction_worker = InductionWorker::find($id_induction_worker);
-        $worker = Worker::find($induction_worker->id_worker);
-        $induction = Induction::find($induction_worker->id_induction);
-        $detail_induction_worker = DetailInductionWorker::where('induction_worker_id', $induction_worker->id)
-            ->orderBy('time', 'asc')
+        // Si id_service es null o 0, obtén todos los registros sin filtrar por id_service
+        $inductionWorkers = InductionWorker::whereIn('id_induction', $ids_induction)
+            ->orderBy('id', 'asc')
             ->get();
 
-        // Cargar los datos necesarios para el PDF en el arreglo $data
-        $casosTotales = $induction_worker->case_count;
-        $casosBuenos = count($detail_induction_worker);
-        $casosMalos = 8 - $casosBuenos;
+        $induction = Induction::find($id_induction);
 
-        $data = [
-            'induction_worker' => $induction_worker,
-            'worker' => $worker,
-            'induction' => $induction,
-            'imagen' => "https://quickchart.io/chart?c={type:'doughnut', data:{datasets:[{data:[$casosBuenos,$casosMalos],backgroundColor:['rgb(32,164,81)','rgb(255,0,0)'],}],labels:['Encontrado', 'No encontrados'],},options:{title:{display:false},plugins: { datalabels: { color: 'white' } },},}",
-            'detail_induction_worker' => $detail_induction_worker,
-            'casosTotales' => $casosTotales,
-            'casosBuenos' => $casosBuenos,
-            'casosMalos' => $casosMalos,
-            'nota' => $induction_worker->Ponderado,
-            'categoria' => $induction_worker->Categoria,
-            'porcentaje' => $induction_worker->Porcentaje,
+        // Crear un arreglo vacío para los datos a exportar
+        $data = [];
+        // Iterar sobre los registros y construir el arreglo de datos
+
+        foreach ($inductionWorkers as $worker) {
+            // Verificar si el status es igual a 1
+            if ($worker->status == 1) {
+                if ($worker->worker->user->name == $worker->worker->user->last_name) {
+                    $name = $worker->worker->user->name;
+                } else {
+                    $name = $worker->worker->user->name . ' ' . $worker->worker->user->last_name;
+                }
+                $data[] = [
+                    'doi' => $worker->worker->user->doi,
+                    'name' => $name,
+                    'nota' => $worker->Ponderado,
+                    'categoria' => $worker->Categoria,
+                    'porcentaje' => number_format($worker->Porcentaje, 0) . '%',
+                ];
+            }
+        }
+
+        // Crear una instancia de la clase de exportación y pasar los datos
+        $cabecera = [
+            'simulador' => $induction->alias,
+            'instructor' => $induction->worker->user->name . ' ' . $induction->worker->user->last_name,
+            'fecha' => Carbon::now()->format('d/m/Y'),
         ];
 
-        // Generate PDF
-        $pdf = PDF::loadView('ReportesFormatos.asistenciaPDF', $data);
+        $id_company = session('id_company');
 
-        return $pdf;
+
+        $headerKeys = ["intento", "nombre", "empresa", "codigo", "cargo", "start_date", "id_service"];
+        $headerMap = [
+            "codigo" => "Documento de identidad",
+            "nombre" => "Datos del Trajador",
+            "empresa" => "Empresa",
+            "cargo" => "Cargo",
+        ];
+        if ($induction->alias == 'Aislamiento y bloqueo de energías') {
+            $detailKeys = ["start_date", "maxNota", "EPPs", "Equipos de bloqueo", "Aislamiento", "Bloqueo y tarjeteo"];
+
+            $detailMap = [
+                "start_date" => "Fecha de inicio",
+                "EPPs" => "EPPs",
+                "Equipos de bloqueo" => "Equipos de bloqueo",
+                "Aislamiento" => "Aislamiento",
+                "Bloqueo y tarjeteo" => "Bloqueo y tarjeteo",
+                "maxNota" => "Nota"
+            ];
+        } elseif ($induction->alias == 'Seguridad de Procesos') {
+
+            $detailKeys = [
+                "start_date",
+                "EPPs",
+                "Equipos de bloqueo",
+                "Aislamiento",
+                "Bloqueo y tarjeteo",
+                "Derrame de crudo",
+                "Fuga de agua",
+                "Deterioro de tuberías",
+                "Desgaste de estructuras",
+                "Personaje de caída",
+                "Derrame de barriles",
+                "Camión de grua",
+                "Ingreso al tanque",
+                "maxNota"
+            ];
+            $detailMap = [
+                "start_date" => "Fecha de inicio",
+                "EPPs" => "EPPs",
+                "Equipos de bloqueo" => "Equipos de bloqueo",
+                "Aislamiento" => "Aislamiento",
+                "Bloqueo y tarjeteo" => "Bloqueo y tarjeteo",
+                "Derrame de crudo" => "Derrame de crudo",
+                "Fuga de agua" => "Fuga de agua",
+                "Deterioro de tuberías" => "Deterioro de tuberías",
+                "Desgaste de estructuras" => "Desgaste de estructuras",
+                "Personaje de caída" => "Personaje de caída",
+                "Derrame de barriles" => "Derrame de barriles",
+                "Camión de grua" => "Camión de grua",
+                "Ingreso al tanque" => "Ingreso al tanque",
+                "maxNota" => "Nota"
+            ];
+        } else {
+            $detailKeys = [
+                "start_date",
+                "maxNota"
+            ];
+            $detailMap = [
+                "start_date" => "Fecha de inicio",
+                "maxNota" => "Nota"
+            ];
+        }
+        $data = $this->notaConfipetrolExcel($inductionWorkers, $headerKeys, $detailKeys, $induction->alias, $fecha_inicio, $fecha_fin);
+
+        // Función de comparación para ordenar por 'start_date'
+        usort($data, function ($a, $b) {
+            // Manejar null values y formato de fecha
+            $dateA = $a['start_date'] ? strtotime($a['start_date']) : 0;
+            $dateB = $b['start_date'] ? strtotime($b['start_date']) : 0;
+
+            return $dateA - $dateB;
+        });
+
+        // if ('Seguridad de Procesos' == $induction->alias) {
+        //     dd($data);
+        // }
+
+        $export = new ExcelGeneralConfipetrol(collect($data), collect($cabecera), collect($headerMap), collect($detailMap));
+
+        $filename = $cabecera['simulador'] . '_' . date('Y-m-d_H-i-s') . '.xlsx';
+        Excel::store($export, $path . $filename, 'local');
     }
 
-    public function descargar_asistencia_zip(Request $request, $id_induction)
+    public function reporteGeneral(Request $request)
     {
-        // Recupera los trabajadores de la inducción para la inducción dada
-        $induction_workers = InductionWorker::where('id_induction', $id_induction)->get();
+        $id_company = session('id_company');
+        // Variables de fecha y servicio, ajustar según sea necesario
+        $fecha_inicio = null;
+        $fecha_fin = null;
+        $id_service = null;
+
+        $inductions = Induction::select(
+            'alias',
+            DB::raw('array_agg(id) as ids') // Agrega los IDs de cada grupo
+        )
+            ->where('id_company', $id_company)
+            ->where('status', true)
+            ->groupBy('alias')
+            ->get();
 
         // Crea el directorio principal para almacenar los informes
-        $reportDir = 'reportes';
+        $reportDir = 'reportes_excel';
         Storage::makeDirectory($reportDir);
 
-        // Crea un directorio para la inducción específica
-        $inductionDir = $reportDir . '/' . $id_induction;
+        // Crea un directorio para la inducción específica con la fecha y hora actual
+        $inductionDir = $reportDir . '/' . date('Y-m-d_H-i-s');
         Storage::makeDirectory($inductionDir);
 
-        // Genera y almacena los PDFs para cada trabajador de la inducción
-        foreach ($induction_workers as $induction_worker) {
-            $pdf = $this->generarReportePDF($induction_worker->id);
-            $pdfFileName = 'reporte_' . $induction_worker->worker->user->doi . '.pdf';
-            Storage::put($inductionDir . '/' . $pdfFileName, $pdf->output());
+
+        foreach ($inductions as $induction) {
+            // Asegurarse de que los ids sean un array
+            $ids = $induction->ids;
+            if (!is_array($ids)) {
+                $ids = explode(',', trim($ids, '{}'));
+            }
+
+            // Asumiendo que generarDataGeneral ahora retorna el path del archivo Excel generado
+            $this->generarDataGeneral($ids, $ids[0], $fecha_inicio, $fecha_fin, $inductionDir . '/');
         }
 
         // Crea un archivo ZIP
-        $zipFileName = 'reportes.zip';
+        $tempZipPath = tempnam(sys_get_temp_dir(), 'reportes_induction');
+        $zipFileName = basename($tempZipPath) . '.zip';
         $zipFilePath = storage_path('app/' . $reportDir . '/' . $zipFileName);
 
         $zip = new ZipArchive;
@@ -962,28 +1231,30 @@ class SupervisorController extends Controller
         return response()->download($zipFilePath);
     }
 
-    public function descargar_asistencia_excel(Request $request, $id_induction, $fecha_inicio = null, $fecha_fin = null)
+    public function descargar_asistencia_excel(Request $request, $id_induction, $fecha_inicio = null, $fecha_fin = null, $id_service = null)
     {
         // Obtener registros de InductionWorker
-        // Verifica si al menos una de las fechas es "0000-00-00"
-        if ($fecha_inicio === '0000-00-00' || $fecha_fin === '0000-00-00') {
-            // No apliques ningún filtro de fecha
-            $inductionWorkers = InductionWorker::where('id_induction', $id_induction)
+        if ($id_service !== null && $id_service != 0) {
+            // Filtra por id_service si está presente y es diferente de 0
+            $inductionWorkers = InductionWorker::whereHas('worker', function ($query) use ($id_service) {
+                $query->where('id_service', $id_service);
+            })
+                ->where('id_induction', $id_induction)
                 ->orderBy('id', 'asc')
                 ->get();
         } else {
-            // Añade la hora correspondiente a las fechas
+            // Si id_service es null o 0, obtén todos los registros sin filtrar por id_service
+            $inductionWorkers = InductionWorker::where('id_induction', $id_induction)
+                ->orderBy('id', 'asc')
+                ->get();
+        }
+
+        if ($fecha_inicio !== '0000-00-00' && $fecha_fin !== '0000-00-00') {
             $fecha_inicio .= ' 00:00:00';
             $fecha_fin .= ' 23:59:59';
-
-            // Aplica el filtro de fechas solo si ambas fechas son válidas
-            $query = InductionWorker::where('id_induction', $id_induction)
-                ->orderBy('id', 'asc');
-            if ($fecha_inicio && $fecha_fin) {
-                $query->where('start_date', '>=', $fecha_inicio)
-                    ->where('end_date', '<=', $fecha_fin);
-            }
-            $inductionWorkers = $query->get();
+        } else {
+            $fecha_inicio = null;
+            $fecha_fin = null;
         }
 
         $induction = Induction::find($id_induction);
@@ -1053,25 +1324,70 @@ class SupervisorController extends Controller
                 $export = new InductionExcelReportExport(collect($data), collect($cabecera));
                 break;
             case 4:
-                $data = [];
-                // Iterar sobre los registros y construir el arreglo de datos
+                $headerKeys = ["intento", "nombre", "empresa", "codigo", "cargo", "start_date", "id_service"];
+                $headerMap = [
+                    "codigo" => "Documento de identidad",
+                    "nombre" => "Datos del Trajador",
+                    "empresa" => "Empresa",
+                    "cargo" => "Cargo",
+                ];
+                if ($induction->alias == 'Aislamiento y bloqueo de energías') {
+                    $detailKeys = ["start_date", "maxNota", "EPPs", "Equipos de bloqueo", "Aislamiento", "Bloqueo y tarjeteo"];
 
-                foreach ($inductionWorkers as $worker) {
-                    // Verificar si el status es igual a 1
-                    if ($worker->status == 1) {
-                        if ($worker->worker->user->name == $worker->worker->user->last_name) {
-                            $name = $worker->worker->user->name;
-                        } else {
-                            $name = $worker->worker->user->name . ' ' . $worker->worker->user->last_name;
-                        }
-                        $data[] = [
-                            'doi' => $worker->worker->user->doi,
-                            'name' => $name,
-                            'nota' => $worker->notaConfipetrol(),
-                        ];
-                    }
+                    $detailMap = [
+                        "start_date" => "Fecha de inicio",
+                        "EPPs" => "EPPs",
+                        "Equipos de bloqueo" => "Equipos de bloqueo",
+                        "Aislamiento" => "Aislamiento",
+                        "Bloqueo y tarjeteo" => "Bloqueo y tarjeteo",
+                        "maxNota" => "Nota"
+                    ];
+                } elseif ($induction->alias == 'Seguridad de Procesos') {
+
+                    $detailKeys = [
+                        "start_date",
+                        "EPPs",
+                        "Equipos de bloqueo",
+                        "Aislamiento",
+                        "Bloqueo y tarjeteo",
+                        "Derrame de crudo",
+                        "Fuga de agua",
+                        "Deterioro de tuberías",
+                        "Desgaste de estructuras",
+                        "Personaje de caída",
+                        "Derrame de barriles",
+                        "Camión de grua",
+                        "Ingreso al tanque",
+                        "maxNota"
+                    ];
+                    $detailMap = [
+                        "start_date" => "Fecha de inicio",
+                        "EPPs" => "EPPs",
+                        "Equipos de bloqueo" => "Equipos de bloqueo",
+                        "Aislamiento" => "Aislamiento",
+                        "Bloqueo y tarjeteo" => "Bloqueo y tarjeteo",
+                        "Derrame de crudo" => "Derrame de crudo",
+                        "Fuga de agua" => "Fuga de agua",
+                        "Deterioro de tuberías" => "Deterioro de tuberías",
+                        "Desgaste de estructuras" => "Desgaste de estructuras",
+                        "Personaje de caída" => "Personaje de caída",
+                        "Derrame de barriles" => "Derrame de barriles",
+                        "Camión de grua" => "Camión de grua",
+                        "Ingreso al tanque" => "Ingreso al tanque",
+                        "maxNota" => "Nota"
+                    ];
+                } else {
+                    $detailKeys = [
+                        "start_date",
+                        "maxNota"
+                    ];
+                    $detailMap = [
+                        "start_date" => "Fecha de inicio",
+                        "maxNota" => "Nota"
+                    ];
                 }
-                $export = new ExcelGeneralConfipetrol(collect($data), collect($cabecera));
+                $data = $this->notaConfipetrolExcel($inductionWorkers, $headerKeys, $detailKeys, $induction->alias, $fecha_inicio, $fecha_fin);
+                $export = new ExcelGeneralConfipetrol(collect($data), collect($cabecera), collect($headerMap), collect($detailMap));
                 break;
             default:
                 break;
@@ -1080,6 +1396,148 @@ class SupervisorController extends Controller
         $filename = $cabecera['simulador'] . '_' . date('Y-m-d_H-i-s') . '.xlsx';
         return Excel::download($export, $filename);
     }
+
+    public function notaConfipetrolExcel($inductionWorkers, $headerKeys, $detailKeys, $alias, $fecha_inicio, $fecha_fin)
+    {
+        $data = [];
+        foreach ($inductionWorkers as $worker) {
+            if ($alias == 'Aislamiento y bloqueo de energías') {
+
+                $datos = $worker->notaConfipetrolMax(1);
+            } elseif ($alias == 'Seguridad de Procesos') {
+                $datos = $worker->notaConfipetrolProcesos(1);
+            } else {
+                $datos = $worker->notaConfipetrolAnalisis(1);
+            }
+            $intentos = $worker->num_report;
+
+            $cabecera = array_intersect_key($datos, array_flip($headerKeys));
+
+            if ($intentos) {
+                $arr_detalle = [];
+                $detalle = array_intersect_key($datos, array_flip($detailKeys));
+
+                if ($fecha_inicio !== null && $fecha_fin !== null) {
+                    if (isset($detalle['start_date']) && $fecha_inicio <= $detalle['start_date'] && $detalle['start_date'] <= $fecha_fin) {
+                        $detalle['start_date'] = date('d-m-Y ', strtotime($detalle['start_date']));
+                        $arr_detalle[] = $detalle;
+                    }
+                } else {
+                    $detalle['start_date'] = isset($detalle['start_date']) ? date('d-m-Y ', strtotime($detalle['start_date'])) : null;
+                    $arr_detalle[] = $detalle;
+                }
+
+                if ($intentos > 1) {
+                    for ($i = 2; $i <= $intentos; $i++) {
+                        if ($alias == 'Aislamiento y bloqueo de energías') {
+                            $datos = $worker->notaConfipetrolMax($i);
+                        } elseif ($alias == 'Seguridad de Procesos') {
+                            $datos = $worker->notaConfipetrolProcesos($i);
+                        } else {
+                            $datos = $worker->notaConfipetrolAnalisis($i);
+                        }
+                        $detalle = array_intersect_key($datos, array_flip($detailKeys));
+
+                        if ($fecha_inicio !== null && $fecha_fin !== null) {
+                            if (isset($detalle['start_date']) && $fecha_inicio <= $detalle['start_date'] && $detalle['start_date'] <= $fecha_fin) {
+                                $detalle['start_date'] = date('d-m-Y ', strtotime($detalle['start_date']));
+                                $arr_detalle[] = $detalle;
+                            }
+                        } else {
+                            $detalle['start_date'] = isset($detalle['start_date']) ? date('d-m-Y ', strtotime($detalle['start_date'])) : null;
+                            $arr_detalle[] = $detalle;
+                        }
+                    }
+                }
+                $cabecera['detalle'] = $arr_detalle;
+            }
+
+            $data[] = $cabecera;
+        }
+
+        return $data;
+    }
+
+    public function generarReportePDF($id_induction_worker)
+    {
+        $induction_worker = InductionWorker::find($id_induction_worker);
+        $worker = Worker::find($induction_worker->id_worker);
+        $induction = Induction::find($induction_worker->id_induction);
+        $detail_induction_worker = DetailInductionWorker::where('induction_worker_id', $induction_worker->id)
+            ->orderBy('time', 'asc')
+            ->get();
+
+        // Cargar los datos necesarios para el PDF en el arreglo $data
+        $casosTotales = $induction_worker->case_count;
+        $casosBuenos = $detail_induction_worker->filter(function ($detail) {
+            return floatval($detail->identified) != 0;
+        })->count();
+        $casosMalos = 8 - $casosBuenos;
+
+        $data = [
+            'induction_worker' => $induction_worker,
+            'worker' => $worker,
+            'induction' => $induction,
+            'imagen' => "https://quickchart.io/chart?c={type:'doughnut', data:{datasets:[{data:[$casosBuenos,$casosMalos],backgroundColor:['rgb(32,164,81)','rgb(255,0,0)'],}],labels:['Encontrado', 'No encontrados'],},options:{title:{display:false},plugins: { datalabels: { color: 'white' } },},}",
+            'detail_induction_worker' => $detail_induction_worker,
+            'casosTotales' => $casosTotales,
+            'casosBuenos' => $casosBuenos,
+            'casosMalos' => $casosMalos,
+            'nota' => $induction_worker->Ponderado,
+            'categoria' => $induction_worker->Categoria,
+            'porcentaje' => $induction_worker->Porcentaje,
+        ];
+
+        // Generate PDF
+        $pdf = PDF::loadView('ReportesFormatos.asistenciaPDF', $data);
+
+        return $pdf;
+    }
+
+    public function descargar_asistencia_zip(Request $request, $id_induction)
+    {
+        // Recupera los trabajadores de la inducción para la inducción dada
+        $induction_workers = InductionWorker::where('id_induction', $id_induction)
+            ->where('status', '1')
+            ->where('num_report', '>', 0)
+            ->get();
+        // Crea el directorio principal para almacenar los informes
+        $reportDir = 'reportes';
+        Storage::makeDirectory($reportDir);
+
+        // Crea un directorio para la inducción específica
+        $inductionDir = $reportDir . '/' . $id_induction;
+        Storage::makeDirectory($inductionDir);
+        // Genera y almacena los PDFs para cada trabajador de la inducción
+        foreach ($induction_workers as $induction_worker) {
+            $pdf = $this->generarPDFISem($induction_worker->id, $induction_worker->num_report, 'Evaluación');
+            $pdfFileName = 'reporte_' . $induction_worker->worker->user->doi . '.pdf';
+            Storage::put($inductionDir . '/' . $pdfFileName, $pdf->output());
+        }
+
+        // Crea un archivo ZIP
+        $tempZipPath = tempnam(sys_get_temp_dir(), 'reportes');
+        $zipFileName = basename($tempZipPath) . '.zip';
+        $zipFilePath = storage_path('app/' . $reportDir . '/' . $zipFileName);
+
+        $zip = new ZipArchive;
+        if ($zip->open($zipFilePath, ZipArchive::CREATE) === true) {
+            // Añade cada PDF al archivo ZIP
+            foreach (Storage::files($inductionDir) as $file) {
+                $zip->addFile(Storage::path($file), basename($file));
+            }
+
+            $zip->close();
+        }
+
+        // Elimina el directorio de la inducción
+        Storage::deleteDirectory($inductionDir);
+
+        // Descarga el archivo ZIP
+        return response()->download($zipFilePath);
+    }
+
+
 
     public function reportealumno(Request $request)
     {

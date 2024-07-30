@@ -3,153 +3,77 @@
 
 @section('content')
     <div class="row">
-        <div class="col-lg-8 d-flex flex-column">
+        <div class="col-lg-6 d-flex flex-column">
             <div class="row flex-grow">
                 <div class="col-12 col-lg-12 grid-margin stretch-card">
                     <div class="card card-rounded">
                         <div class="card-body">
                             <div class="d-sm-flex justify-content-between align-items-start">
                                 <div>
-                                    <h4 class="card-title card-title-dash">Rendimiento Anual</h4>
-                                    <h5 class="card-subtitle card-subtitle-dash">Análisis del rendimiento a lo largo del año
-                                    </h5>
+                                    <h4 class="card-title card-title-dash">Número de trabajadores por servicio</h4>
+                                    <h5 class="card-subtitle card-subtitle-dash">Análisis del número de trabajadores por cada servicio</h5>
                                 </div>
-
                             </div>
                             <div class="chartjs-wrapper mt-5">
-                                <div class="chartjs-size-monitor">
-                                    <div class="chartjs-size-monitor-expand">
-                                        <div class=""></div>
-                                    </div>
-                                    <div class="chartjs-size-monitor-shrink">
-                                        <div class=""></div>
-                                    </div>
-                                </div>
-                                <canvas id="lineChart" width="573" height="300"
-                                    style="display: block; height: 150px; width: 459px;"
-                                    class="chartjs-render-monitor"></canvas>
+                                <div id="container"></div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-lg-4 d-flex flex-column">
-            <div class="row flex-grow">
-                <div class="col-md-6 col-lg-12 grid-margin stretch-card">
-                    <div class="card card-rounded">
-                        <div class="card-body pb-0">
-                            <h4 class="card-title card-title-dash mb-4">Resumen Anual</h4>
-                            <div class="chartjs-wrapper mt-5">
-                                <div class="chartjs-size-monitor">
-                                    <div class="chartjs-size-monitor-expand">
-                                        <div class=""></div>
-                                    </div>
-                                    <div class="chartjs-size-monitor-shrink">
-                                        <div class=""></div>
-                                    </div>
-                                </div>
-                                <canvas id="donutChartAnual" width="573" height="187"
-                                    style="display: block; height: 150px; width: 459px;"
-                                    class="chartjs-render-monitor"></canvas>
-                            </div>
-                            <div class="mt-4 mb-4">
-                                <ul class="list-group">
-                                    <li class="list-group-item">
-                                        <p class="mb-1">Total de Inscripciones</p>
-                                        <h2 id="totalInscripcionesAnuales" class="text-info">1000</h2>
-                                        <!-- Reemplaza con tus datos reales -->
-                                    </li>
-                                    <li class="list-group-item">
-                                        <p class="mb-1">Aprobados</p>
-                                        <h2 id="totalAprobadosAnuales" class="text-success">700</h2>
-                                        <!-- Reemplaza con tus datos reales -->
-                                    </li>
-                                    <li class="list-group-item">
-                                        <p class="mb-1">Desaprobados</p>
-                                        <h2 id="totalDesaprobadosAnuales" class="text-danger">200</h2>
-                                        <!-- Reemplaza con tus datos reales -->
-                                    </li>
-                                    <li class="list-group-item">
-                                        <p class="mb-1">Pendientes de Notas</p>
-                                        <h2 id="totalPendientesAnuales" class="text-warning">100</h2>
-                                        <!-- Reemplaza con tus datos reales -->
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-lg-8 d-flex flex-column">
+        <div class="col-lg-6 d-flex flex-column">
             <div class="row flex-grow">
                 <div class="col-12 col-lg-12 grid-margin stretch-card">
                     <div class="card card-rounded">
                         <div class="card-body">
                             <div class="d-sm-flex justify-content-between align-items-start">
                                 <div>
-                                    <h4 class="card-title card-title-dash">Rendimiento Semanal</h4>
-                                    <h5 class="card-subtitle card-subtitle-dash">Análisis del rendimiento en los últimos 7
-                                        días</h5>
+                                    <h4 class="card-title card-title-dash">Número de trabajadores por servicio</h4>
+                                    <h5 class="card-subtitle card-subtitle-dash">Análisis del número de trabajadores por cada servicio</h5>
                                 </div>
                             </div>
                             <div class="chartjs-wrapper mt-5">
-                                <div class="chartjs-size-monitor">
-                                    <div class="chartjs-size-monitor-expand">
-                                        <div class=""></div>
-                                    </div>
-                                    <div class="chartjs-size-monitor-shrink">
-                                        <div class=""></div>
-                                    </div>
-                                </div>
-                                <canvas id="lineChartUltimos7Dias" width="573" height="187"
-                                    style="display: block; height: 150px; width: 459px;"
-                                    class="chartjs-render-monitor"></canvas>
+                                <div id="container-talleres-inducciones"></div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-lg-4 d-flex flex-column">
+        <div class="col-lg-6 d-flex flex-column">
             <div class="row flex-grow">
-                <div class="col-md-6 col-lg-12 grid-margin stretch-card">
+                <div class="col-12 col-lg-12 grid-margin stretch-card">
                     <div class="card card-rounded">
-                        <div class="card-body pb-0">
-                            <h4 class="card-title card-title-dash mb-4">Resumen de los Últimos 7 Días</h4>
-                            <div class="chartjs-wrapper mt-5">
-                                <div class="chartjs-size-monitor">
-                                    <div class="chartjs-size-monitor-expand">
-                                        <div class=""></div>
-                                    </div>
-                                    <div class="chartjs-size-monitor-shrink">
-                                        <div class=""></div>
-                                    </div>
+                        <div class="card-body">
+                            <div class="d-sm-flex justify-content-between align-items-start">
+                                <div>
+                                    <h4 class="card-title card-title-dash">Número de trabajadores por servicio</h4>
+                                    <h5 class="card-subtitle card-subtitle-dash">Análisis del número de trabajadores por cada servicio</h5>
                                 </div>
-                                <canvas id="donutChartUltimos7Dias" width="573" height="187"
-                                    style="display: block; height: 150px; width: 459px;"
-                                    class="chartjs-render-monitor"></canvas>
                             </div>
-                            <div class="mt-4">
-                                <ul class="list-group">
-                                    <li class="list-group-item">
-                                        <p class="mb-1">Aprobados</p>
-                                        <h2 class="text-success">250</h2> <!-- Reemplaza con tus datos reales -->
-                                    </li>
-                                    <li class="list-group-item">
-                                        <p class="mb-1">Desaprobados</p>
-                                        <h2 class="text-danger">50</h2> <!-- Reemplaza con tus datos reales -->
-                                    </li>
-                                    <li class="list-group-item">
-                                        <p class="mb-1">Pendientes de Notas</p>
-                                        <h2 class="text-warning">50</h2> <!-- Reemplaza con tus datos reales -->
-                                    </li>
-                                </ul>
+                            <div class="chartjs-wrapper mt-5">
+                                <div id="container-talleres-trabajadores"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-12 d-flex flex-column">
+            <div class="row flex-grow">
+                <div class="col-12 col-lg-12 grid-margin stretch-card">
+                    <div class="card card-rounded">
+                        <div class="card-body">
+                            <div class="d-sm-flex justify-content-between align-items-start">
+                                <div>
+                                    <h4 class="card-title card-title-dash">Número de trabajadores por servicio</h4>
+                                    <h5 class="card-subtitle card-subtitle-dash">Análisis del número de trabajadores por cada servicio</h5>
+                                </div>
+                            </div>
+                            <div class="chartjs-wrapper mt-5">
+                                <div id="containertalleresyear"></div>
                             </div>
                         </div>
                     </div>
@@ -157,6 +81,8 @@
             </div>
         </div>
     </div>
+
+
 @endsection
 
 
@@ -167,229 +93,297 @@
         iconSuperAdmin.classList.add('active');
     </script>
 
-    <script>
-        var dataporMes = @json($induccionesPorMes);
-        console.log(dataporMes);
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
 
-        var labelsGrafica = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre",
-            "Octubre", "Noviembre", "Diciembre"
-        ];
 
-        var aprobados = dataporMes.map(function(induccion) {
-            return induccion.estadoTrabajadores.approved;
-        });
+<script>
+    // Para mostrar los servicios
+    let data = @json($data);
+    console.log(data);
 
-        var desaprobados = dataporMes.map(function(induccion) {
-            return induccion.estadoTrabajadores.disapproved;
-        });
+    let chartData = data.servicios.map(function(e) {
+       return {
+           name: e.name,
+           y: e.numero_workers,
+           color: 'rgb(' + Math.floor(Math.random() * 256) + ',' + Math.floor(Math.random() * 256) + ',' + Math.floor(Math.random() * 256) + ')'
+       };
+    });
 
-        var pendientes = dataporMes.map(function(induccion) {
-            return induccion.estadoTrabajadores.pending;
-        });
-
-        var totalAprobadosAnuales = aprobados.reduce(function(a, b) {
-            return a + b;
-        }, 0);
-
-        var totalDesaprobadosAnuales = desaprobados.reduce(function(a, b) {
-            return a + b;
-        }, 0);
-
-        var totalPendientesAnuales = pendientes.reduce(function(a, b) {
-            return a + b;
-        }, 0);
-
-        var totalInscripcionesAnuales = totalAprobadosAnuales + totalDesaprobadosAnuales + totalPendientesAnuales;
-
-        $('#totalAprobadosAnuales').text(totalAprobadosAnuales);
-        $('#totalDesaprobadosAnuales').text(totalDesaprobadosAnuales);
-        $('#totalPendientesAnuales').text(totalPendientesAnuales);
-        $('#totalInscripcionesAnuales').text(totalInscripcionesAnuales);
-
-        if (window.lineChart instanceof Chart) {
-            window.lineChart.destroy();
-        }
-
-        var lineChartCtx = document.getElementById("lineChart").getContext("2d");
-        window.lineChart = new Chart(lineChartCtx, {
-            type: "line",
-            data: {
-                labels: labelsGrafica,
-                datasets: [{
-                        label: "Aprobados",
-                        data: aprobados,
-                        fill: false,
-                        borderColor: "#2196f3",
-                        backgroundColor: "#2196f3",
-                        borderWidth: 1,
-                        smooth: 0.4,
-                    },
-                    {
-                        label: "Desaprobados",
-                        data: desaprobados,
-                        fill: false,
-                        borderColor: "#f32196",
-                        backgroundColor: "#f32196",
-                        borderWidth: 1,
-                        smooth: 0.4,
-                    },
-                    {
-                        label: "Pendientes",
-                        data: pendientes,
-                        fill: false,
-                        borderColor: "#4caf50",
-                        backgroundColor: "#4caf50",
-                        borderWidth: 1,
-                        smooth: 0.4,
-                    },
-                ],
+    const chart = Highcharts.chart('container', {
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: 'Número de trabajadores por servicio'
+        },
+        xAxis: {
+            categories: data.servicios.map(function(e) { return ''; }),
+            title: {
+                text: 'Servicios'
+            }
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Número de trabajadores',
+                align: 'high'
             },
-            options: {
-                title: {
-                    display: true,
-                    text: 'Evolución de Aprobados, Desaprobados y Pendientes de Nota a lo largo del año'
-                },
-                tooltips: {
-                    callbacks: {
-                        title: function(tooltipItem, data) {
-                            var index = tooltipItem[0]['index'];
-                            return labelsGrafica[index];
-                        },
-                        label: function(tooltipItem, data) {
-                            var dataset = data['datasets'][tooltipItem['datasetIndex']];
-                            return dataset['data'][tooltipItem['index']];
-                        }
-                    }
-                },
-                legend: {
-                    position: 'bottom',
+            labels: {
+                overflow: 'justify'
+            }
+        },
+        tooltip: {
+            valueSuffix: ' trabajadores'
+        },
+        plotOptions: {
+            column: {
+                dataLabels: {
+                    enabled: true
                 }
             }
-        });
-    </script>
-
-    <script>
-        var donutChartCtxAnual = document.getElementById("donutChartAnual").getContext("2d");
-
-        var dataDonutChartAnual = {
-            labels: ["Aprobados", "Desaprobados", "Pendientes de Notas"],
-            datasets: [{
-                data: [totalAprobadosAnuales, totalDesaprobadosAnuales, totalPendientesAnuales],
-                backgroundColor: ["#28a745", "#dc3545", "#ffc107"],
-                hoverBackgroundColor: ["#218838", "#c82333", "#ffb21a"],
-                borderWidth: 1,
-            }],
-        };
-
-        var donutChartOptionsAnual = {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutoutPercentage: 60,
-            legend: {
-                position: 'bottom',
-            },
-        };
-
-        var donutChartAnual = new Chart(donutChartCtxAnual, {
-            type: 'doughnut',
-            data: dataDonutChartAnual,
-            options: donutChartOptionsAnual,
-        });
-    </script>
-
-    <script>
-        var donutChartCtxUltimos7Dias = document.getElementById("donutChartUltimos7Dias").getContext("2d");
-
-        var dataDonutChart = {
-            labels: ["Aprobados", "Desaprobados", "Pendientes de Notas"],
-            datasets: [{
-                data: [250, 50, 50], // Reemplaza con tus datos reales
-                backgroundColor: ["#28a745", "#dc3545", "#ffc107"],
-                hoverBackgroundColor: ["#218838", "#c82333", "#ffb21a"],
-                borderWidth: 1,
-            }],
-        };
-
-        var donutChartOptions = {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutoutPercentage: 60, // Ajusta el tamaño del agujero en el gráfico de dona
-            legend: {
-                position: 'bottom',
-            },
-        };
-
-        var donutChartUltimos7Dias = new Chart(donutChartCtxUltimos7Dias, {
-            type: 'doughnut',
-            data: dataDonutChart,
-            options: donutChartOptions,
-        });
-    </script>
-
-    <script>
-        // Datos genéricos
-        var labelsGrafica = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
-        var aprobados = [25, 30, 35, 40, 38, 42, 37];
-        var desaprobados = [5, 3, 7, 2, 6, 4, 8];
-        var pendientes = [8, 6, 10, 12, 9, 11, 7];
-
-        // Cambia el ID del canvas a "lineChartUltimos7Dias"
-        if (window.lineChartUltimos7Dias instanceof Chart) {
-            window.lineChartUltimos7Dias.destroy();
+        },
+        series: chartData.map(function(e) {
+            return {
+                name: e.name,
+                data: [e.y],
+                color: e.color
+            };
+        }),
+        exporting: {
+            enabled: true
         }
+    });
 
-        var lineChartCtxUltimos7Dias = document.getElementById("lineChartUltimos7Dias").getContext("2d");
-        window.lineChartUltimos7Dias = new Chart(lineChartCtxUltimos7Dias, {
-            type: "line",
-            data: {
-                labels: labelsGrafica,
-                datasets: [{
-                        label: "Aprobados",
-                        data: aprobados,
-                        fill: false,
-                        borderColor: "#2196f3",
-                        backgroundColor: "#2196f3",
-                        borderWidth: 1,
-                    },
-                    {
-                        label: "Desaprobados",
-                        data: desaprobados,
-                        fill: false,
-                        borderColor: "#f32196",
-                        backgroundColor: "#f32196",
-                        borderWidth: 1,
-                    },
-                    {
-                        label: "Pendientes",
-                        data: pendientes,
-                        fill: false,
-                        borderColor: "#4caf50",
-                        backgroundColor: "#4caf50",
-                        borderWidth: 1,
-                    },
-                ],
+    // Agrupar por alias y contar el número de talleres y trabajadores
+    let groupedData = data.inducciones.reduce(function(acc, curr) {
+        if (typeof acc[curr.alias] == 'undefined') {
+            acc[curr.alias] = { talleres: 1, trabajadores: curr.workers_count };
+        } else {
+            acc[curr.alias].talleres += 1;
+            acc[curr.alias].trabajadores += curr.workers_count;
+        }
+        return acc;
+    }, {});
+
+    // Preparar los datos para el gráfico de talleres
+    let chartDataTalleres = Object.keys(groupedData).map(function(alias) {
+        return {
+            name: alias,
+            data: [groupedData[alias].talleres],
+            color: 'rgb(' + Math.floor(Math.random() * 256) + ',' + Math.floor(Math.random() * 256) + ',' + Math.floor(Math.random() * 256) + ')'
+        };
+    });
+
+    // Crear el gráfico de talleres
+    const chartTalleres = Highcharts.chart('container-talleres-inducciones', {
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: 'Número de talleres creados'
+        },
+        xAxis: {
+            categories: [''],
+            title: {
+                text: 'Talleres'
+            }
+
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Número de talleres',
+                align: 'high'
             },
-            options: {
-                title: {
-                    display: true,
-                    text: 'Evolución de Aprobados, Desaprobados y Pendientes de Nota en los últimos 7 días'
-                },
-                tooltips: {
-                    callbacks: {
-                        title: function(tooltipItem, data) {
-                            var index = tooltipItem[0]['index'];
-                            return labelsGrafica[index];
-                        },
-                        label: function(tooltipItem, data) {
-                            var dataset = data['datasets'][tooltipItem['datasetIndex']];
-                            return dataset['data'][tooltipItem['index']];
-                        }
-                    }
-                },
-                legend: {
-                    position: 'bottom',
+            labels: {
+                overflow: 'justify'
+            }
+        },
+        tooltip: {
+            valueSuffix: ' talleres'
+        },
+        plotOptions: {
+            column: {
+                dataLabels: {
+                    enabled: true
                 }
             }
+        },
+        series: chartDataTalleres,
+        exporting: {
+            enabled: true
+        }
+    });
+
+    // Crear el gráfico de trabajadores
+    // Preparar los datos para el gráfico de trabajadores
+    let chartDataTrabajadores = Object.keys(groupedData).map(function(alias) {
+        return {
+            name: alias,
+            data: [groupedData[alias].trabajadores],
+            color: 'rgb(' + Math.floor(Math.random() * 256) + ',' + Math.floor(Math.random() * 256) + ',' + Math.floor(Math.random() * 256) + ')'
+        };
+    });
+
+    const chartTrabajadores = Highcharts.chart('container-talleres-trabajadores', {
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: 'Número de trabajadores por taller'
+        },
+        xAxis: {
+            categories: [''],
+            title: {
+                text: 'Talleres'
+            }
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Número de trabajadores',
+                align: 'high'
+            },
+            labels: {
+                overflow: 'justify'
+            }
+        },
+        tooltip: {
+            valueSuffix: ' trabajadores'
+        },
+        plotOptions: {
+            column: {
+                dataLabels: {
+                    enabled: true
+                }
+            }
+        },
+        series: chartDataTrabajadores,
+        exporting: {
+            enabled: true
+        }
+    });
+    let inducciones = data.inducciones;
+    let meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+
+    let dataMeses = inducciones.reduce((acc, curr) => {
+        let year = curr.year;
+        if (!acc[year]) {
+            acc[year] = {};
+            meses.forEach(month => {
+                acc[year][month] = { Aprobados: 0, Desaprobados: 0, SinNota: 0 };
+            });
+        }
+        let month = curr.month;
+        acc[year][month].Aprobados += curr.aprovados;
+        acc[year][month].Desaprobados += curr.reprobados;
+        acc[year][month].SinNota += curr.sinNota;
+        return acc;
+    }, {});
+
+    // Crear un select para los años
+    // Crear un select para los años
+    let selectYear = document.createElement('select');
+    Object.keys(dataMeses).forEach(year => {
+        let option = document.createElement('option');
+        option.value = year;
+        option.text = year;
+        selectYear.appendChild(option);
+    });
+
+    // Obtener el elemento donde quieres insertar el select
+    let container = document.getElementById('containertalleresyear');
+
+    // Insertar el select antes del container
+    container.parentNode.insertBefore(selectYear, container);
+
+    // El resto de tu código sigue aquí...
+
+    // Cuando se selecciona un año, actualizar el gráfico
+    selectYear.addEventListener('change', (event) => {
+        let year = event.target.value;
+        let dataYear = dataMeses[year];
+
+        // Actualizar el gráfico
+        chartMeses.update({
+            xAxis: {
+                categories: Object.keys(dataYear)
+            },
+            series: [
+                {
+                    name: 'Aprobados',
+                    data: Object.keys(dataYear).map(month => dataYear[month].Aprobados)
+                },
+                {
+                    name: 'Desaprobados',
+                    data: Object.keys(dataYear).map(month => dataYear[month].Desaprobados)
+                },
+                {
+                    name: 'Sin Nota',
+                    data: Object.keys(dataYear).map(month => dataYear[month].SinNota)
+                }
+            ]
         });
-    </script>
+    });
+
+    // Crear el gráfico inicial con el primer año
+    let firstYear = Object.keys(dataMeses)[0];
+    let dataFirstYear = dataMeses[firstYear];
+
+    const chartMeses = Highcharts.chart('containertalleresyear', {
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: 'Número de aprobados, desaprobados y sin nota por mes'
+        },
+        xAxis: {
+            categories: Object.keys(dataFirstYear),
+            title: {
+                text: 'Meses'
+            }
+        },
+        yAxis: {
+            title: {
+                text: 'Cantidad',
+                align: 'high'
+            },
+            labels: {
+                overflow: 'justify'
+            }
+        },
+        tooltip: {
+            valueSuffix: ' estudiantes'
+        },
+        plotOptions: {
+            column: {
+                dataLabels: {
+                    enabled: true
+                }
+            }
+        },
+        series: [
+            {
+                name: 'Aprobados',
+                data: Object.keys(dataFirstYear).map(month => dataFirstYear[month].Aprobados),
+                color: 'rgb(0, 123, 255)'
+            },
+            {
+                name: 'Desaprobados',
+                data: Object.keys(dataFirstYear).map(month => dataFirstYear[month].Desaprobados),
+                color: 'rgb(220, 53, 69)'
+            },
+            {
+                name: 'Sin Nota',
+                data: Object.keys(dataFirstYear).map(month => dataFirstYear[month].SinNota),
+                color: 'rgb(255, 193, 7)'
+            }
+        ],
+        exporting: {
+            enabled: true
+        }
+    });
+</script>
 @endsection
