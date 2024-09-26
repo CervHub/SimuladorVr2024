@@ -390,7 +390,9 @@ class SupervisorController extends Controller
 
                         if ($fila[1]) {
                             $id_company = session('id_company');
-                            $service = Service::where('name', $fila[1])->where('id_company', $id_company)->first();
+                            $service = Service::where('name', $fila[1])->where('id_company', $id_company)
+                            ->where('status', '1')
+                            ->first();
                         }
 
                         if ($fila[0]) {

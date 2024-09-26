@@ -2,14 +2,8 @@
 /node_modules
 /public/build
 /public/hot
-/public/storage
-# /public/workshops
-# /public/logo_photo
 /storage/*.key
 /vendor
-.env
-.env.backup
-.env.production
 .phpunit.result.cache
 Homestead.json
 Homestead.yaml
@@ -19,5 +13,3 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
-/public/apiunity/conexion.php
-/public/apiunity/conexionisem.php
