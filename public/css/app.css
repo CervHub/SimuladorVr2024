@@ -1,0 +1,53 @@
+:root {
+    --dashboard-background-color: #232227;
+    --text-primary-color: black;
+    --text-secondary-color: white;
+}
+
+.text-black-cerv {
+    color: var(--text-primary-color);
+}
+
+.text-white-cerv {
+    color: var(--text-secondary-color);
+}
+
+.bg-black {
+    background-color: var(--dashboard-background-color) !important;
+}
+
+body{
+    background-color: black !important;
+}
+
+.btn-custom {
+    height: 30px;
+    line-height: 30px;
+    /* Alinear el contenido verticalmente */
+    padding: 0 10px;
+    margin-top: 10px;
+    /* Añadir espaciado horizontal */
+}
+
+#myTable_filter {
+    display: none;
+}
+
+#myTable_length {
+    display: none;
+}
+
+.form-control-custom {
+    border-radius: 25px;
+    border: none !important;
+
+}
+
+.small {
+    font-size: 10px;
+}
+
+.form-control {
+    color: black !important;
+}
+
