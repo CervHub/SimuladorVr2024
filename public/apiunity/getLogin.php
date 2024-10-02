@@ -24,7 +24,7 @@ $queryInduction = "SELECT
     workers.position as cargo,
     workers.celular as celular,
     s.name as nombre_servicio,
-	s.id as id_service
+    s.id as id_service
 FROM induction_workers
 JOIN inductions ON induction_workers.id_induction = inductions.id
 JOIN workshops AS w ON inductions.id_workshop = w.id
@@ -39,6 +39,30 @@ WHERE inductions.intentos >= (induction_workers.num_report + 1)
     AND (to_timestamp(inductions.date_start || ' ' || inductions.time_start, 'YYYY-MM-DD HH24:MI:SS')) <= CURRENT_TIMESTAMP
 ;";
 
+$default_steps = [
+    'Aislamiento y bloqueo de energías' => [
+        'pasos' => [
+            ['name' => 'Inspección de zona de trabajo', 'duration' => 2400],
+            ['name' => 'Selección de EPPs', 'duration' => 300],
+            ['name' => 'Selección de accesorios de bloqueo', 'duration' => 300],
+            ['name' => 'Aislamiento de energía', 'duration' => 2400],
+            ['name' => 'Bloqueo y tarjeteo de equipo', 'duration' => 2400]
+        ]
+    ],
+    'Análisis de Fallas' => [
+        'pasos' => [
+            ['name' => 'Selección EPPs', 'duration' => 300],
+            ['name' => 'Análisis de fallas en el escenario', 'duration' => 2400]
+        ]
+    ],
+    'Seguridad de Procesos' => [
+        'pasos' => [
+            ['name' => 'Selección de EPPs', 'duration' => 300],
+            ['name' => 'Reconocimiento de seguridad industrial y seguridad de procesos', 'duration' => 2400]
+        ]
+    ]
+];
+
 try {
     $stmt1 = $db->prepare($queryInduction);
     $stmt1->execute($query_params_login);
@@ -47,9 +71,21 @@ try {
     $db->exec("RESET TIME ZONE");
 
     if ($stmt1->rowCount() > 0) {
+        $inductions = $stmt1->fetchAll(PDO::FETCH_ASSOC);
+
+        // Añadir pasos por defecto a cada inducción
+        foreach ($inductions as &$induction) {
+            $taller = $induction['taller'];
+            if (isset($default_steps[$taller])) {
+                $induction['pasos'] = $default_steps[$taller]['pasos'];
+            } else {
+                $induction['pasos'] = []; // Si no hay pasos por defecto para este taller
+            }
+        }
+
         $responseData = [
             'dni' => $query_params_login[':dni'],
-            'inducciones' => $stmt1->fetchAll(PDO::FETCH_ASSOC),
+            'inducciones' => $inductions,
         ];
 
         // Establecer encabezados HTTP y enviar respuesta JSON
@@ -70,4 +106,3 @@ try {
     header('Content-Type: application/json');
     echo json_encode(array('error' => 'Error general: ' . $ex->getMessage()));
 }
-?>

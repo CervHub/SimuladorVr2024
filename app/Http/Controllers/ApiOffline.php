@@ -13,6 +13,30 @@ class ApiOffline extends Controller
 {
     public function DownloadData(Request $request)
     {
+        $default_steps = [
+            'Aislamiento y bloqueo de energías' => [
+                'pasos' => [
+                    ['name' => 'Inspección de zona de trabajo', 'duration' => 2400],
+                    ['name' => 'Selección de EPPs', 'duration' => 300],
+                    ['name' => 'Selección de accesorios de bloqueo', 'duration' => 300],
+                    ['name' => 'Aislamiento de energía', 'duration' => 2400],
+                    ['name' => 'Bloqueo y tarjeteo de equipo', 'duration' => 2400]
+                ]
+            ],
+            'Análisis de Fallas' => [
+                'pasos' => [
+                    ['name' => 'Selección EPPs', 'duration' => 300],
+                    ['name' => 'Análisis de fallas en el escenario', 'duration' => 2400]
+                ]
+            ],
+            'Seguridad de Procesos' => [
+                'pasos' => [
+                    ['name' => 'Selección de EPPs', 'duration' => 300],
+                    ['name' => 'Reconocimiento de seguridad industrial y seguridad de procesos', 'duration' => 2400]
+                ]
+            ]
+        ];
+
         try {
             $id_company = $request->input('id_company');
 
@@ -49,6 +73,7 @@ class ApiOffline extends Controller
                                 'celular' => $induction_worker->worker->celular,
                                 'nombre_servicio' => $induction_worker->worker->service->name,
                                 'id_service' => $induction_worker->worker->id_service,
+                                'pasos' => $default_steps[$induction->alias]['pasos']
                             ]
                         ];
                     }

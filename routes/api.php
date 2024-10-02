@@ -20,3 +20,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('/downloadData', [ApiOffline::class, 'DownloadData']);
+
+Route::post('/getPasos', [ApiOffline::class, 'GetPasos']);

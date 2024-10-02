@@ -72,7 +72,7 @@
 
                 <div class="card rounded-0 mt-3">
                     <div class="card-body table-responsive">
-                        <div class="row">
+                        <div class="row d-none">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="fecha_inicio">Fecha de inicio:</label>
@@ -100,7 +100,31 @@
                             </div>
 
                         </div>
-                        <h4 class="card-title">Induccion - Grupo</h4>
+                        <h4 class="card-title">Inducción - Grupo</h4>
+                        <div class="filtrar-reporte-por-fechas">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <form action="{{ route('entrenador.reporte') }}" method="GET">
+                                        <div class="form-group">
+                                            <label for="filter_start">Fecha de inicio:</label>
+                                            <input type="date" class="form-control" id="filter_start" name="filter_start" value="{{ request('filter_start') }}">
+                                        </div>
+                                </div>
+                                <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="filter_end">Fecha de fin:</label>
+                                            <input type="date" class="form-control" id="filter_end" name="filter_end" value="{{ request('filter_end') }}">
+                                        </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 text-left">
+                                    <button type="submit" class="btn btn-primary text-white">Filtrar</button>
+                                </form>
+                                </div>
+                            </div>
+                        </div>
+
                         <table id="myTable" class="display dataTable table table-striped">
                             <thead>
                                 <tr>

@@ -135,13 +135,24 @@ class SupervisorController extends Controller
 
     public function reporte(Request $request)
     {
-        $inductions = Induction::where('id_company', session('id_company'))
-            ->where('status', '1')
-            ->orderBy('id', 'desc')
-            ->get();
-        // Cambio del 2/14/2024
+        $filter_start = $request->filter_start ?? null;
+        $filter_end = $request->filter_end ?? null;
+        $query = Induction::where('id_company', session('id_company'))
+            ->where('status', '1');
+
+        // Si ambos filtros están presentes, aplicar el filtrado por rango de fechas
+        if ($filter_start && $filter_end) {
+            $query = $query->where('date_start', '>=', $filter_start)
+                           ->where('date_start', '<=', $filter_end);
+        }
+
+        $inductions = $query->orderBy('id', 'desc')->get();
+
+        // Removido para integrar la lógica de filtrado
+        // dd($inductions);
+
         $services = Service::where('id_company', session('id_company'))->get();
-        return view('Supervisor.reporte', compact('inductions', 'services'));
+        return view('Supervisor.reporte', compact('inductions', 'services', 'filter_start', 'filter_end'));
     }
 
     public function crearservicio(Request $request)
