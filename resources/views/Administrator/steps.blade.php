@@ -34,6 +34,13 @@
 @section('content')
     <div class="container mt-4">
         <div class="row">
+            <div class="col-12 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="mb-0"><strong>Nota: Todos los tiempos están en segundos.</strong></h4>
+                    </div>
+                </div>
+            </div>
             @foreach ($steps as $workshop)
                 <div class="col-md-6 mb-4">
                     <div class="card h-100">
@@ -135,7 +142,8 @@
 
                         // Update the original values to the new values
                         changedSteps.forEach(step => {
-                            const input = document.querySelector(`.duration[data-id='${step.id}']`);
+                            const input = document.querySelector(
+                                `.duration[data-id='${step.id}']`);
                             input.dataset.original = step.duration;
                         });
 
