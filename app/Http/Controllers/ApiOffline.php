@@ -16,9 +16,10 @@ class ApiOffline extends Controller
         try {
             // Consulta SQL para obtener los pasos
             $steps = DB::select("
-                SELECT workshops.name as taller, steps.name, steps.duration
-                FROM steps
-                INNER JOIN workshops ON steps.workshop_id = workshops.id
+               SELECT workshops.name as taller, steps.name, steps.duration
+              FROM steps
+              INNER JOIN workshops ON steps.workshop_id = workshops.id
+              ORDER BY steps.created_at
             ");
 
             // Construir el array $default_steps dinámicamente

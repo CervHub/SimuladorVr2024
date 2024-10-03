@@ -42,7 +42,8 @@ WHERE inductions.intentos >= (induction_workers.num_report + 1)
 // Consulta SQL para obtener los pasos
 $query = "SELECT workshops.name as taller, steps.name, steps.duration
               FROM steps
-              INNER JOIN workshops ON steps.workshop_id = workshops.id";
+              INNER JOIN workshops ON steps.workshop_id = workshops.id
+              ORDER BY steps.created_at";
 
 $stmt = $db->prepare($query);
 $stmt->execute();
