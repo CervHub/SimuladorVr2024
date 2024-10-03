@@ -39,29 +39,32 @@ WHERE inductions.intentos >= (induction_workers.num_report + 1)
     AND (to_timestamp(inductions.date_start || ' ' || inductions.time_start, 'YYYY-MM-DD HH24:MI:SS')) <= CURRENT_TIMESTAMP
 ;";
 
-$default_steps = [
-    'Aislamiento y bloqueo de energías' => [
-        'pasos' => [
-            ['name' => 'Inspección de zona de trabajo', 'duration' => 2400],
-            ['name' => 'Selección de EPPs', 'duration' => 300],
-            ['name' => 'Selección de accesorios de bloqueo', 'duration' => 300],
-            ['name' => 'Aislamiento de energía', 'duration' => 2400],
-            ['name' => 'Bloqueo y tarjeteo de equipo', 'duration' => 2400]
-        ]
-    ],
-    'Análisis de Fallas' => [
-        'pasos' => [
-            ['name' => 'Selección EPPs', 'duration' => 300],
-            ['name' => 'Análisis de fallas en el escenario', 'duration' => 2400]
-        ]
-    ],
-    'Seguridad de Procesos' => [
-        'pasos' => [
-            ['name' => 'Selección de EPPs', 'duration' => 300],
-            ['name' => 'Reconocimiento de seguridad industrial y seguridad de procesos', 'duration' => 2400]
-        ]
-    ]
-];
+// Consulta SQL para obtener los pasos
+$query = "SELECT workshops.name as taller, steps.name, steps.duration
+              FROM steps
+              INNER JOIN workshops ON steps.workshop_id = workshops.id";
+
+$stmt = $db->prepare($query);
+$stmt->execute();
+
+// Obtener los resultados de la consulta
+$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Construir el array $default_steps dinámicamente
+// Construir el array $default_steps dinámicamente
+$default_steps = [];
+foreach ($results as $row) {
+    $taller = strtoupper($row['taller']); // Convertir el nombre del taller a mayúsculas
+    if (!isset($default_steps[$taller])) {
+        $default_steps[$taller] = ['pasos' => []];
+    }
+    $default_steps[$taller]['pasos'][] = [
+        'name' => $row['name'],
+        'duration' => $row['duration']
+    ];
+}
+
+
 
 try {
     $stmt1 = $db->prepare($queryInduction);
@@ -75,7 +78,7 @@ try {
 
         // Añadir pasos por defecto a cada inducción
         foreach ($inductions as &$induction) {
-            $taller = $induction['taller'];
+            $taller = strtoupper($induction['taller']); // Convertir el nombre del taller a mayúsculas
             if (isset($default_steps[$taller])) {
                 $induction['pasos'] = $default_steps[$taller]['pasos'];
             } else {

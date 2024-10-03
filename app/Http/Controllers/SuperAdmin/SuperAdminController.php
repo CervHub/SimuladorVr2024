@@ -10,6 +10,7 @@ use App\Http\Controllers\Models\WorkshopController;
 use App\Http\Controllers\Models\WorshopCompanyController;
 use Illuminate\Support\Facades\Session;
 use App\Models\Workshop;
+use App\Models\Step;
 use App\Models\WorkshopCompany;
 use Illuminate\Support\Facades\Validator;
 
@@ -214,5 +215,12 @@ class SuperAdminController extends Controller
             Session::flash('success', 'La Eliminacion se ha realizado exitosamente.');
         }
         return redirect()->back();
+    }
+
+    public function dashboardtalleresShow($workshop_id)
+    {
+        $workshop = Workshop::find($workshop_id);
+        $steps = Step::where('workshop_id', $workshop_id)->get();
+        return view('SuperAdmin.Taller.steps', compact('workshop', 'steps'));
     }
 }

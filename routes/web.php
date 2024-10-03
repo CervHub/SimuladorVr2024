@@ -22,6 +22,7 @@ use PhpOffice\PhpSpreadsheet\Style\Supervisor;
 
 use App\Http\Controllers\ApiIsemController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StepController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -57,6 +58,12 @@ Route::middleware(['superadmin', 'auth'])->group(function () {
     Route::post('talleres/createtallercompanies', [SuperAdminController::class, 'createtallercompanies'])->name('superadministrador.createtallercompanies');
     Route::post('talleres/details2', [SuperAdminController::class, 'detailstalleres2'])->name('detailstalleres2');
     Route::post('talleres/editar/company', [SuperAdminController::class, 'editartallercompany'])->name('superadministrador.editar.taller.company');
+    Route::get('talleres/show/{workshop_id}', [SuperAdminController::class, 'dashboardtalleresShow'])->name('superadministrador.taller.show');
+
+    //Rutas para los pasos de los talleres
+    Route::post('talleres/{workshop_id}/pasos/create', [StepController::class, 'createstep'])->name('superadministrador.create.step');
+    Route::post('talleres/pasos/edit/{step_id}', [StepController::class, 'editstep'])->name('superadministrador.edit.step');
+    Route::post('talleres/pasos/delete/{step_id}', [StepController::class, 'deletestep'])->name('superadministrador.delete.step');
 });
 
 // BEGIN Rutas para Administrador
@@ -76,6 +83,10 @@ Route::middleware(['admin', 'auth'])->group(function () {
     // MOdificacion para actualizar rutas de los talleres desde el administrador
     Route::get('administrador/talleres', [AdminController::class, 'talleres'])->name('administrador.talleres');
     Route::post('administrador/talleres/update', [AdminController::class, 'updateTalleres'])->name('administrador.talleres.update');
+
+    // Modificacion de tiempos de pasos de talleres
+    Route::get('administrador/talleres/steps', [AdminController::class, 'steps'])->name('administrador.talleres.steps');
+    Route::post('administrador/talleres/updatesteps', [AdminController::class, 'updateSteps'])->name('administrador.talleres.updatesteps');
 
     // Rutas para los departamentos
     Route::get('departamentos', [DepartamentoController::class, 'departamento'])->name('departamentos');

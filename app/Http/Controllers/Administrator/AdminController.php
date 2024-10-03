@@ -9,8 +9,10 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Models\UserController;
 use Illuminate\Support\Facades\Session;
 use App\Models\Company;
+use App\Models\Step;
 use App\Models\WorkshopCompany;
 use Illuminate\Support\Facades\DB;
+
 class AdminController extends Controller
 {
 
@@ -184,5 +186,45 @@ class AdminController extends Controller
             // Aquí puedes manejar el error como quieras
             return response()->json(['message' => 'Ocurrió un error al actualizar los datos'], 500);
         }
+    }
+
+    public function steps()
+    {
+        $id_company = session('id_company');
+        $workshops = WorkshopCompany::where('id_company', $id_company)->get();
+
+        $steps = $workshops->map(function ($workshop) {
+            return [
+                'name' => $workshop->alias,
+                'steps' => $workshop->workshop->steps->map(function ($step) {
+                    return [
+                        'id' => $step->id,
+                        'name' => $step->name,
+                        'duration' => $step->duration
+                    ];
+                })
+            ];
+        });
+
+        return view('Administrator.steps', compact('steps'));
+    }
+
+    public function updateSteps(Request $request)
+    {
+        $steps = $request->input('steps');
+
+        foreach ($steps as $step) {
+            // Assuming you have a Step model and the id and duration fields
+            $stepModel = Step::find($step['id']);
+            if ($stepModel) {
+                $stepModel->duration = $step['duration'];
+                $stepModel->save();
+            }
+        }
+
+        return response()->json([
+            'message' => 'Pasos actualizados correctamente',
+            'data' => $steps
+        ], 200);
     }
 }

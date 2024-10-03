@@ -16,4 +16,9 @@ class Workshop extends Model
     {
         return $this->hasMany(Induction::class, 'id_workshop');
     }
+
+    public function steps()
+    {
+        return $this->hasMany(Step::class, 'workshop_id');
+    }
 }

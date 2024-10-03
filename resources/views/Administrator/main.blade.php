@@ -35,5 +35,17 @@
                 <span class="menu-title">Gerencias</span>
             </a>
         </li>
+        @php
+            $userOrCompany = session('id_company');
+        @endphp
+
+        @if ($userOrCompany == 4)
+            <li class="nav-item" id="steps">
+                <a class="nav-link" href="{{ route('administrador.talleres.steps') }}">
+                    <i class="mdi mdi-wrench menu-icon"></i>
+                    <span class="menu-title">Talleres Steps</span>
+                </a>
+            </li>
+        @endif
     </ul>
 @endsection
