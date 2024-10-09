@@ -432,9 +432,7 @@
                 <td class="col-5 align-left align-top" style="text-align: right;">
                     <dl class="dl-container">
                         <div class="dl-row">
-                            <img style="border-radius: 25px;"
-                                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTl90mjnnqvi6gWjOUEnhQ19WYquDnoOb0bNKIkohv6ObMKACZsn9-DBsGvXb1KjuRJhGM&usqp=CAU"
-                                width="300px" alt="">
+                            <img style="border-radius: 25px;" src="{{ $logo_taller }}" width="300px" alt="">
                         </div>
                     </dl>
                 </td>

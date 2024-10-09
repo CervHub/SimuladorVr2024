@@ -319,9 +319,9 @@
 <body>
     <table class="no-border">
         <tr style="padding:0; margin:0;">
-            <td style="width: 100px; padding:0;">
+            <td style="width: 120px; padding:0;">
                 <div class="">
-                    <img src="{{ $logo }}" width="64px" alt="Logo">
+                    <img src="{{ $logo }}" width="120px" alt="Logo">
                 </div>
             </td>
             <td style="padding-right:0;">
