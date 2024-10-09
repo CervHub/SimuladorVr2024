@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ApiOffline; // Importa tu controlador
+use App\Http\Controllers\Api\ApiController; // Importa tu controlador
 
 /*
 |--------------------------------------------------------------------------
@@ -22,3 +23,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('/downloadData', [ApiOffline::class, 'DownloadData']);
 
 Route::post('/getPasos', [ApiOffline::class, 'GetPasos']);
+
+
+//Rutas para el grupo F
+// Login General de instructor
+Route::post('/login', [ApiController::class, 'login']);
+// Login Usuario
+Route::post('/loginUser', [ApiController::class, 'loginUser']);
