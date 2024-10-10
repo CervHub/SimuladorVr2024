@@ -286,46 +286,53 @@ class ApiController extends Controller
     {
         try {
             $request->validate([
-                'induction_worker_id' => 'required|numeric', // Obligatorio
-                'attempt' => 'required|numeric', // Obligatorio
-                'is_training' => 'required|boolean' // Obligatorio
+                'detail_induction_worker_id' => 'required|numeric', // Obligatorio
+                'end_date' => 'required|date', // Obligatorio
+                'json_data' => 'required|json' // Obligatorio y debe ser JSON válido
             ]);
 
-            $induction_worker = InductionWorker::where('id', $request->induction_worker_id)
-                ->first();
+            // Procesar los datos JSON
+            $jsonData = json_decode($request->input('json_data'), true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new \Exception('El formato de los datos JSON no es válido.');
+            }
 
-            if (!$induction_worker) {
+            // Validar si existe el registro de la detail_induction_worker_id
+            $detailInductionWorker = DetailInductionWorker::find($request->detail_induction_worker_id);
+            if (!$detailInductionWorker) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'No se encontró el registro de la inducción.'
+                    'message' => 'No se encontró el registro de la evaluación.'
                 ], 404);
             }
 
-            $previous_attempt = $induction_worker ? (int) $induction_worker->num_report : 0;
-            $current_attempt = (int) $request->attempt;
-            $is_training = $request->is_training;
-
-            //Verificar intento
-            if ($current_attempt < $previous_attempt) {
+            // Verificar si el campo json ya ha sido actualizado previamente
+            if (!is_null($detailInductionWorker->json)) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'El intento debe ser mayor a los ya existentes.',
-                    'previous_attempt' => $previous_attempt,
-                    'current_attempt' => $current_attempt
+                    'message' => 'El campo JSON ya ha sido actualizado previamente y no se puede actualizar nuevamente.'
                 ], 400);
             }
 
-            if ($is_training) {
-                $this->training();
-            } else {
-                $this->evaluation();
+            // Usar transacción para asegurar la consistencia de la base de datos
+            DB::beginTransaction();
+            try {
+                // Actualizar los datos de la evaluación
+                $detailInductionWorker->update([
+                    'end_date' => $request->end_date,
+                    'json' => $jsonData
+                ]);
+
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
             }
 
             return response()->json([
                 'status' => true,
                 'message' => 'Datos recibidos correctamente.',
                 'data' => $request->all(),
-                'previous_attempt' => $previous_attempt,
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -333,16 +340,8 @@ class ApiController extends Controller
                 'message' => 'Ocurrió un error al procesar la solicitud.',
                 'error' => $e->getMessage()
             ], 500);
+        } finally {
+            // Aquí puedes agregar cualquier limpieza si es necesario
         }
-    }
-
-    private function training()
-    {
-        return true;
-    }
-
-    private function evaluation()
-    {
-        return true;
     }
 }
