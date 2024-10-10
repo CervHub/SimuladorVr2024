@@ -310,7 +310,7 @@ class ApiController extends Controller
             if (!is_null($detailInductionWorker->json)) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'El campo JSON ya ha sido actualizado previamente y no se puede actualizar nuevamente.'
+                    'message' => 'El campo JSON ya ha sido actualizado previamente y no se puede actualizar nuevamente. '
                 ], 400);
             }
 
