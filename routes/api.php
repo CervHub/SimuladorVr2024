@@ -25,8 +25,12 @@ Route::post('/downloadData', [ApiOffline::class, 'DownloadData']);
 Route::post('/getPasos', [ApiOffline::class, 'GetPasos']);
 
 
-//Rutas para el grupo F
+// Rutas para el grupo F
 // Login General de instructor
 Route::post('/login', [ApiController::class, 'login']);
 // Login Usuario
 Route::post('/loginUser', [ApiController::class, 'loginUser']);
+// Subir Crear o Actualizar los detalles de un taller que lleva el usuario
+Route::post('/uploadWorkshop', [ApiController::class, 'uploadWorkshop']);
+// Para crear el detalle de un taller
+Route::post('/createWorkshop', [ApiController::class, 'createWorkshop']);
