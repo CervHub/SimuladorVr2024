@@ -123,7 +123,7 @@ class ApiController extends Controller
             $request->validate([
                 'dni' => 'required|string',
                 'company_id' => 'required|numeric',
-                'password' => 'required|string',
+                // 'password' => 'required|string',
             ]);
 
             $worker = $this->findWorker($request->company_id, $request->dni);
@@ -331,8 +331,7 @@ class ApiController extends Controller
 
             return response()->json([
                 'status' => true,
-                'message' => 'Datos recibidos correctamente.',
-                'data' => $request->all(),
+                'message' => 'Datos recibidos correctamente.'
             ]);
         } catch (\Exception $e) {
             return response()->json([
