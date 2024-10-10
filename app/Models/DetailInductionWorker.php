@@ -17,6 +17,8 @@ class DetailInductionWorker extends Model
         'note',
         'note_reference',
         'report',
+        'json',
+        'end_date',
         'start_date',
         'end_date',
         'entrenamiento'
