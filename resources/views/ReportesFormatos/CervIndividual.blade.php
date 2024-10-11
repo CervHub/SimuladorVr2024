@@ -19,9 +19,9 @@
         th,
         td {
             border: 1px solid #ddd;
-            padding: 5px;
+            padding: 2px;
             text-align: left;
-            font-size: 13px;
+            font-size: 12px;
         }
 
         th {
@@ -52,127 +52,311 @@
         .header-table .center {
             text-align: center;
         }
+
+        .w-5 {
+            width: 5%;
+        }
+
+        .w-10 {
+            width: 10%;
+        }
+
+        .w-15 {
+            width: 15%;
+        }
+
+        .w-20 {
+            width: 20%;
+        }
+
+        .w-30 {
+            width: 30%;
+        }
+
+        .w-40 {
+            width: 40%;
+        }
+
+        .w-50 {
+            width: 50%;
+        }
+
+        .w-60 {
+            width: 60%;
+        }
+
+        .w-100 {
+            width: 100%;
+        }
+
+        .text-left {
+            text-align: left;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .font-bold {
+            font-weight: bold;
+        }
+
+        .font-size-24 {
+            font-size: 24px;
+        }
+
+        .no-border {
+            border: none;
+        }
+
+        .no-margin-padding {
+            margin: 0;
+            padding: 0;
+        }
+
+        .no-margin-left {
+            margin-left: 0;
+            padding-left: 0;
+        }
+
+        .no-margin-right {
+            margin-right: 0;
+            padding-right: 0;
+        }
     </style>
 </head>
 
 <body>
-    <table class="header-table" style="width: 100%; border-collapse: collapse;">
+    <table class="header-table w-100">
         <tbody>
             <tr>
-                <td style="width: 20%; text-align: left;">
+                <td class="w-20 text-left">
                     <img src="" alt="Logo" style="width: 100px; height: auto;">
                 </td>
-                <td style="width: 60%; text-align: center; font-size: 24px; font-weight: bold;">
-                    REPORTE POR PARTICIPANTE
+                <td class="w-60 text-center font-size-24 font-bold">
+                    REPORTE DE EVALUACIÓN EN SIMULADOR
                 </td>
-                <td style="width: 20%;"></td>
+                <td class="w-20"></td>
             </tr>
         </tbody>
     </table>
 
-    <table>
-        <tbody>
-            <tr>
-                <th class="bold">Nombre del Taller:</th>
-                <td colspan="3">Nombre del Taller</td>
-            </tr>
-            <tr>
-                <th class="bold">Usuario:</th>
-                <td colspan="3">Nombre del Usuario</td>
-            </tr>
-            <tr>
-                <th class="bold">Inicio:</th>
-                <td>Fecha de Inicio</td>
-                <th class="bold">Fin:</th>
-                <td>Fecha de Fin</td>
-            </tr>
-            <tr>
-                <th class="bold">Modalidad:</th>
-                <td>Modalidad</td>
-                <th class="bold">Plataforma:</th>
-                <td>Plataforma</td>
-            </tr>
-            <tr>
-                <th class="bold">% de Acierto:</th>
-                <td>Nota Parcial</td>
-                <th class="bold">Duración:</th>
-                <td>Duración Total</td>
-            </tr>
-        </tbody>
-    </table>
 
-    <h5>Resumen General</h5>
 
-    <table>
+    <table class="w-100">
         <thead>
             <tr>
-                <th>Tarea</th>
-                <th>Total de Errores</th>
-                <th>Porcentaje Completado</th>
-                <th>Tiempo</th>
-                <th>% de Acierto</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            <tr>
-                <td>Tarea 1</td>
-                <td style="text-align:center;">0</td>
-                <td style="text-align:center;">100%</td>
-                <td style="text-align:center;">00:30:00</td>
-                <td style="text-align:center;">100%</td>
-            </tr>
-            <tr>
-                <td>Tarea 2</td>
-                <td style="text-align:center;">1</td>
-                <td style="text-align:center;">90%</td>
-                <td style="text-align:center;">00:45:00</td>
-                <td style="text-align:center;">90%</td>
-            </tr>
-        </tbody>
-        <tfoot>
-            <tr>
-                <th style="text-align:center;">Totales</th>
-                <th style="text-align:center;">1</th>
-                <th style="text-align:center;">95%</th>
-                <th style="text-align:center;">01:15:00</th>
-                <th style="text-align:center;">95%</th>
-            </tr>
-        </tfoot>
-    </table>
-
-    <h5>Acciones</h5>
-    <table>
-        <thead>
-            <tr>
-                <th>Tarea 1</th>
-                <th style="text-align:left;">Descripción</th>
-                <th style="text-align:center;">Intentos</th>
-                <th style="text-align:center;">Duración</th>
-                <th style="text-align:center;">Acumulado</th>
+                <th colspan="3" class="text-center">DATOS DEL EVALUADO</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td style="width: 30%; font-size:12px;">Acción 1</td>
-                <td style="width: 40%; text-align: justify; font-size:12px;">
-                    1. Descripción de la acción 1.
+                <th class="font-bold w-20">Nombres y Apellido:</th>
+                <td class="w-30">{{ $data['worker']['nombres'] }}</td>
+                <td class="w-40" rowspan="7" style="text-align: center; vertical-align: middle;">
+                    <img src="{{ $data['worker']['photo'] }}" alt="Foto del trabajador" style="max-height: 150px;">
                 </td>
-                <td style="width: 10%; text-align: center; font-size:12px;">1</td>
-                <td style="width: 10%; text-align: center; font-size:12px;">00:15:00</td>
-                <td style="width: 10%; text-align: center; font-size:12px;">00:15:00</td>
             </tr>
             <tr>
-                <td style="width: 30%; font-size:12px;">Acción 2</td>
-                <td style="width: 40%; text-align: justify; font-size:12px;">
-                    1. Descripción de la acción 2.
-                </td>
-                <td style="width: 10%; text-align: center; font-size:12px;">2</td>
-                <td style="width: 10%; text-align: center; font-size:12px;">00:30:00</td>
-                <td style="width: 10%; text-align: center; font-size:12px;">00:45:00</td>
+                <th class="font-bold w-20">DNI:</th>
+                <td class="w-30">{{ $data['worker']['doi'] }}</td>
+            </tr>
+            <tr>
+                <th class="font-bold w-20">Licencia:</th>
+                <td class="w-30">{{ $data['worker']['license'] }}</td>
+            </tr>
+            <tr>
+                <th class="font-bold w-20">Categoría:</th>
+                <td class="w-30">{{ $data['worker']['category'] }}</td>
+            </tr>
+            <tr>
+                <th class="font-bold w-20">Hora Inicio:</th>
+                <td class="w-30">{{ $data['json']['startDate'] }}</td>
+            </tr>
+            <tr>
+                <th class="font-bold w-20">Hora Final:</th>
+                <td class="w-30">{{ $data['json']['endDate'] }}</td>
+            </tr>
+            <tr>
+                <th class="font-bold w-20">Tiempo de Evaluación:</th>
+                <td class="w-30">-</td>
             </tr>
         </tbody>
     </table>
+
+    <table class="w-100">
+        <tbody>
+            <tr>
+                <th class="font-bold w-15">Puntaje Inicial:</th>
+                <td class="w-30">100</td>
+                <td class="w-15" rowspan="3" style="text-align: center; font-size: 1.5em;">
+                    {{ $data['json']['note'] }}
+                </td>
+            </tr>
+            <tr>
+                <th class="font-bold w-15">Puntaje Final:</th>
+                <td class="w-30">{{ $data['json']['note'] }}</td>
+            </tr>
+            <tr>
+                <th class="font-bold w-15">Final:</th>
+                <td class="w-30">
+                    @if ($data['json']['note'] >= 80)
+                        Aprobado
+                    @else
+                        No Aprobado
+                    @endif
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+
+    @php
+        $worker = $data['worker'];
+        $json = $data['json']; // Asumiendo que $data['json'] ya es un array
+    @endphp
+
+    @if ($json)
+        <table class="w-100 no-margin-padding">
+            <tr>
+                <td class="no-border no-margin-left" style="width: 50%; vertical-align: top;">
+                    <table class="w-100">
+                        <thead>
+                            <tr>
+                                <th colspan="2" class="text-center">DATOS DEL EJERCICIO</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($json['tables']['exercise'] as $item)
+                                <tr>
+                                    <th>{{ $item['name'] }}</th>
+                                    <td>{{ $item['description'] }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </td>
+                <td class="no-border no-margin-right" style="width: 50%; vertical-align: top;">
+                    <table class="w-100">
+                        <thead>
+                            <tr>
+                                <th colspan="2" class="text-center">DATOS DEL VEHÍCULO</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($json['tables']['vehicleData'] as $item)
+                                <tr>
+                                    <th>{{ $item['name'] }}</th>
+                                    <td>{{ $item['description'] }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+        <table class="w-100 no-margin-padding">
+            <tr>
+                <td class="no-border no-margin-left" style="width: 50%; vertical-align: top;">
+                    <table class="w-100">
+                        <thead>
+                            <tr>
+                                <th colspan="3" class="text-center">RESUMEN DEL EJERCICIO</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>FACTOR/USO</th>
+                                <th>Tiempo</th>
+                                <th>Cantidad</th>
+                            </tr>
+                            @foreach ($json['tables']['summary'] as $item)
+                                <tr>
+                                    <th>{{ $item['name'] }}</th>
+                                    <td>{{ $item['time'] }}</td>
+                                    <td>{{ $item['quantity'] }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </td>
+                <td class="no-border no-margin-right" style="width: 50%; vertical-align: top;">
+                    <table class="w-100">
+                        <tbody>
+                            @foreach ($json['tables']['extras'] as $item)
+                                <tr>
+                                    <th>{{ $item['name'] }}</th>
+                                    <td>{{ $item['description'] }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+        <table class="w-100">
+            <thead>
+                <tr>
+                    <th>Infracción</th>
+                    <th>Puntaje</th>
+                    <th>Repetición</th>
+                    <th>Total Puntos</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($json['tables']['infractions'] as $item)
+                    <tr>
+                        <th>{{ $item['name'] }}</th>
+                        <td>{{ $item['score'] }}</td>
+                        <td>{{ $item['repetition'] }}</td>
+                        <td>{{ $item['total'] }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+        <table class="w-100">
+            <thead>
+                <tr>
+                    <th colspan="4" class="text-center">DETALLES DE LA EVALUACIÓN</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th>Acción</th>
+                    <th>Tiempo Ocurrido</th>
+                    <th>Tipo de evento</th>
+                    <th>Descripción</th>
+                </tr>
+                @foreach ($json['details'] as $item)
+                    <tr>
+                        <th>{{ $item['action'] }}</th>
+                        <td>{{ $item['currentTime'] }}</td>
+                        <td>{{ $item['eventType'] }}</td>
+                        <td>{{ $item['description'] }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @else
+        <p>No se encontró data</p>
+    @endif
+
+    <table class="w-100">
+        <tbody class="no-border">
+
+            <tr class="no-border">
+                <td class="no-border text-center"></td>
+                <td class="no-border text-center"></td>
+            </tr>
+            <tr class="no-border">
+                <td class="no-border text-center">_________________________ <br>{{ $data['worker']['nombres'] }}</td>
+                <td class="no-border text-center">_________________________ <br>{{ $header['instructor'] }}</td>
+            </tr>
+        </tbody>
+    </table>
+
 </body>
 
 </html>

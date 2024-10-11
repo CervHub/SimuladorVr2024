@@ -240,6 +240,9 @@ class UserController extends Controller
             $new_worker->id_user = $user->id;
             $new_worker->id_company = $id_company;
             $new_worker->nombre = $request->name;
+            $new_worker->license = $request->license_number;
+            $new_worker->category = $request->license_category;
+            $new_worker->photo = $request->photo_base64;
             $new_worker->apellido = $request->last_name;
             $new_worker->id_service = $request->id_service;
             $new_worker->position = $request->position;

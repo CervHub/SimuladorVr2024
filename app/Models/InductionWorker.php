@@ -454,4 +454,33 @@ class InductionWorker extends Model
         ];
         return $data;
     }
+
+    public function jsonNoteFilter($isTraining, $attemptIndex)
+    {
+        // Filtrar los detalles directamente en la consulta
+        $detail = $this->detail()->where('entrenamiento', $isTraining)
+            ->where('report', $attemptIndex)
+            ->first();
+
+        // Verificar si se encontró el detalle
+        if ($detail) {
+            $json = json_decode($detail->json, true);
+
+            $worker = [
+                "nombres" => ($this->worker->nombre ?? '-') . ' ' . ($this->worker->apellido ?? '-'),
+                "doi" => $this->worker->user->doi ?? '-',
+                "license" => $this->worker->license ?? '-',
+                "category" => $this->worker->category ?? '-',
+                "photo" => $this->worker->photo ?? '-'
+            ];
+
+            return [
+                'worker' => $worker,
+                'json' => $json,
+            ];
+        }
+
+        // Si no se encuentra el intento especificado
+        return null;
+    }
 }
