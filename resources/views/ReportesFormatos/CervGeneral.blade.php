@@ -139,7 +139,6 @@
         </tbody>
     </table>
 
-    <h5>Acciones</h5>
     <table class="w-100">
         <thead>
             <tr>
@@ -154,29 +153,42 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($newNoteJson as $item)
+            @php
+                $counter = 1;
+            @endphp
+            @forelse ($newNoteJson as $item)
                 @php
                     $start_dates = [];
                     $end_dates = [];
                     $notes = [];
                     $attempts = [];
-
-                    foreach ($item as $i) {
-                        $start_dates[] = $i['start_date'];
-                        $end_dates[] = $i['end_date'];
-                        $notes[] = $i['note'];
-                        $attempts[] = $i['attempt']; // Assuming 'attempt' is the key for the attempt data
+                    foreach ($item['attempts'] as $i) {
+                        if ($i['is_training'] == 0) {
+                            $start_dates[] = $i['start_date'] ?? '';
+                            $end_dates[] = $i['end_date'] ?? '';
+                            $notes[] = $i['note'] ?? '';
+                            $attempts[] = $i['attempt'] ?? ''; // Assuming 'attempt' is the key for the attempt data
+                        }
                     }
                 @endphp
-                <td class="w-5">Nº</td>
-                <td class="text-left w-10">DNI</td>
-                <td class="text-center w-10">LICENCIA</td>
-                <td class="text-center w-30">NOMBRES Y APELLIDOS</td>
-                <td class="text-center">{!! implode('<br>', $attempts) !!}</td>
-                <td class="text-center w-15">{!! implode('<br>', $start_dates) !!}</td>
-                <td class="text-center w-15">{!! implode('<br>', $end_dates) !!}</td>
-                <td class="text-center">{!! implode('<br>', $notes) !!}</td>
-            @endforeach
+                <tr>
+                    <td class="w-5">{{ $counter }}</td>
+                    <td class="text-left w-10">{{ $item['worker']['doi'] }}</td>
+                    <td class="text-center w-10">{{ $item['worker']['license'] }}</td>
+                    <td class="text-center w-30">{{ $item['worker']['nombres'] }}</td>
+                    <td class="text-center">{!! implode('<br>', $attempts) !!}</td>
+                    <td class="text-center w-15">{!! implode('<br>', $start_dates) !!}</td>
+                    <td class="text-center w-15">{!! implode('<br>', $end_dates) !!}</td>
+                    <td class="text-center">{!! implode('<br>', $notes) !!}</td>
+                </tr>
+                @php
+                    $counter++;
+                @endphp
+            @empty
+                <tr>
+                    <td colspan="8" class="text-center">No data available</td>
+                </tr>
+            @endforelse
         </tbody>
     </table>
 </body>

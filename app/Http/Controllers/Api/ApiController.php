@@ -99,7 +99,7 @@ class ApiController extends Controller
         // Buscar al trabajador por code_worker
         // Que empiece con '400-<company_id>-' y termine con el DNI
         $worker = Worker::where('code_worker', 'like', $code_worker_header . '%')
-            ->where('code_worker', 'like', '%' . $dni)
+            ->where('code_worker', 'like', '%-' . $dni)
             ->first();
 
         if ($worker) {

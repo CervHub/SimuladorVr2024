@@ -1580,6 +1580,7 @@ class SupervisorController extends Controller
 
             $inductions = InductionWorker::whereIn('id_worker', $workerIds)->get();
 
+
             $inductionsData = [];
             foreach ($inductions as $induction) {
                 $result = DB::table('detail_induction_workers')
@@ -1601,12 +1602,22 @@ class SupervisorController extends Controller
                 for ($i = 1; $i <= $induction->num_report; $i++) {
                     $data = $induction->detailsByReportAndTraining($i, 'evaluacion')->first();
                     if ($data) {
+
+                        $start_date = $data->start_date;
+                        $end_date = $data->end_date;
+
+                        if (session('id_company') == 5) {
+                            $json = json_decode($data->json, true);
+                            $start_date = $json['startDate'] ?? '-';
+                            $end_date = $json['endDate'] ?? '-';
+                        }
+
                         $intentos[] = [
                             'intento' => $data->report,
                             'note' => $data->note,
                             'note_reference' => $data->note_reference,
-                            'date_start' => $data->start_date,
-                            'date_end' => $data->end_date,
+                            'date_start' => $start_date,
+                            'date_end' => $end_date,
                             'modo' => 'Evaluación',
                             'id' => $data->id
                         ];
@@ -1615,12 +1626,20 @@ class SupervisorController extends Controller
                 }
                 for ($i = 1; $i <= $nuevoIntento; $i++) {
                     $data = $induction->detailsByReportAndTraining($i, 'entrenamiento')->first();
+                    $start_date = $data->start_date;
+                    $end_date = $data->end_date;
+
+                    if (session('id_company') == 5) {
+                        $json = json_decode($data->json, true);
+                        $start_date = $json['startDate'] ?? '-';
+                        $end_date = $json['endDate'] ?? '-';
+                    }
                     $intentos[] = [
                         'intento' => $data->report,
                         'note' => $data->note,
                         'note_reference' => $data->note_reference,
-                        'date_start' => $data->start_date,
-                        'date_end' => $data->end_date,
+                        'date_start' => $start_date,
+                        'date_end' => $end_date,
                         'modo' => 'Entrenamiento',
                         'id' => $data->id
                     ];

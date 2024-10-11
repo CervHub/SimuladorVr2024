@@ -75,6 +75,7 @@ class Induction extends Model
     public function newNoteJson()
     {
         $workers = $this->workers()->get();
+
         $notes = [];
 
         foreach ($workers as $worker) {
