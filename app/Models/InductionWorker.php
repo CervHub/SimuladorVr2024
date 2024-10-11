@@ -425,6 +425,22 @@ class InductionWorker extends Model
 
     // Nueva función para obtener la nota de un trabajador en un reporte específico
 
+    public function jsonNote()
+    {
+        $details = $this->detail()->get();
+        $notes = [];
 
+        foreach ($details as $detail) {
+            $notes[] = [
+                'nombre' => 'nombres',
+                'dni' => 'dni',
+                'current_attempt' =>  1,
+                'start_date' =>  '2021-01-01 00:00:00',
+                'end_date' =>  '2021-01-01 00:00:00',
+                'note' => '80'
+            ];
+        }
 
+        return $notes;
+    }
 }

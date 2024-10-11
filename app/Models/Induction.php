@@ -60,4 +60,27 @@ class Induction extends Model
             'pending' => count($pending),
         ];
     }
+
+    public function header()
+    {
+        return [
+            'taller' => $this->workshop->name ?? '',
+            'instructor' => ($this->worker->nombre ?? '') . ' ' . ($this->worker->apellido ?? ''),
+            'instructor_doi' => $this->worker->user->doi ?? '',
+            'date_start' => ($this->date_start ?? '') . ' ' . ($this->time_start ?? ''),
+            'date_end' => ($this->date_end ?? '') . ' ' . ($this->time_end ?? ''),
+        ];
+    }
+
+    public function newNoteJson()
+    {
+        $workers = $this->workers()->get();
+        $notes = [];
+
+        foreach ($workers as $worker) {
+            $notes[] = $worker->jsonNote();
+        }
+
+        return $notes;
+    }
 }

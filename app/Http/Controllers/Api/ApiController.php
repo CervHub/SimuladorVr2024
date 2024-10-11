@@ -109,6 +109,9 @@ class ApiController extends Controller
                 'last_name' => $worker->apellido,
                 'code_worker' => $worker->code_worker,
                 'position' => $worker->position,
+                'license' => $worker->license ?? '',
+                'category' => $worker->category ?? '',
+                'photo' => $worker->photo ?? '',
             ];
         }
         return null;
@@ -194,7 +197,6 @@ class ApiController extends Controller
             $request->validate([
                 'induction_worker_id' => 'required|numeric', // Obligatorio
                 'attempt' => 'required|numeric', // Obligatorio
-                'start_date' => 'required|date', // Obligatorio
                 'is_training' => 'required|boolean' // Obligatorio
             ]);
 
@@ -217,7 +219,6 @@ class ApiController extends Controller
                     ->distinct('report')
                     ->count('report');
 
-                $start_date = Carbon::parse($request->start_date)->format('Y-m-d H:i:s');
 
                 $detail_induction_worker = DetailInductionWorker::create([
                     'induction_worker_id' => $request->induction_worker_id,
@@ -225,7 +226,7 @@ class ApiController extends Controller
                     'case' => '',
                     'note' => 0,
                     'note_reference' => 0,
-                    'start_date' => $start_date,
+                    'start_date' => '',
                     'end_date' => '',
                     'entrenamiento' => 1
                 ]);
@@ -249,7 +250,6 @@ class ApiController extends Controller
                     ], 400);
                 }
 
-                $start_date = Carbon::parse($request->start_date)->format('Y-m-d H:i:s');
 
 
                 $detail_induction_worker = DetailInductionWorker::create([
@@ -258,7 +258,7 @@ class ApiController extends Controller
                     'case' => '',
                     'note' => 0,
                     'note_reference' => 0,
-                    'start_date' => $start_date,
+                    'start_date' => '',
                     'end_date' => '',
                     'entrenamiento' => 0
                 ]);
@@ -287,7 +287,6 @@ class ApiController extends Controller
         try {
             $request->validate([
                 'detail_induction_worker_id' => 'required|numeric', // Obligatorio
-                'end_date' => 'required|date', // Obligatorio
                 'json_data' => 'required|json' // Obligatorio y debe ser JSON válido
             ]);
 
@@ -319,7 +318,6 @@ class ApiController extends Controller
             try {
                 // Actualizar los datos de la evaluación
                 $detailInductionWorker->update([
-                    'end_date' => $request->end_date,
                     'json' => $jsonData
                 ]);
 

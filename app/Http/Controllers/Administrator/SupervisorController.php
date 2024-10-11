@@ -143,7 +143,7 @@ class SupervisorController extends Controller
         // Si ambos filtros están presentes, aplicar el filtrado por rango de fechas
         if ($filter_start && $filter_end) {
             $query = $query->where('date_start', '>=', $filter_start)
-                           ->where('date_start', '<=', $filter_end);
+                ->where('date_start', '<=', $filter_end);
         }
 
         $inductions = $query->orderBy('id', 'desc')->get();
@@ -402,8 +402,8 @@ class SupervisorController extends Controller
                         if ($fila[1]) {
                             $id_company = session('id_company');
                             $service = Service::where('name', $fila[1])->where('id_company', $id_company)
-                            ->where('status', '1')
-                            ->first();
+                                ->where('status', '1')
+                                ->first();
                         }
 
                         if ($fila[0]) {
@@ -1011,56 +1011,70 @@ class SupervisorController extends Controller
     }
     public function descargar_asistencia($id_induction, $fecha_inicio = null, $fecha_fin = null, $id_service)
     {
-        $induction_worker = InductionWorker::where('id_induction', $id_induction)
-            ->orderBy('id', 'asc')
-            ->where('status', '1')
-            ->get();
         $induction = Induction::find($id_induction);
-        $result = InductionWorker::where('induction_workers.id_induction', $id_induction)
-            ->orderBy('id', 'asc')
-            ->where('status', '1')
-            ->get();
-
         $logo = Company::find($induction->id_company)->url_image_desktop;
-        if ($induction->worker->user->signature != null) {
-            $dataImage = file_get_contents(public_path($induction->worker->user->signature));
-            $base64 = 'data:image/' . pathinfo($induction->worker->user->signature, PATHINFO_EXTENSION) . ';base64,' . base64_encode($dataImage);
+        $signature = $induction->worker->user->signature;
+
+        if ($signature != null) {
+            $dataImage = file_get_contents(public_path($signature));
+            $base64 = 'data:image/' . pathinfo($signature, PATHINFO_EXTENSION) . ';base64,' . base64_encode($dataImage);
         } else {
-            $dataImage = null;
             $base64 = null;
         }
 
-        $data = [
-            'induction_worker' => $induction_worker,
+        $commonData = [
             'induction' => $induction,
-            'result' => $result,
             'logo' => $logo,
             'id_service' => $id_service,
             'signature' => $base64,
             'fecha_inicio' => $fecha_inicio,
             'fecha_fin' => $fecha_fin,
         ];
-        // Configura los márgenes directamente en DOMPDF
+
         if ($induction->id_company == 2) {
+            $induction_worker = InductionWorker::where('id_induction', $id_induction)
+                ->orderBy('id', 'asc')
+                ->where('status', '1')
+                ->get();
+            $result = InductionWorker::where('induction_workers.id_induction', $id_induction)
+                ->orderBy('id', 'asc')
+                ->where('status', '1')
+                ->get();
+
+            $data = array_merge($commonData, [
+                'induction_worker' => $induction_worker,
+                'result' => $result,
+            ]);
+
             $pdf = PDF::loadView('ReportesFormatos.IsemAsistenciaPdf', $data);
-            // dd($result[0]->worker);
         } else if ($induction->id_company == 4) {
+            $data = $commonData;
+
             if ($induction->alias == 'Aislamiento y bloqueo de energías') {
                 $pdf = PDF::loadView('ReportesFormatos.ConfipetrolAsistenciaAislamientoPdf', $data)
                     ->setPaper('a4', 'landscape');
             } elseif ($induction->alias == 'Seguridad de Procesos') {
-                // Aquí puedes cargar la vista que corresponda a 'Seguridad de Procesos'
-                $pdf = PDF::loadView('ReportesFormatos.ConfipetrolAsistenciaSeguridadPdf', $data)->setPaper('a4', 'landscape');
+                $pdf = PDF::loadView('ReportesFormatos.ConfipetrolAsistenciaSeguridadPdf', $data)
+                    ->setPaper('a4', 'landscape');
             } else {
-                $pdf = PDF::loadView('ReportesFormatos.ConfipetrolAsistenciaPdf', $data)->setPaper('a4', 'landscape');
+                $pdf = PDF::loadView('ReportesFormatos.ConfipetrolAsistenciaPdf', $data)
+                    ->setPaper('a4', 'landscape');
             }
         } else if ($induction->id_company == 3) {
+            $data = $commonData;
             $pdf = PDF::loadView('ReportesFormatos.LuzDelSurAsistenciaPdf', $data);
+        } else if ($induction->id_company == 5) {
+            $data = $commonData;
+            $data['header'] = $induction->header();
+            $data['newNoteJson'] = $induction->newNoteJson();
+            $pdf = PDF::loadView('ReportesFormatos.CervGeneral', $data)
+                ->setPaper('a4', 'landscape');
+        } else {
+            abort(403, 'Usted no tiene un reporte asignado');
         }
 
         return $pdf->stream('reporte.pdf');
     }
-
     private function generarDataGeneral($ids_induction, $id_induction, $fecha_inicio, $fecha_fin, $path)
     {
         // Si id_service es null o 0, obtén todos los registros sin filtrar por id_service

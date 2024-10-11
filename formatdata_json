@@ -1,0 +1,74 @@
+{
+    "note": "20",
+    "startDate": "2020-01-01 17:00:00",
+    "endDate": "2020-01-01 18:00:00",
+    "time": "180",
+    "details": [
+        {
+            "action": "XXXXXXXX",
+            "currentTime": "20",
+            "eventType": "Action",
+            "description": "Action description",
+            "score": "10"
+        },
+        {
+            "action": "XXXXXXXX",
+            "currentTime": "40",
+            "eventType": "Action",
+            "description": "Action description",
+            "score": "10"
+        }
+    ],
+    "result": {
+        "initialScore": "0",
+        "finalScore": "0"
+    },
+    "tables": {
+        "exercise": [
+            {
+                "name": "Circuit",
+                "description": "Driving circuit"
+            },
+            {
+                "name": "Shift",
+                "description": "Day"
+            }
+        ],
+        "vehicleData": [
+            {
+                "name": "Brand",
+                "description": "Vehicle brand"
+            },
+            {
+                "name": "Model",
+                "description": "Vehicle model"
+            }
+        ],
+        "summary": [
+            {
+                "name": "Time",
+                "time": "180",
+                "quantity": "2"
+            },
+            {
+                "name": "Action",
+                "time": "60",
+                "quantity": "2"
+            }
+        ],
+        "extras": [
+            {
+                "name": "Maximum Speed",
+                "description": "0 km/h"
+            }
+        ],
+        "infractions": [
+            {
+                "name": "Off track",
+                "score": "0",
+                "repetition": "0",
+                "total": "0"
+            }
+        ]
+    }
+}
