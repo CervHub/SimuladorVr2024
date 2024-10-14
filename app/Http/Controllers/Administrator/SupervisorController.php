@@ -1069,11 +1069,29 @@ class SupervisorController extends Controller
 
         $logo = Company::find($induction->id_company)->url_image_desktop;
         if ($induction->worker->user->signature != null) {
-            $dataImage = file_get_contents(public_path($induction->worker->user->signature));
-            $base64 = 'data:image/' . pathinfo($induction->worker->user->signature, PATHINFO_EXTENSION) . ';base64,' . base64_encode($dataImage);
+            $signaturePath = public_path($induction->worker->user->signature);
+            if (file_exists($signaturePath)) {
+                $dataImage = file_get_contents($signaturePath);
+                $base64Signature = 'data:image/' . pathinfo($signaturePath, PATHINFO_EXTENSION) . ';base64,' . base64_encode($dataImage);
+            } else {
+                $base64Signature = null;
+            }
         } else {
-            $dataImage = null;
-            $base64 = null;
+            $base64Signature = null;
+        }
+
+        // Convertir el logo del taller a base64
+        $logoTallerPath = $induction->header()['logo'];
+        if ($logoTallerPath) {
+            $logoTallerFullPath = public_path($logoTallerPath);
+            if (file_exists($logoTallerFullPath)) {
+                $logoTallerImage = file_get_contents($logoTallerFullPath);
+                $base64LogoTaller = 'data:image/' . pathinfo($logoTallerFullPath, PATHINFO_EXTENSION) . ';base64,' . base64_encode($logoTallerImage);
+            } else {
+                $base64LogoTaller = null;
+            }
+        } else {
+            $base64LogoTaller = null;
         }
 
         $data = [
@@ -1082,20 +1100,20 @@ class SupervisorController extends Controller
             'result' => $result,
             'logo' => $logo,
             'id_service' => $id_service,
-            'signature' => $base64,
+            'signature' => $base64Signature,
             'fecha_inicio' => $fecha_inicio,
             'fecha_fin' => $fecha_fin,
+            'logo_taller' => $base64LogoTaller,
         ];
+
         // Configura los márgenes directamente en DOMPDF
         if ($induction->id_company == 2) {
             $pdf = PDF::loadView('ReportesFormatos.IsemAsistenciaPdf', $data);
-            // dd($result[0]->worker);
         } else if ($induction->id_company == 4) {
             if ($induction->alias == 'Aislamiento y bloqueo de energías') {
                 $pdf = PDF::loadView('ReportesFormatos.ConfipetrolAsistenciaAislamientoPdf', $data)
                     ->setPaper('a4', 'landscape');
             } elseif ($induction->alias == 'Seguridad de Procesos') {
-                // Aquí puedes cargar la vista que corresponda a 'Seguridad de Procesos'
                 $pdf = PDF::loadView('ReportesFormatos.ConfipetrolAsistenciaSeguridadPdf', $data)->setPaper('a4', 'landscape');
             } else {
                 $pdf = PDF::loadView('ReportesFormatos.ConfipetrolAsistenciaPdf', $data)->setPaper('a4', 'landscape');
@@ -1113,7 +1131,6 @@ class SupervisorController extends Controller
 
         return $pdf->stream('reporte.pdf');
     }
-
     private function generarDataGeneral($ids_induction, $id_induction, $fecha_inicio, $fecha_fin, $path)
     {
         // Si id_service es null o 0, obtén todos los registros sin filtrar por id_service
