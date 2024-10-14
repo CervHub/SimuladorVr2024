@@ -848,7 +848,7 @@ class SupervisorController extends Controller
 
         if (strpos($data['header']['taller'], 'Extintor') !== false) {
             $pdf = PDF::loadView('ReportesFormatos.CERV.extintores', $data);
-        } else if (strpos($data['header']['taller'], 'montacarga') !== false) {
+        } else if (strpos($data['header']['taller'], 'Montacarga') !== false) {
             $pdf = PDF::loadView('ReportesFormatos.CERV.simuladormanejo', $data);
         } else {
             abort(403, 'No se puede generar el reporte taller no reconocido');
