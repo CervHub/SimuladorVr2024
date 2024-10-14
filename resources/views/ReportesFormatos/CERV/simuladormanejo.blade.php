@@ -183,9 +183,30 @@
                 <th class="font-bold w-20">Hora Final:</th>
                 <td class="w-30">{{ $data['json']['endDate'] ?? 'N/A' }}</td>
             </tr>
+            @php
+                function secondsToTime($seconds)
+                {
+                    // Reemplazar la coma por un punto para convertir a un número flotante
+                    $seconds = str_replace(',', '.', $seconds);
+
+                    if (!is_numeric($seconds)) {
+                        return '00:00:00';
+                    }
+
+                    $seconds = floatval($seconds);
+
+                    $hours = floor($seconds / 3600);
+                    $minutes = floor(($seconds % 3600) / 60);
+                    $seconds = $seconds % 60;
+                    return sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+                }
+            @endphp
+
             <tr>
                 <th class="font-bold w-20">Tiempo de Evaluación:</th>
-                <td class="w-30">-</td>
+                <td class="w-30">
+                    {{ isset($data['json']['time']) ? secondsToTime($data['json']['time']) : '00:00:00' }}
+                </td>
             </tr>
         </tbody>
     </table>

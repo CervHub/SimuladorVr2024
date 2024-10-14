@@ -141,76 +141,68 @@
         </tbody>
     </table>
 
+
+    <!-- Tabla de Datos del Evaluado -->
     <table class="w-100">
         <thead>
             <tr>
-                <th colspan="3" class="text-center">DATOS DEL EVALUADO</th>
+                <th colspan="2" class="text-center">DATOS DEL EVALUADO</th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <th class="font-bold w-20">Nombres y Apellido:</th>
-                <td class="w-30">{{ $data['worker']['nombres'] ?? 'N/A' }}</td>
-                <td class="w-40" rowspan="7" style="text-align: center; vertical-align: middle;">
-                    @php
-                        $photo = $data['worker']['photo'] ?? null;
-                    @endphp
-
-                    @if ($photo != null && $photo != '')
-                        <p>Sin foto</p>
-                    @else
-                        <p>Sin foto</p>
-                    @endif
-                </td>
+                <td class="w-80">{{ $data['worker']['nombres'] ?? 'N/A' }}</td>
             </tr>
             <tr>
                 <th class="font-bold w-20">DNI:</th>
-                <td class="w-30">{{ $data['worker']['doi'] ?? 'N/A' }}</td>
-            </tr>
-            <tr>
-                <th class="font-bold w-20">Licencia:</th>
-                <td class="w-30">{{ $data['worker']['license'] ?? 'N/A' }}</td>
-            </tr>
-            <tr>
-                <th class="font-bold w-20">Categoría:</th>
-                <td class="w-30">{{ $data['worker']['category'] ?? 'N/A' }}</td>
-            </tr>
-            <tr>
-                <th class="font-bold w-20">Hora Inicio:</th>
-                <td class="w-30">{{ $data['json']['startDate'] ?? 'N/A' }}</td>
-            </tr>
-            <tr>
-                <th class="font-bold w-20">Hora Final:</th>
-                <td class="w-30">{{ $data['json']['endDate'] ?? 'N/A' }}</td>
-            </tr>
-            <tr>
-                <th class="font-bold w-20">Tiempo de Evaluación:</th>
-                <td class="w-30">-</td>
+                <td class="w-80">{{ $data['worker']['doi'] ?? 'N/A' }}</td>
             </tr>
         </tbody>
     </table>
 
+    <!-- Tabla de Datos de la Evaluación -->
     <table class="w-100">
+        <thead>
+            <tr>
+                <th colspan="2" class="text-center">DATOS DE LA EVALUACIÓN</th>
+            </tr>
+        </thead>
         <tbody>
             <tr>
-                <th class="font-bold w-15">Puntaje Inicial:</th>
-                <td class="w-30">{{ $data['json']['result']['initialScore'] ?? '-' }}</td>
-                <td class="w-15" rowspan="3" style="text-align: center; font-size: 1.5em;">
-                    {{ $data['json']['result']['finalScore'] ?? '-' }}
-                </td>
+                <th class="font-bold w-20">Taller:</th>
+                <td class="w-80">{{ $header['taller'] ?? 'N/A' }}</td>
             </tr>
             <tr>
-                <th class="font-bold w-15">Descuento:</th>
-                <td class="w-30">{{ $data['json']['result']['discountScore'] ?? '-' }}</td>
+                <th class="font-bold w-20">Hora Inicio:</th>
+                <td class="w-80">{{ $data['json']['startDate'] ?? 'N/A' }}</td>
             </tr>
             <tr>
-                <th class="font-bold w-15">Final:</th>
-                <td class="w-30">
-                    @if (($data['json']['result']['finalScore'] ?? 0) >= 80)
-                        Aprobado
-                    @else
-                        No Aprobado
-                    @endif
+                <th class="font-bold w-20">Hora Final:</th>
+                <td class="w-80">{{ $data['json']['endDate'] ?? 'N/A' }}</td>
+            </tr>
+            <tr>
+                <th class="font-bold w-20">Tiempo de Evaluación:</th>
+                <td class="w-80">
+                    @php
+                        function secondsToTime($seconds)
+                        {
+                            $seconds = str_replace(',', '.', $seconds);
+
+                            if (!is_numeric($seconds)) {
+                                return '00:00:00';
+                            }
+
+                            $seconds = floatval($seconds);
+
+                            $hours = floor($seconds / 3600);
+                            $minutes = floor(($seconds % 3600) / 60);
+                            $seconds = $seconds % 60;
+                            return sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+                        }
+                    @endphp
+
+                    {{ isset($data['json']['time']) ? secondsToTime($data['json']['time']) : '00:00:00' }}
                 </td>
             </tr>
         </tbody>
@@ -249,7 +241,33 @@
         <p>No se encontró data</p>
     @endif
 
-    <table class="w-100" style="margin-top: 150px;">
+    <table class="w-100">
+        <tbody>
+            <tr>
+                <th class="font-bold w-20">Puntaje Inicial:</th>
+                <td>{{ $data['json']['result']['initialScore'] ?? '-' }}</td>
+                <td class="w-15" rowspan="3" style="text-align: center; font-size: 1.5em;">
+                    {{ $data['json']['result']['finalScore'] ?? '-' }}
+                </td>
+            </tr>
+            <tr>
+                <th class="font-bold w-20">Puntaje Errores:</th>
+                <td>{{ $data['json']['result']['errorsScore'] ?? '-' }}</td>
+            </tr>
+            <tr>
+                <th class="font-bold w-20">Puntaje Final:</th>
+                <td>
+                    @if (($data['json']['result']['finalScore'] ?? 0) >= 80)
+                        Aprobado
+                    @else
+                        No Aprobado
+                    @endif
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    {{-- <table class="w-100" style="margin-top: 150px;">
         <tbody class="no-border">
             <tr class="no-border">
                 <td class="no-border text-center"></td>
@@ -267,7 +285,7 @@
                 </td>
             </tr>
         </tbody>
-    </table>
+    </table> --}}
 </body>
 
 </html>
