@@ -245,71 +245,78 @@
                 </tr>
 
 
-                @foreach ($induction_worker as $data)
-                    @php
-                        $num_reports = $data->num_report;
-                    @endphp
-                    @if ($id_service == 0 || $data->worker->service->id == $id_service)
-                        @if ($num_reports > 0)
-                            @for ($i = 1; $i <= $num_reports; $i++)
-                                @php
-                                    $details = $data->notaConfipetrolMax($i);
-                                    $start_date = \Carbon\Carbon::parse($details['start_date']);
-                                @endphp
-                                @if ($fechaInicio == null || $fechaFin == null || ($fechaInicio <= $start_date && $start_date <= $fechaFin))
+                @if (isset($induction_worker) && count($induction_worker) > 0)
+                    @foreach ($induction_worker as $data)
+                        @php
+                            $num_reports = $data->num_report;
+                        @endphp
+                        @if ($id_service == 0 || $data->worker->service->id == $id_service)
+                            @if ($num_reports > 0)
+                                @for ($i = 1; $i <= $num_reports; $i++)
+                                    @php
+                                        $details = $data->notaConfipetrolMax($i);
+                                        $start_date = \Carbon\Carbon::parse($details['start_date']);
+                                    @endphp
+                                    @if ($fechaInicio == null || $fechaFin == null || ($fechaInicio <= $start_date && $start_date <= $fechaFin))
+                                        <tr
+                                            style="background-color: {{ $loop->iteration % 2 == 0 ? '#c9c9c9' : '#ffffff' }}">
+                                            @if ($i == 1)
+                                                <td class="text-center" rowspan="{{ $num_reports }}">
+                                                    {{ $loop->iteration }}</td>
+                                                <td class="column__key--black text-center"
+                                                    rowspan="{{ $num_reports }}">{{ $data->worker->user->doi }}</td>
+                                                <td class="column__key--black text-center"
+                                                    rowspan="{{ $num_reports }}">{{ $data->worker->nombre }}
+                                                    {{ $data->worker->apellido }}</td>
+                                                <td class="column__key--black text-center"
+                                                    rowspan="{{ $num_reports }}">{{ $data->worker->position }}</td>
+                                                <td class="text-center" style="width: 100px;"
+                                                    rowspan="{{ $num_reports }}">{{ $data->worker->service->name }}
+                                                </td>
+                                            @endif
+                                            <td class="text-center">
+                                                {{ isset($details['start_date']) ? date('d-m-Y', strtotime($details['start_date'])) : '-' }}
+                                            </td> <!-- Fecha -->
+                                            <td class="text-center">{{ $i . '/' . $num_reports }}</td>
+                                            <!-- Intento -->
+                                            <td class="text-center">{{ $details['EPPs'] ?? '-' }}</td>
+                                            <!-- Errores Epp -->
+                                            <td class="text-center">{{ $details['Aislamiento'] ?? '-' }}</td>
+                                            <!-- Errores Aislamiento -->
+                                            <td class="text-center">{{ $details['Equipos de bloqueo'] ?? '-' }}</td>
+                                            <!-- Errores Bloqueo -->
+                                            <td class="text-center">{{ $details['Bloqueo y tarjeteo'] ?? '-' }}</td>
+                                            <!-- Errores Tarjeteo -->
+                                            <td class="text-center">{{ $details['maxNota'] ?? '-' }}</td>
+                                        </tr>
+                                    @endif
+                                @endfor
+                            @else
+                                @if ($fechaInicio == null && $fechaFin == null)
                                     <tr
                                         style="background-color: {{ $loop->iteration % 2 == 0 ? '#c9c9c9' : '#ffffff' }}">
-                                        @if ($i == 1)
-                                            <td class="text-center" rowspan="{{ $num_reports }}">
-                                                {{ $loop->iteration }}</td>
-                                            <td class="column__key--black text-center" rowspan="{{ $num_reports }}">
-                                                {{ $data->worker->user->doi }}</td>
-                                            <td class="column__key--black text-center" rowspan="{{ $num_reports }}">
-                                                {{ $data->worker->nombre }}
-                                                {{ $data->worker->apellido }}</td>
-                                            <td class="column__key--black text-center" rowspan="{{ $num_reports }}">
-                                                {{ $data->worker->position }}</td>
-                                            <td class="text-center" style="width: 100px;"
-                                                rowspan="{{ $num_reports }}">{{ $data->worker->service->name }}</td>
-                                        @endif
-                                        <td class="text-center">
-                                            {{ isset($details['start_date']) ? date('d-m-Y', strtotime($details['start_date'])) : '-' }}
-                                        </td> <!-- Fecha -->
-                                        <td class="text-center">{{ $i . '/' . $num_reports }}</td> <!-- Intento -->
-                                        <td class="text-center">{{ $details['EPPs'] ?? '-' }}</td>
-                                        <!-- Errores Epp -->
-                                        <td class="text-center">{{ $details['Aislamiento'] ?? '-' }}</td>
-                                        <!-- Errores Aislamiento -->
-                                        <td class="text-center">{{ $details['Equipos de bloqueo'] ?? '-' }}</td>
-                                        <!-- Errores Bloqueo -->
-                                        <td class="text-center">{{ $details['Bloqueo y tarjeteo'] ?? '-' }}</td>
-                                        <!-- Errores Tarjeteo -->
-                                        <td class="text-center">{{ $details['maxNota'] ?? '-' }}</td>
+                                        <td class="text-center">{{ $loop->iteration }}</td>
+                                        <td class="column__key--black text-center">{{ $data->worker->user->doi }}</td>
+                                        <td class="column__key--black text-center">{{ $data->worker->nombre }}
+                                            {{ $data->worker->apellido }}</td>
+                                        <td class="column__key--black text-center">{{ $data->worker->position }}</td>
+                                        <td class="text-center" style="width: 100px;">
+                                            {{ $data->worker->service->name }}</td>
+                                        <td class="text-center">-</td> <!-- Fecha -->
+                                        <td class="text-center">-</td> <!-- Intento -->
+                                        <td class="text-center">-</td> <!-- Errores Epp -->
+                                        <td class="text-center">-</td> <!-- Errores Aislamiento -->
+                                        <td class="text-center">-</td> <!-- Errores Bloqueo -->
+                                        <td class="text-center">-</td> <!-- Errores Tarjeteo -->
+                                        <td class="text-center">-</td> <!-- Nota -->
                                     </tr>
                                 @endif
-                            @endfor
-                        @else
-                            @if ($fechaInicio == null && $fechaFin == null)
-                                <tr style="background-color: {{ $loop->iteration % 2 == 0 ? '#c9c9c9' : '#ffffff' }}">
-                                    <td class="text-center">{{ $loop->iteration }}</td>
-                                    <td class="column__key--black text-center">{{ $data->worker->user->doi }}</td>
-                                    <td class="column__key--black text-center">{{ $data->worker->nombre }}
-                                        {{ $data->worker->apellido }}</td>
-                                    <td class="column__key--black text-center">{{ $data->worker->position }}</td>
-                                    <td class="text-center" style="width: 100px;">{{ $data->worker->service->name }}
-                                    </td>
-                                    <td class="text-center">-</td> <!-- Fecha -->
-                                    <td class="text-center">-</td> <!-- Intento -->
-                                    <td class="text-center">-</td> <!-- Errores Epp -->
-                                    <td class="text-center">-</td> <!-- Errores Aislamiento -->
-                                    <td class="text-center">-</td> <!-- Errores Bloqueo -->
-                                    <td class="text-center">-</td> <!-- Errores Tarjeteo -->
-                                    <td class="text-center">-</td> <!-- Nota -->
-                                </tr>
                             @endif
                         @endif
-                    @endif
-                @endforeach
+                    @endforeach
+                @else
+                    <p>No hay datos disponibles.</p>
+                @endif
             </tbody>
         </table>
 
