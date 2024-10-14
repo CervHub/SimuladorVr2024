@@ -66,7 +66,7 @@
             <tbody>
                 <tr>
                     <td class="text-center" style="padding-top: 0px; padding-bottom: 0px; width: 20%;">
-                        <img src="{{ $logo_taller }}" width="128px" alt="Logo">
+                        <img src="{{ $logo_taller ?? '' }}" width="128px" alt="Logo">
                     </td>
                     <td nowrap colspan="4" style="padding-top: 0px; padding-bottom: 0px;">
                         <h3 class="title">REPORTE DE EVALUACIÓN </h3>
@@ -276,7 +276,8 @@
                                             {{ isset($details['start_date']) ? date('d-m-Y', strtotime($details['start_date'])) : '-' }}
                                         </td> <!-- Fecha -->
                                         <td class="text-center">{{ $i . '/' . $num_reports }}</td> <!-- Intento -->
-                                        <td class="text-center">{{ $details['EPPs'] ?? '-' }}</td> <!-- Errores Epp -->
+                                        <td class="text-center">{{ $details['EPPs'] ?? '-' }}</td>
+                                        <!-- Errores Epp -->
                                         <td class="text-center">{{ $details['Aislamiento'] ?? '-' }}</td>
                                         <!-- Errores Aislamiento -->
                                         <td class="text-center">{{ $details['Equipos de bloqueo'] ?? '-' }}</td>

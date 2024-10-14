@@ -846,7 +846,14 @@ class SupervisorController extends Controller
             'data' => $induction_worker->jsonNoteFilter($modo == 'Entrenamiento' ? 1 : 0, $intento),
         ];
 
-        $pdf = PDF::loadView('ReportesFormatos.CervIndividual', $data);
+        if (strpos($data['header']['taller'], 'Extintor') !== false) {
+            $pdf = PDF::loadView('ReportesFormatos.CERV.extintores', $data);
+        } else if (strpos($data['header']['taller'], 'montacarga') !== false) {
+            $pdf = PDF::loadView('ReportesFormatos.CERV.simuladormanejo', $data);
+        } else {
+            abort(403, 'No se puede generar el reporte taller no reconocido');
+        }
+
         return $pdf->stream('ReporteIndividual.pdf');
     }
 
