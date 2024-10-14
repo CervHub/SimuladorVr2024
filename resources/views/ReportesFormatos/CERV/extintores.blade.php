@@ -217,22 +217,20 @@
         <table class="w-100">
             <thead>
                 <tr>
-                    <th colspan="4" class="text-center">DETALLES DE LA EVALUACIÓN</th>
+                    <th colspan="3" class="text-center">DETALLES DE LA EVALUACIÓN</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <th>Acción</th>
-                    <th>Tiempo Ocurrido</th>
-                    <th>Tipo de evento</th>
-                    <th>Descripción</th>
+                    <th>Conteo de Errores</th>
+                    <th>Puntuación de Errores por Tarea</th>
                 </tr>
                 @foreach ($json['details'] ?? [] as $item)
                     <tr>
                         <th>{{ $item['action'] ?? 'N/A' }}</th>
-                        <td>{{ $item['currentTime'] ?? 'N/A' }}</td>
-                        <td>{{ $item['eventType'] ?? 'N/A' }}</td>
-                        <td>{{ $item['description'] ?? 'N/A' }}</td>
+                        <td>{{ $item['errorCount'] ?? 'N/A' }}</td>
+                        <td>{{ $item['errorScoreByTask'] ?? 'N/A' }}</td>
                     </tr>
                 @endforeach
             </tbody>
@@ -252,7 +250,7 @@
             </tr>
             <tr>
                 <th class="font-bold w-20">Puntaje Errores:</th>
-                <td>{{ $data['json']['result']['errorsScore'] ?? '-' }}</td>
+                <td>{{ $data['json']['result']['errorScore'] ?? '-' }}</td>
             </tr>
             <tr>
                 <th class="font-bold w-20">Puntaje Final:</th>

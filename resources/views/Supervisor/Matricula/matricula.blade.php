@@ -168,43 +168,6 @@
     </script>
 
     <script>
-        function editar(id) {
-            console.log("Holi");
-            $('#loading-overlay').show();
-            $('#form-edit').hide();
-            console.log("Id para editar", id)
-
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
-                }
-            });
-
-            $.ajax({
-                url: '{{ route('entrenador.search.worker.doi') }}', // Cambia esto a la URL correcta de tu servidor de ping
-                type: 'POST',
-                data: {
-                    id: id
-                },
-                success: function(response) {
-                    console.log(response);
-                    $('#name_editar').val(response.name);
-                    $('#last_name_editar').val(response.last_name);
-                    $('#position_editar').val(response.position);
-                    // $('#department_editar').val(response.department);
-                    $('#dni_editar').val(response.dni);
-                    $('#celular_editar').val(response.celular);
-                    $('#worker_id_editar').val(response.id);
-                    $('#employee_code_editar').val(response.employee_code);
-                    $('#loading-overlay').hide();
-                    $('#form-edit').show();
-                },
-                error: function(xhr, ajaxOptions, thrownError) {
-                    console.log("Error en la conexión:", xhr.status, thrownError);
-                }
-            });
-        }
-
         function eliminar(id) {
 
             console.log("Id para Eliminar", id)
@@ -232,5 +195,118 @@
                 }
             });
         }
+    </script>
+    <script>
+        function editar(id) {
+            console.log("Holi");
+            $('#loading-overlay').show();
+            $('#form-edit').hide();
+            console.log("Id para editar", id)
+
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                }
+            });
+
+            $.ajax({
+                url: '{{ route('entrenador.search.worker.doi') }}',
+                type: 'POST',
+                data: {
+                    id: id
+                },
+                success: function(response) {
+                    console.log(response);
+                    $('#name_editar').val(response.name);
+                    $('#last_name_editar').val(response.last_name);
+                    $('#position_editar').val(response.position);
+                    $('#dni_editar').val(response.dni);
+                    $('#celular_editar').val(response.celular);
+                    $('#worker_id_editar').val(response.id);
+                    $('#employee_code_editar').val(response.employee_code);
+                    $('#license_number_editar').val(response.license);
+                    $('#license_category_editar').val(response.category);
+                    if (response.photo) {
+                        $('#canvasEdit').show();
+                        var canvas = document.getElementById('canvasEdit');
+                        var context = canvas.getContext('2d');
+                        var image = new Image();
+                        image.onload = function() {
+                            context.drawImage(image, 0, 0, canvas.width, canvas.height);
+                        };
+                        image.src = response.photo;
+                    }
+                    $('#loading-overlay').hide();
+                    $('#form-edit').show();
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    console.log("Error en la conexión:", xhr.status, thrownError);
+                }
+            });
+        }
+
+        $(document).ready(function() {
+            $('#takePhotoBtnEdit').click(function() {
+                $('#cameraEdit').show();
+                $('#canvasEdit').hide();
+                Webcam.set({
+                    width: 320,
+                    height: 240,
+                    image_format: 'jpeg',
+                    jpeg_quality: 90
+                });
+                Webcam.attach('#cameraEdit');
+
+                $(this).text('Capturar Foto').off('click').on('click', function() {
+                    Webcam.snap(function(data_uri) {
+                        $('#cameraEdit').hide();
+                        $('#canvasEdit').show();
+                        var canvas = document.getElementById('canvasEdit');
+                        var context = canvas.getContext('2d');
+                        var img = new Image();
+                        img.onload = function() {
+                            canvas.width = img.width;
+                            canvas.height = img.height;
+                            context.drawImage(img, 0, 0);
+                        };
+                        img.src = data_uri;
+                        $('#photo_base64_editar').val(data_uri);
+
+                        // Cambiar el texto del botón y la funcionalidad para tomar de nuevo
+                        $('#takePhotoBtnEdit').text('Tomar de Nuevo').off('click').on(
+                            'click',
+                            function() {
+                                $('#canvasEdit').hide();
+                                $('#cameraEdit').show();
+                                Webcam.attach('#cameraEdit');
+                                $(this).text('Capturar Foto').off('click').on('click',
+                                    function() {
+                                        Webcam.snap(function(data_uri) {
+                                            $('#cameraEdit').hide();
+                                            $('#canvasEdit').show();
+                                            var canvas = document
+                                                .getElementById(
+                                                    'canvasEdit');
+                                            var context = canvas.getContext(
+                                                '2d');
+                                            var img = new Image();
+                                            img.onload = function() {
+                                                canvas.width = img
+                                                    .width;
+                                                canvas.height = img
+                                                    .height;
+                                                context.drawImage(img,
+                                                    0, 0);
+                                            };
+                                            img.src = data_uri;
+                                            $('#photo_base64_editar').val(
+                                                data_uri);
+                                        });
+                                    });
+                            });
+                    });
+                });
+            });
+        });
     </script>
 @endsection

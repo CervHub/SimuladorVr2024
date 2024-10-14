@@ -14,7 +14,8 @@
                     <i class="fas fa-spinner fa-spin"></i> Cargando...
                 </div>
             </div>
-            <form action="{{ route('matricula.edituser') }}" method="POST" id="form-edit">
+            <form action="{{ route('matricula.edituser') }}" method="POST" id="form-edit"
+                enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body">
                     <input type="hidden" name="worker_id" id="worker_id_editar" value="">
@@ -33,29 +34,53 @@
                         <input type="text" class="form-control" name="position" id="position_editar"
                             placeholder="Ingrese su cargo">
                     </div>
-                    {{-- <div class="form-group">
-                        <label for="department">Departamento o Área: (Opcional)</label>
-                        <input type="text" class="form-control" name="department" id="department_editar"
-                            placeholder="Ingrese su departamento o área">
-                    </div> --}}
                     <div class="form-group">
                         <label for="employee_code">Código de Trabajador: (Opcional)</label>
                         <input type="text" class="form-control" name="employee_code" id="employee_code_editar"
                             placeholder="Ingrese el código del trabajador">
                     </div>
-
                     <div class="form-group">
                         <label for="cellphone_number">Número de Celular: (Opcional)</label>
                         <input type="text" class="form-control" name="celular" id="celular_editar"
                             placeholder="Ingrese el número de celular">
                     </div>
-
                     <div class="form-group">
                         <label for="dni">Documento de Identidad (Referencial):</label>
                         <input type="text" class="form-control" name="dni" id="dni_editar" readonly>
                     </div>
+                    <div class="form-group">
+                        <label for="license_number">Número de Licencia (Opcional):</label>
+                        <input type="text" class="form-control" id="license_number_editar" name="license_number"
+                            placeholder="Ingrese el número de licencia">
+                    </div>
+                    <div class="form-group">
+                        <label for="license_category">Categoría de Brevet (Opcional):</label>
+                        <select class="form-control" id="license_category_editar" name="license_category">
+                            <option value="">Seleccione una categoría</option>
+                            <option value="A-I">A-I</option>
+                            <option value="A-IIa">A-IIa</option>
+                            <option value="A-IIb">A-IIb</option>
+                            <option value="A-IIIa">A-IIIa</option>
+                            <option value="A-IIIb">A-IIIb</option>
+                            <option value="A-IIIc">A-IIIc</option>
+                            <option value="B-I">B-I</option>
+                            <option value="B-IIa">B-IIa</option>
+                            <option value="B-IIb">B-IIb</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="photo">Foto (Opcional):</label>
+                        <br>
+                        <button type="button" class="btn btn-primary mt-2" id="takePhotoBtnEdit">Tomar Foto</button>
+                        <br>
+                        <div id="cameraEdit"
+                            style="display: none; text-align: center; margin-top: 10px; width: 320px; height: 240px;">
+                        </div>
+                        <canvas id="canvasEdit"
+                            style="display: none; margin: 10px auto; border: 1px solid #ccc; width: 320px; height: 240px;"></canvas>
+                        <input type="hidden" id="photo_base64_editar" name="photo_base64">
+                    </div>
                 </div>
-
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-primary">Guardar</button>
@@ -64,3 +89,4 @@
         </div>
     </div>
 </div>
+

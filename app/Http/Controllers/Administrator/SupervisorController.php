@@ -240,7 +240,12 @@ class SupervisorController extends Controller
             $worker->employee_code = $request->employee_code;
             $worker->position = $request->position;
             $worker->department = $request->department;
-            $worker->celular = $request->celular;
+            $worker->license = $request->license_number;
+            $worker->category = $request->license_category;
+            $worker->celular = $request->celular ?? '';
+            if ($request->photo_base64) {
+                $worker->photo = $request->photo_base64;
+            }
             $worker->save();
 
             // Éxito
