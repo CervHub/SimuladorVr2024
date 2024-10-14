@@ -57,13 +57,22 @@ class ApiController extends Controller
                 'password' => 'required|string',
             ]);
 
+            // Verificar si el usuario existe con el prefijo 200
+            $user = $this->findWorker($request->company_id, $request->dni, '300');
+            if (!$user) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Usuario no encontrado o no tiene permisos para acceder como instructor.'
+                ], 404);
+            }
+
             // Llamar al método de autenticación
             $auth_result = $this->authenticate($request->company_id, $request->dni, $request->password);
 
             if (!$auth_result) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Credenciales incorrectas o instructor no autorizado.'
+                    'message' => 'Contraseña incorrecta.'
                 ], 401);
             }
 
@@ -89,15 +98,15 @@ class ApiController extends Controller
         }
     }
 
-    private function findWorker($company_id, $dni)
+    private function findWorker($company_id, $dni, $prefix = '400')
     {
         // Company ID debe tener 3 dígitos
         $formatted_company_id = str_pad($company_id, 3, '0', STR_PAD_LEFT);
         // Cabecera del ID
-        $code_worker_header = '400-' . $formatted_company_id . '-';
+        $code_worker_header = $prefix . '-' . $formatted_company_id . '-';
 
         // Buscar al trabajador por code_worker
-        // Que empiece con '400-<company_id>-' y termine con el DNI
+        // Que empiece con '<prefix>-<company_id>-' y termine con el DNI
         $worker = Worker::where('code_worker', 'like', $code_worker_header . '%')
             ->where('code_worker', 'like', '%-' . $dni)
             ->first();
