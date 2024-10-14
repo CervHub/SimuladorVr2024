@@ -156,7 +156,7 @@
                         $photo = $data['worker']['photo'] ?? null;
                     @endphp
 
-                    @if ($photo != null && $photo != '')
+                    @if ($photo != null && $photo != '' && $photo != '-')
                         <img src="{{ $photo }}" alt="Foto del trabajador" style="width: 150px; height: auto;">
                     @else
                         <p>Sin foto</p>
