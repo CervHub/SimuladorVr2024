@@ -61,14 +61,22 @@ class Induction extends Model
         ];
     }
 
+    public function company()
+    {
+        return $this->belongsTo(Company::class, 'id_company');
+    }
+
     public function header()
     {
+
         return [
             'taller' => $this->workshop->name ?? '',
             'instructor' => ($this->worker->nombre ?? '') . ' ' . ($this->worker->apellido ?? ''),
             'instructor_doi' => $this->worker->user->doi ?? '',
             'date_start' => ($this->date_start ?? '') . ' ' . ($this->time_start ?? ''),
             'date_end' => ($this->date_end ?? '') . ' ' . ($this->time_end ?? ''),
+            'logo_cerv' => 'logo/logo_negro.png',
+            'logo' => $this->company->url_image_desktop
         ];
     }
 

@@ -131,10 +131,10 @@
         <tbody>
             <tr>
                 <td class="w-20 text-left">
-                    <img src="" alt="Logo" style="width: 100px; height: auto;">
+                    <img src="{{ $logo }}" alt="Logo" style="width: 100px; height: auto;">
                 </td>
-                <td class="w-60 text-center font-size-24 font-bold">
-                    REPORTE DE EVALUACIÓN EN SIMULADOR
+                <td class="w-60 text-center font-bold" style="font-size: 16px;">
+                    REPORTE DE EVALUACIÓN
                 </td>
                 <td class="w-20"></td>
             </tr>
@@ -151,13 +151,13 @@
             <tr>
                 <th class="font-bold w-20">Nombres y Apellido:</th>
                 <td class="w-30">{{ $data['worker']['nombres'] ?? 'N/A' }}</td>
-                <td class="w-40" rowspan="7" style="text-align: center; vertical-align: middle;">
+                <td class="w-30" rowspan="7" style="text-align: center; vertical-align: middle;">
                     @php
                         $photo = $data['worker']['photo'] ?? null;
                     @endphp
 
                     @if ($photo != null && $photo != '')
-                        <p>Sin foto</p>
+                        <img src="{{ $photo }}" alt="Foto del trabajador" style="width: 150px; height: auto;">
                     @else
                         <p>Sin foto</p>
                     @endif

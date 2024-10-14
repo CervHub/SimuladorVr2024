@@ -846,6 +846,19 @@ class SupervisorController extends Controller
             'data' => $induction_worker->jsonNoteFilter($modo == 'Entrenamiento' ? 1 : 0, $intento),
         ];
 
+        $logoPath = $data['header']['logo'];
+
+        // Verificar si el archivo existe en la carpeta public de Laravel
+        if (!file_exists(public_path($logoPath))) {
+            $logoPath = 'public/logo/logo_negro.png'; // URL del logo por defecto
+        }
+
+        // Leer el contenido del archivo y convertirlo a base64
+        $logoData = file_get_contents(public_path($logoPath));
+        $logoBase64 = 'data:image/png;base64,' . base64_encode($logoData);
+
+        $data['logo'] = $logoBase64;
+
         if (strpos($data['header']['taller'], 'Extintor') !== false) {
             $pdf = PDF::loadView('ReportesFormatos.CERV.extintores', $data);
         } else if (strpos($data['header']['taller'], 'Montacarga') !== false) {

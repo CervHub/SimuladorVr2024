@@ -131,10 +131,10 @@
         <tbody>
             <tr>
                 <td class="w-20 text-left">
-                    <img src="" alt="Logo" style="width: 100px; height: auto;">
+                    <img src="{{ $logo }}" alt="Logo" style="width: 100px; height: auto;">
                 </td>
-                <td class="w-60 text-center font-size-24 font-bold">
-                    REPORTE DE EVALUACIÓN EN SIMULADOR
+                <td class="w-60 text-center font-bold" style="font-size: 16px;">
+                    REPORTE DE EVALUACIÓN
                 </td>
                 <td class="w-20"></td>
             </tr>
