@@ -852,17 +852,27 @@ class SupervisorController extends Controller
         ];
 
         $logoPath = $data['header']['logo'];
+        $sinPhoto = 'logo/sin-photo.png';
+        // Asegurarse de que $logoPath tenga un valor predeterminado válido
+        if (empty($logoPath)) {
+            $logoPath = 'logo/logo_negro.png'; // URL del logo por defecto
+        }
 
         // Verificar si el archivo existe en la carpeta public de Laravel
         if (!file_exists(public_path($logoPath))) {
-            $logoPath = 'public/logo/logo_negro.png'; // URL del logo por defecto
+            $logoPath = 'logo/logo_negro.png'; // Usar el logo por defecto si el archivo no existe
         }
 
+        // Continuar con la lógica para manejar $logoPath...
         // Leer el contenido del archivo y convertirlo a base64
         $logoData = file_get_contents(public_path($logoPath));
         $logoBase64 = 'data:image/png;base64,' . base64_encode($logoData);
 
+        $sinPhoto = file_get_contents(public_path($sinPhoto));
+        $sinPhotoBase64 = 'data:image/png;base64,' . base64_encode($sinPhoto);
+
         $data['logo'] = $logoBase64;
+        $data['sinPhoto'] = $sinPhotoBase64;
 
         if (strpos($data['header']['taller'], 'Extintor') !== false) {
             $pdf = PDF::loadView('ReportesFormatos.CERV.extintores', $data);

@@ -107,20 +107,22 @@
                                     <form action="{{ route('entrenador.reporte') }}" method="GET">
                                         <div class="form-group">
                                             <label for="filter_start">Fecha de inicio:</label>
-                                            <input type="date" class="form-control" id="filter_start" name="filter_start" value="{{ request('filter_start') }}">
+                                            <input type="date" class="form-control" id="filter_start" name="filter_start"
+                                                value="{{ request('filter_start') }}">
                                         </div>
                                 </div>
                                 <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="filter_end">Fecha de fin:</label>
-                                            <input type="date" class="form-control" id="filter_end" name="filter_end" value="{{ request('filter_end') }}">
-                                        </div>
+                                    <div class="form-group">
+                                        <label for="filter_end">Fecha de fin:</label>
+                                        <input type="date" class="form-control" id="filter_end" name="filter_end"
+                                            value="{{ request('filter_end') }}">
+                                    </div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-12 text-left">
                                     <button type="submit" class="btn btn-primary text-white">Filtrar</button>
-                                </form>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -169,10 +171,12 @@
                                                     onclick="modificarEnlace(this, '{{ route('descargar_asistencia_pdf', ['id_induction' => $induction->id, 'fecha_inicio' => '0000-00-00', 'fecha_fin' => '0000-00-00', 'id_service' => 0]) }}')">
                                                     <i class="fas fa-file-pdf"></i>
                                                 </a>
-                                                <a href="#" class="btn btn-custom btn-success  text-white me-0"
-                                                    onclick="modificarEnlace(this, '{{ route('descargar_asistencia_excel', ['id_induction' => $induction->id, 'fecha_inicio' => '0000-00-00', 'fecha_fin' => '0000-00-00', 'id_service' => 0]) }}')">
-                                                    <i class="fas fa-file-excel"></i>
-                                                </a>
+                                                @if (session('id_company') != 5)
+                                                    <a href="#" class="btn btn-custom btn-success  text-white me-0"
+                                                        onclick="modificarEnlace(this, '{{ route('descargar_asistencia_excel', ['id_induction' => $induction->id, 'fecha_inicio' => '0000-00-00', 'fecha_fin' => '0000-00-00', 'id_service' => 0]) }}')">
+                                                        <i class="fas fa-file-excel"></i>
+                                                    </a>
+                                                @endif
                                                 @if (session('id_company') == 2)
                                                     <a href="{{ route('descargar_asistencia_zip', ['id_induction' => $induction->id]) }}"
                                                         class="btn btn-custom btn-warning text-white me-0">

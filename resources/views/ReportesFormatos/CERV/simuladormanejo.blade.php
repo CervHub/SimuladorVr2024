@@ -159,7 +159,7 @@
                     @if ($photo != null && $photo != '' && $photo != '-')
                         <img src="{{ $photo }}" alt="Foto del trabajador" style="width: 150px; height: auto;">
                     @else
-                        <p>Sin foto</p>
+                        <img src="{{ $sinPhoto }}" alt="Foto del trabajador" style="width: 150px; height: auto;">
                     @endif
                 </td>
             </tr>
