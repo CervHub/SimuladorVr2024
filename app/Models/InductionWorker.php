@@ -438,6 +438,7 @@ class InductionWorker extends Model
                 'start_date' => $json['startDate'] ?? '-',
                 'end_date' => $json['endDate'] ?? '-',
                 'note' => $json['note'] ?? '-',
+                'json' => $json,
             ];
         }
 

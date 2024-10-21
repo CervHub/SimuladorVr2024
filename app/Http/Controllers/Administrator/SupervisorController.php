@@ -30,6 +30,8 @@ use Illuminate\Support\Facades\DB;
 use ZipArchive;
 use Illuminate\Support\Facades\Storage;
 
+use App\Exports\ExportDataCervExcel;
+
 class SupervisorController extends Controller
 {
     protected $serviceController;
@@ -1007,6 +1009,26 @@ class SupervisorController extends Controller
 
         abort(403, 'No se encontró el reporte solicitado.');
     }
+
+    public function descargar_reporte_excel($id_induction, $modo)
+    {
+        $induction_id = $id_induction;
+        $modo = $modo;
+
+        $induction = Induction::find($induction_id);
+        $workers = $induction->workers->filter(function ($worker) {
+            return $worker->status == '1';
+        });
+
+        $data = $workers->map(function ($worker) use ($modo) {
+            return $worker->jsonNote();
+        });
+
+        $export = new ExportDataCervExcel(collect($data));
+        $filename = 'reporte_' . $induction->alias . '_' . date('Y-m-d_H-i-s') . '.xlsx';
+        return Excel::download($export, $filename);
+    }
+
     // $isValid = isset($data_report) && is_array($data_report) && array_key_exists($intento, $data_report);
     // if (!$isValid) {
     //     // Configura los márgenes directamente en DOMPDF

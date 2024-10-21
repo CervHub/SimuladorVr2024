@@ -18,8 +18,8 @@ use App\Http\Controllers\DepartamentoController;
 
 //Authentication
 use App\Http\Controllers\AuthenticationController;
-use PhpOffice\PhpSpreadsheet\Style\Supervisor;
 
+use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\ApiIsemController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StepController;
@@ -163,10 +163,7 @@ Route::get('isem/v1/insertcasos/{json}', [ApiIsemController::class, 'insertcasos
 Route::get('isem/v1/{dni}', [ApiIsemController::class, 'induction']);
 
 Route::get('view/pdf/{id_induction_worker}/{intento}/{entrenamiento}', [SupervisorController::class, 'visualizar_reporte_notas'])->name('view.pdf');
-
-
-use App\Http\Controllers\ReporteController;
-
+Route::get('view/download/excel/{id_induction}/{modo}', [SupervisorController::class, 'descargar_reporte_excel'])->name('view.excel');
 Route::get('imagen/{porcentaje}', [ReporteController::class, 'generarImagen'])->name('imagen.generar');
 
 // Begin Rutas para User
