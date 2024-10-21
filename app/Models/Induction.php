@@ -34,7 +34,7 @@ class Induction extends Model
     }
     public function workers()
     {
-        return $this->hasMany(InductionWorker::class, 'id_induction');
+        return $this->hasMany(InductionWorker::class, 'id_induction')->where('status', 1);
     }
     public function alias()
     {
