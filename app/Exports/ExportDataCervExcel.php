@@ -42,10 +42,10 @@ class ExportDataCervExcel implements FromCollection, WithHeadings
                 $results['Licencia'] = $worker['license'] ?? '';
                 $results['Categoria'] = $worker['category'] ?? '';
                 $results['Nombres y Apellidos'] = $worker['nombres'] ?? '';
-                $results['Fecha de Inicio'] = $attempt['startDate'] ?? '';
-                $results['Fecha de Fin'] = $attempt['endDate'] ?? '';
+                $results['Fecha de Inicio'] = $attempt['start_date'] ?? '';
+                $results['Fecha de Fin'] = $attempt['end_date'] ?? '';
                 $results['Nota'] = $attempt['note'] ?? '';
-
+                dd($attempt);
                 foreach ($infractions as $infraction) {
                     $results['InfraccionNombre'] = $infraction['name'] ?? '';
                     $results['InfraccionScore'] = $infraction['score'] ?? '';
