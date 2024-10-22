@@ -95,7 +95,7 @@
         }
 
         h3 span {
-            font-size: 2.5em;
+            font-size: 2em;
             color: #000000;
             /* Ajusta este valor según sea necesario */
             display: inline-block;
@@ -131,13 +131,13 @@
 
 <body>
     <div class="certificado">
-        <h3 class="uppercase bold_sub">Otorga la presente</h3>
         <h1 class="uppercase bold mt-05">Constancia</h1>
-        <h3 class="mt-2" style="color: #000000">A: <span>{{ $worker['nombres'] }}</span></h3>
+        <h3 class="uppercase bold_sub">Otorgada A:</h3>
+        <h3 class="mt-2" style="color: #000000"><span>{{ $worker['nombres'] }}</span></h3>
         <p class="bold_sub mt-2">Por haber terminado satisfactoriamente el curso:</p>
         <h2 class="uppercase curso mt-05">{{ $taller }}</h2>
         <p class="mt-2">Como parte de su desarrollo en la Plataforma de Capacitación en Seguridad y Salud.</p>
-        <p class="mt-2" style="margin-bottom: 0">{{ $fecha }}</p>
+        <p class="mt-2" style="margin-bottom: 0">Lima, {{ $fecha }}</p>
 
         <div>
             <img src="{{ $firma }}" alt="" style="max-height: 120px;">

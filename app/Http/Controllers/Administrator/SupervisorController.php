@@ -1610,7 +1610,7 @@ class SupervisorController extends Controller
         return $pdf;
     }
 
-    private function generarConstancyCerv($data, $induction)
+    private function generarConstancyCerv($data, $induction, $fondo, $firma)
     {
 
         $qr = route('validate_certificate', ['induction_worker_id' => $data['id'], 'induction_id' => $induction->id]);
@@ -1620,30 +1620,19 @@ class SupervisorController extends Controller
         $qrCodeBase64 = 'data:image/svg+xml;base64,' . base64_encode($qrCode);
         $taller = $induction->alias;
         if (strpos($taller, 'Montacarga') !== false) {
-            $taller = explode(' - ', $taller)[0];
+            $taller = "CAPACITACIÓN EN USO DE MONTACARGAS";
         } elseif (strpos($taller, 'Extintor') !== false) {
-            $taller = explode(' Tipo ', $taller)[0];
+            $taller = "CAPACITACIÓN EN USO DE EXTINTORES";
         }
 
         $datos = [
             'worker' => $data,
-            'photo' => '',
+            'photo' => $fondo,
             'taller' => $taller,
             'fecha' => Carbon::parse($induction->date_start)->locale('es')->isoFormat('D [de] MMMM [del] YYYY'),
-            'firma' => '',
+            'firma' => $firma,
             'qr' => $qrCodeBase64
         ];
-
-        $base64Path = public_path('certificados/certificado-cerv.jpg');
-        if (file_exists($base64Path)) {
-            $dataImage = file_get_contents($base64Path);
-            $datos['photo'] = 'data:image/' . pathinfo($base64Path, PATHINFO_EXTENSION) . ';base64,' . base64_encode($dataImage);
-        }
-        $base64SignaturePath = public_path('certificados/firma-cerv.png');
-        if (file_exists($base64SignaturePath)) {
-            $dataImage = file_get_contents($base64SignaturePath);
-            $datos['firma'] = 'data:image/' . pathinfo($base64SignaturePath, PATHINFO_EXTENSION) . ';base64,' . base64_encode($dataImage);
-        }
 
         $pdf = PDF::loadView('ReportesFormatos.Cerfiticados.cerv', $datos)->setPaper('a4', 'landscape');
         return $pdf;
@@ -1676,14 +1665,41 @@ class SupervisorController extends Controller
             abort(403, 'El trabajador no ha aprobado la inducción');
         }
 
+        $fondo = null;
+        $firma = null;
+        $base64Path = public_path('certificados/certificado-cerv.jpg');
+        if (file_exists($base64Path)) {
+            $dataImage = file_get_contents($base64Path);
+            $fondo = 'data:image/' . pathinfo($base64Path, PATHINFO_EXTENSION) . ';base64,' . base64_encode($dataImage);
+        }
+        $base64SignaturePath = public_path('certificados/firma-cerv.png');
+        if (file_exists($base64SignaturePath)) {
+            $dataImage = file_get_contents($base64SignaturePath);
+            $firma = 'data:image/' . pathinfo($base64SignaturePath, PATHINFO_EXTENSION) . ';base64,' . base64_encode($dataImage);
+        }
+
+
         $data = $induction_worker->jsonNote()['worker'];
-        $pdf = $this->generarConstancyCerv($data, $induction);
+        $pdf = $this->generarConstancyCerv($data, $induction, $fondo, $firma);
 
         return $pdf->stream('certificado.pdf');
     }
 
     public function descargar_constancias(Request $request, $id_induction)
     {
+        $fondo = null;
+        $firma = null;
+        $base64Path = public_path('certificados/certificado-cerv.jpg');
+        if (file_exists($base64Path)) {
+            $dataImage = file_get_contents($base64Path);
+            $fondo = 'data:image/' . pathinfo($base64Path, PATHINFO_EXTENSION) . ';base64,' . base64_encode($dataImage);
+        }
+        $base64SignaturePath = public_path('certificados/firma-cerv.png');
+        if (file_exists($base64SignaturePath)) {
+            $dataImage = file_get_contents($base64SignaturePath);
+            $firma = 'data:image/' . pathinfo($base64SignaturePath, PATHINFO_EXTENSION) . ';base64,' . base64_encode($dataImage);
+        }
+
         $induction = Induction::find($id_induction);
         $workers = $induction->workers->filter(function ($worker) use ($induction) {
             if (strpos($induction->alias, 'Montacarga') !== false) {
@@ -1705,7 +1721,7 @@ class SupervisorController extends Controller
         // Genera y almacena los PDFs para cada trabajador de la inducción
         foreach ($workers as $worker) {
             $data = $worker->jsonNote()['worker'];
-            $pdf = $this->generarConstancyCerv($data, $induction);
+            $pdf = $this->generarConstancyCerv($data, $induction, $fondo, $firma);
             $pdfFileName = 'constancia_' . $data['doi'] . '.pdf';
             Storage::put($inductionDir . '/' . $pdfFileName, $pdf->output());
         }
