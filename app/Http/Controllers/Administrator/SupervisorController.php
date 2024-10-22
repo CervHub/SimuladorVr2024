@@ -1620,9 +1620,9 @@ class SupervisorController extends Controller
         $qrCodeBase64 = 'data:image/svg+xml;base64,' . base64_encode($qrCode);
         $taller = $induction->alias;
         if (strpos($taller, 'Montacarga') !== false) {
-            $taller = "CAPACITACIÓN EN USO DE MONTACARGAS";
+            $taller = "USO DE MONTACARGAS";
         } elseif (strpos($taller, 'Extintor') !== false) {
-            $taller = "CAPACITACIÓN EN USO DE EXTINTORES";
+            $taller = "USO DE EXTINTORES";
         }
 
         $datos = [
