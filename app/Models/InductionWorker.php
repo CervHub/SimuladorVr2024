@@ -443,6 +443,7 @@ class InductionWorker extends Model
         }
 
         $worker = [
+            "id" => $this->id ?? '-',
             "nombres" => ($this->worker->nombre ?? '-') . ' ' . ($this->worker->apellido ?? '-'),
             "doi" => $this->worker->user->doi ?? '-',
             "license" => $this->worker->license ?? '-',

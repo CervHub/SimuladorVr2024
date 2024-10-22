@@ -183,6 +183,13 @@
                                                         <i class="fas fa-file-archive"></i>
                                                     </a>
                                                 @endif
+                                                @if (session('id_company') == 5)
+                                                    <a href="{{ route('descargar_constancias', ['id_induction' => $induction->id]) }}"
+                                                        class="btn btn-custom btn-warning text-white me-0"
+                                                        title="Descargar Constancias">
+                                                        <i class="fas fa-file-alt"></i>
+                                                    </a>
+                                                @endif
                                             </div>
                                         </td>
                                     </tr>

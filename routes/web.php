@@ -136,6 +136,7 @@ Route::middleware(['entrenador', 'auth'])->group(function () {
     Route::get('descargar_asistencia/{id_induction}/{fecha_inicio}/{fecha_fin}/{id_service}', [SupervisorController::class, 'descargar_asistencia'])->name('descargar_asistencia_pdf');
     Route::get('descargar_asistencia_excel/{id_induction}/{fecha_inicio}/{fecha_fin}/{id_service}', [SupervisorController::class, 'descargar_asistencia_excel'])->name('descargar_asistencia_excel');
     Route::get('descargar_asistencia_zip/{id_induction}', [SupervisorController::class, 'descargar_asistencia_zip'])->name('descargar_asistencia_zip');
+    Route::get('descargar_constancias/{id_induction}', [SupervisorController::class, 'descargar_constancias'])->name('descargar_constancias');
 
     //Reporte general
     Route::get('reporte/general/', [SupervisorController::class, 'reporteGeneral'])->name('reporte.general.descargar');
@@ -153,6 +154,8 @@ Route::middleware(['entrenador', 'auth'])->group(function () {
 
     Route::get('/getAreas/{id}', [DepartamentoController::class, 'getAreas']);
 });
+
+Route::get('validate/certificate/{induction_worker_id}/{induction_id}', [SupervisorController::class, 'validate_certificate'])->name('validate_certificate');
 
 Route::get('profile', [ProfileController::class, 'perfil'])->name('perfil');
 Route::post('profile/update', [ProfileController::class, 'update'])->name('updateperfil');

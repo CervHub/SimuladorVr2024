@@ -31,6 +31,7 @@ use ZipArchive;
 use Illuminate\Support\Facades\Storage;
 
 use App\Exports\ExportDataCervExcel;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class SupervisorController extends Controller
 {
@@ -1607,6 +1608,132 @@ class SupervisorController extends Controller
         $pdf = PDF::loadView('ReportesFormatos.asistenciaPDF', $data);
 
         return $pdf;
+    }
+
+    private function generarConstancyCerv($data, $induction)
+    {
+
+        $qr = route('validate_certificate', ['induction_worker_id' => $data['id'], 'induction_id' => $induction->id]);
+        $qrCode = QrCode::size(300)->generate($qr);
+
+        // Convert QR code to base64
+        $qrCodeBase64 = 'data:image/svg+xml;base64,' . base64_encode($qrCode);
+        $taller = $induction->alias;
+        if (strpos($taller, 'Montacarga') !== false) {
+            $taller = explode(' - ', $taller)[0];
+        } elseif (strpos($taller, 'Extintor') !== false) {
+            $taller = explode(' Tipo ', $taller)[0];
+        }
+
+        $datos = [
+            'worker' => $data,
+            'photo' => '',
+            'taller' => $taller,
+            'fecha' => Carbon::parse($induction->date_start)->locale('es')->isoFormat('D [de] MMMM [del] YYYY'),
+            'firma' => '',
+            'qr' => $qrCodeBase64
+        ];
+
+        $base64Path = public_path('certificados/certificado-cerv.jpg');
+        if (file_exists($base64Path)) {
+            $dataImage = file_get_contents($base64Path);
+            $datos['photo'] = 'data:image/' . pathinfo($base64Path, PATHINFO_EXTENSION) . ';base64,' . base64_encode($dataImage);
+        }
+        $base64SignaturePath = public_path('certificados/firma-cerv.png');
+        if (file_exists($base64SignaturePath)) {
+            $dataImage = file_get_contents($base64SignaturePath);
+            $datos['firma'] = 'data:image/' . pathinfo($base64SignaturePath, PATHINFO_EXTENSION) . ';base64,' . base64_encode($dataImage);
+        }
+
+        $pdf = PDF::loadView('ReportesFormatos.Cerfiticados.cerv', $datos)->setPaper('a4', 'landscape');
+        return $pdf;
+    }
+
+    public function generarQr($url)
+    {
+        $qrCode = QrCode::size(300)->generate($url);
+
+        return response($qrCode, 200)->header('Content-Type', 'image/png');
+    }
+
+    public function validate_certificate(Request $request, $induction_worker_id, $induction_id)
+    {
+        $induction = Induction::find($induction_id);
+        $induction_worker = InductionWorker::find($induction_worker_id);
+        if (!$induction || !$induction_worker) {
+            abort(403, 'No se encontró certificado');
+        }
+
+        $hasPassed = collect($induction_worker->jsonNote()['attempts'])->contains(function ($attempt) {
+            return $attempt['note'] >= 0;
+        });
+
+        if (!$hasPassed) {
+            abort(403, 'El trabajador no ha aprobado la inducción');
+        }
+
+        $data = $induction_worker->jsonNote()['worker'];
+        $pdf = $this->generarConstancyCerv($data, $induction);
+
+        return $pdf->stream('certificado.pdf');
+    }
+
+    public function descargar_constancias(Request $request, $id_induction)
+    {
+        $induction = Induction::find($id_induction);
+        $workers = $induction->workers->filter(function ($worker) use ($induction) {
+            if (strpos($induction->alias, 'Montacarga') !== false) {
+                return collect($worker->jsonNote()['attempts'])->contains(function ($attempt) {
+                    return $attempt['note'] >= 0;
+                });
+            }
+            return true;
+        });
+
+        // Crea el directorio principal para almacenar los informes
+        $reportDir = 'constancias';
+        Storage::makeDirectory($reportDir);
+
+        // Crea un directorio para la inducción específica
+        $inductionDir = $reportDir . '/' . $id_induction;
+        Storage::makeDirectory($inductionDir);
+
+        // Genera y almacena los PDFs para cada trabajador de la inducción
+        foreach ($workers as $worker) {
+            $data = $worker->jsonNote()['worker'];
+            $pdf = $this->generarConstancyCerv($data, $induction);
+            $pdfFileName = 'constancia_' . $data['doi'] . '.pdf';
+            Storage::put($inductionDir . '/' . $pdfFileName, $pdf->output());
+        }
+
+        // Verifica si hay archivos en el directorio antes de crear el ZIP
+        $files = Storage::files($inductionDir);
+        if (empty($files)) {
+            // Elimina el directorio de la inducción si está vacío
+            Storage::deleteDirectory($inductionDir);
+            abort(403, 'No hay constancias para descargar.');
+        }
+
+        // Crea un archivo ZIP
+        $tempZipPath = tempnam(sys_get_temp_dir(), 'constancias');
+        $zipFileName = basename($tempZipPath) . '.zip';
+        $zipFilePath = storage_path('app/' . $reportDir . '/' . $zipFileName);
+
+        $zip = new ZipArchive;
+        if ($zip->open($zipFilePath, ZipArchive::CREATE) === true) {
+            // Añade cada PDF al archivo ZIP
+            foreach ($files as $file) {
+                $zip->addFile(Storage::path($file), basename($file));
+            }
+
+            $zip->close();
+        }
+
+        // Elimina el directorio de la inducción
+        Storage::deleteDirectory($inductionDir);
+
+        // Descarga el archivo ZIP
+        return response()->download($zipFilePath);
     }
 
     public function descargar_asistencia_zip(Request $request, $id_induction)
