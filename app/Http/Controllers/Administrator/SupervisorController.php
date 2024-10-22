@@ -1664,12 +1664,13 @@ class SupervisorController extends Controller
             abort(403, 'No se encontró certificado');
         }
 
-        $hasPassed = collect($induction_worker->jsonNote()['attempts'])->contains(function ($attempt) use ($induction) {
-            if (strpos($induction->alias, 'Montacarga') !== false) {
+        $hasPassed = true;
+
+        if (strpos($induction->alias, 'Montacarga') !== false) {
+            $hasPassed = collect($induction_worker->jsonNote()['attempts'])->contains(function ($attempt) {
                 return $attempt['note'] >= 0;
-            }
-            return true;
-        });
+            });
+        }
 
         if (!$hasPassed) {
             abort(403, 'El trabajador no ha aprobado la inducción');
