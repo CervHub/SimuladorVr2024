@@ -189,6 +189,7 @@ class ApiController extends Controller
             INNER JOIN inductions AS i ON iw.id_induction = i.id
             WHERE iw.id_worker = ?
             AND iw.status = '1'
+            AND i.status = '1'
             AND iw.num_report + 1 <= i.intentos
             AND NOW() BETWEEN (i.date_start || ' ' || i.time_start)::timestamp AND (i.date_end || ' ' || i.time_end)::timestamp
         ", [$workerId]);
