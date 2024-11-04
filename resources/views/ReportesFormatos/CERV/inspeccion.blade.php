@@ -93,6 +93,11 @@
             text-align: left;
         }
 
+        .text-light {
+            color: #777;
+            font-weight: normal;
+        }
+
         .text-center {
             text-align: center;
         }
@@ -292,16 +297,16 @@
             <tbody>
                 <tr>
                     <th>Componente</th>
-                    <th>Inspeccionado</th>
-                    <th>Puntaje</th>
-                    <th>Tiempo</th>
+                    <th class="text-center">Inspeccionado</th>
+                    <th class="text-center">Puntaje</th>
+                    <th class="text-center">Tiempo</th>
                 </tr>
                 @foreach ($json['tables']['inspection'] ?? [] as $item)
                     <tr>
-                        <th>{{ $item['component'] ?? 'N/A' }}</th>
-                        <td>{{ $item['viewed'] ?? 'N/A' }}</td>
-                        <td>{{ $item['correctly'] ?? 'N/A' }}</td>
-                        <td>{{ $item['timestamp'] ?? 'N/A' }}</td>
+                        <th class="text-center text-light">{{ $item['component'] ?? 'N/A' }}</th>
+                        <td class="text-center text-light">{{ $item['viewed'] ?? 'N/A' }}</td>
+                        <td class="text-center text-light">{{ $item['correctly'] ?? 'N/A' }}</td>
+                        <td class="text-center text-light">{{ $item['timestamp'] ?? 'N/A' }}</td>
                     </tr>
                 @endforeach
             </tbody>
