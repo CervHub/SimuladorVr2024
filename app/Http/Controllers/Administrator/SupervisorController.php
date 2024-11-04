@@ -1816,7 +1816,7 @@ class SupervisorController extends Controller
                 ->pluck('id');
 
             $inductions = InductionWorker::whereIn('id_worker', $workerIds)
-                ->whereHas('inductions', function ($query) {
+                ->whereHas('induction', function ($query) {
                     $query->where('status', '1');
                 })
                 ->get();
