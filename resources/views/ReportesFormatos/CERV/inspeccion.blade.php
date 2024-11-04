@@ -94,7 +94,6 @@
         }
 
         .text-light {
-            color: #777;
             font-weight: normal;
         }
 
@@ -303,7 +302,7 @@
                 </tr>
                 @foreach ($json['tables']['inspection'] ?? [] as $item)
                     <tr>
-                        <th class="text-center text-light">{{ $item['component'] ?? 'N/A' }}</th>
+                        <th class="text-light">{{ $item['component'] ?? 'N/A' }}</th>
                         <td class="text-center text-light">{{ $item['viewed'] ?? 'N/A' }}</td>
                         <td class="text-center text-light">{{ $item['correctly'] ?? 'N/A' }}</td>
                         <td class="text-center text-light">{{ $item['timestamp'] ?? 'N/A' }}</td>
