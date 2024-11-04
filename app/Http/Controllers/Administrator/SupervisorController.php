@@ -879,6 +879,8 @@ class SupervisorController extends Controller
 
         if (strpos($data['header']['taller'], 'Extintor') !== false) {
             $pdf = PDF::loadView('ReportesFormatos.CERV.extintores', $data);
+        } else if (strpos($data['header']['taller'], 'Montacarga - Inspe') !== false) {
+            $pdf = PDF::loadView('ReportesFormatos.CERV.inspeccion', $data);
         } else if (strpos($data['header']['taller'], 'Montacarga') !== false) {
             $pdf = PDF::loadView('ReportesFormatos.CERV.simuladormanejo', $data);
         } else {
@@ -1813,7 +1815,11 @@ class SupervisorController extends Controller
                 ->where('id_company', session('id_company'))
                 ->pluck('id');
 
-            $inductions = InductionWorker::whereIn('id_worker', $workerIds)->get();
+            $inductions = InductionWorker::whereIn('id_worker', $workerIds)
+                ->whereHas('inductions', function ($query) {
+                    $query->where('status', '1');
+                })
+                ->get();
 
 
             $inductionsData = [];
