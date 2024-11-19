@@ -877,16 +877,21 @@ class SupervisorController extends Controller
         $data['logo'] = $logoBase64;
         $data['sinPhoto'] = $sinPhotoBase64;
 
-        if (strpos($data['header']['taller'], 'Extintor') !== false) {
-            $pdf = PDF::loadView('ReportesFormatos.CERV.extintores', $data);
-        } else if (strpos($data['header']['taller'], 'Montacarga - Inspe') !== false) {
-            $pdf = PDF::loadView('ReportesFormatos.CERV.inspeccion', $data);
-        } else if (strpos($data['header']['taller'], 'Montacarga') !== false) {
-            $pdf = PDF::loadView('ReportesFormatos.CERV.simuladormanejo', $data);
+
+        $taller = $data['header']['taller'];
+        if (strpos($taller, 'Extintor') !== false) {
+            $viewName = 'ReportesFormatos.CERV.extintores';
+        } else if (strpos($taller, 'Komatsu980E')) {
+            $viewName = 'ReportesFormatos.Cerv.dynamic';
+        } else if (strpos($taller, 'Montacarga - Inspe') !== false) {
+            $viewName = 'ReportesFormatos.CERV.inspeccion';
+        } else if (strpos($taller, 'Montacarga') !== false) {
+            $viewName = 'ReportesFormatos.CERV.simuladormanejo';
         } else {
             abort(403, 'No se puede generar el reporte taller no reconocido');
         }
 
+        $pdf = PDF::loadView($viewName, $data);
         return $pdf->stream('ReporteIndividual.pdf');
     }
 

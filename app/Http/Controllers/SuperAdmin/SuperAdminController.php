@@ -111,7 +111,6 @@ class SuperAdminController extends Controller
 
     public function editartaller(Request $request)
     {
-
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $maxSize = 1024; // Tamaño máximo en kilobytes (1 MB = 1024 KB)
@@ -121,11 +120,13 @@ class SuperAdminController extends Controller
                 Session::flash('error', 'La imagen debe ser menos de 1MB.');
                 return redirect()->back();
             }
+
+            if ($image->getError()) {
+                Session::flash('error', 'Ha ocurrido un error en la carga de la imagen.');
+                return redirect()->back();
+            }
         }
-        if ($request->file('image')->getError()) {
-            Session::flash('error', 'Ha ocurrido un error en la carga de la imagen.');
-            return redirect()->back();
-        }
+
         $estado = $this->workshopController->edit($request);
         if ($estado) {
             // Creación exitosa
@@ -137,7 +138,6 @@ class SuperAdminController extends Controller
 
     public function editartallercompany(Request $request)
     {
-        dd($request);
         $estado = $this->workshopcompanyController->edit($request);
         if ($estado) {
             Session::flash('success', 'La actualizacion se ha realizado exitosamente.');

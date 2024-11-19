@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Models;
 use App\Http\Controllers\Controller;
 use App\Models\Workshop;
 use Illuminate\Http\Request;
+use App\Models\Induction;
 use App\Models\WorkshopCompany;
 
 class WorshopCompanyController extends Controller
@@ -34,14 +35,22 @@ class WorshopCompanyController extends Controller
     }
     public function edit(Request $request)
     {
+        $workshopcompany = WorkshopCompany::find($request->id_workshop_company);
+
         try {
-            $workshopcompany = WorkshopCompany::find($request->id_workshop_company);
+            // Actualizar el alias y otros campos de WorkshopCompany
             $workshopcompany->alias = $request->alias;
             $workshopcompany->status = $request->status;
-            $workshopcompany->id_workshop = $request->id_workshop;
             $workshopcompany->save();
+
+            // Actualizar el alias de todas las inducciones
+            Induction::where('id_workshop', $workshopcompany->id_workshop)
+                ->where('id_company', $workshopcompany->id_company)
+                ->update(['alias' => $request->alias]);
+
             return true;
         } catch (\Throwable $th) {
+            dd($th);
             return false;
         }
     }
