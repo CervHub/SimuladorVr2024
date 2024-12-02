@@ -214,7 +214,8 @@
             <tr>
                 <th class="font-bold w-20">Tiempo de Evaluación:</th>
                 <td class="w-30">
-                    {{ isset($data['json']['time']) ? secondsToTime($data['json']['time']) : '00:00:00' }}
+                    {{-- {{ isset($data['json']['time']) ? secondsToTime($data['json']['time']) : '00:00:00' }} --}}
+                    {{ $data['json']['time'] ?? '00:00:00' }}
                 </td>
             </tr>
         </tbody>
