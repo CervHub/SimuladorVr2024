@@ -883,6 +883,12 @@ class SupervisorController extends Controller
             $viewName = 'ReportesFormatos.CERV.extintores';
         } else if (strpos($taller, 'Komatsu980E')) {
             $viewName = 'ReportesFormatos.Cerv.dynamic';
+        } else if (strpos($taller, 'Komatsu930E')) {
+            $viewName = 'ReportesFormatos.Cerv.dynamic';
+        } else if (strpos($taller, 'CAT797')) {
+            $viewName = 'ReportesFormatos.Cerv.dynamic';
+        } else if (strpos($taller, 'PalaPH4100')) {
+            $viewName = 'ReportesFormatos.Cerv.dynamic';
         } else if (strpos($taller, 'Montacarga - Inspe') !== false) {
             $viewName = 'ReportesFormatos.CERV.inspeccion';
         } else if (strpos($taller, 'Montacarga') !== false) {
