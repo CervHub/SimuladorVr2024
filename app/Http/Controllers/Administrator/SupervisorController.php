@@ -879,19 +879,23 @@ class SupervisorController extends Controller
 
 
         $taller = $data['header']['taller'];
+        $dynamicTalleres = ['Komatsu980E', 'Komatsu930E', 'CAT797', 'PalaPH4100'];
+
+        $dynamicMatch = false;
+        foreach ($dynamicTalleres as $dynamicTaller) {
+            if (strpos($taller, $dynamicTaller) !== false) {
+                $dynamicMatch = true;
+                break;
+            }
+        }
+
         if (strpos($taller, 'Extintor') !== false) {
             $viewName = 'ReportesFormatos.CERV.extintores';
-        } else if (strpos($taller, 'Komatsu980E')) {
-            $viewName = 'ReportesFormatos.Cerv.dynamic';
-        } else if (strpos($taller, 'Komatsu930E')) {
-            $viewName = 'ReportesFormatos.Cerv.dynamic';
-        } else if (strpos($taller, 'CAT797')) {
-            $viewName = 'ReportesFormatos.Cerv.dynamic';
-        } else if (strpos($taller, 'PalaPH4100')) {
+        } else if ($dynamicMatch) {
             $viewName = 'ReportesFormatos.Cerv.dynamic';
         } else if (strpos($taller, 'Montacarga - Inspe') !== false) {
             $viewName = 'ReportesFormatos.CERV.inspeccion';
-        } else if (strpos($taller, 'Montacarga') !== false) {
+        } else if (strpos($taller, 'Montacarga') !== false || strpos($taller, 'Apilador') !== false || strpos($taller, 'Trilateral') !== false) {
             $viewName = 'ReportesFormatos.CERV.simuladormanejo';
         } else {
             abort(403, 'No se puede generar el reporte taller no reconocido');
