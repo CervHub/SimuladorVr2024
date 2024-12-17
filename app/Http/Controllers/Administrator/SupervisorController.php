@@ -905,6 +905,50 @@ class SupervisorController extends Controller
         return $pdf->stream('ReporteIndividual.pdf');
     }
 
+    private function genReportYanbal($induction_worker, $worker, $induction, $intento, $modo)
+    {
+        $data = [
+            'header' => $induction->header(),
+            'data' => $induction_worker->jsonNoteFilter($modo == 'Entrenamiento' ? 1 : 0, $intento),
+        ];
+
+        $logoPath = $data['header']['logo'];
+        $sinPhoto = 'logo/sin-photo.png';
+        // Asegurarse de que $logoPath tenga un valor predeterminado válido
+        if (empty($logoPath)) {
+            $logoPath = 'logo/logo_yanbal.png'; // URL del logo por defecto
+        }
+
+        // Verificar si el archivo existe en la carpeta public de Laravel
+        if (!file_exists(public_path($logoPath))) {
+            $logoPath = 'logo/logo_yanbal.png'; // Usar el logo por defecto si el archivo no existe
+        }
+
+        // Continuar con la lógica para manejar $logoPath...
+        // Leer el contenido del archivo y convertirlo a base64
+        $logoData = file_get_contents(public_path($logoPath));
+        $logoBase64 = 'data:image/png;base64,' . base64_encode($logoData);
+
+        $sinPhoto = file_get_contents(public_path($sinPhoto));
+        $sinPhotoBase64 = 'data:image/png;base64,' . base64_encode($sinPhoto);
+
+        $data['logo'] = $logoBase64;
+        $data['sinPhoto'] = $sinPhotoBase64;
+
+
+        $taller = $data['header']['taller'];
+
+
+        if (strpos($taller, 'Montacarga') !== false || strpos($taller, 'Apilador') !== false || strpos($taller, 'Trilateral') !== false) {
+            $viewName = 'ReportesFormatos.CERV.simuladormanejo';
+        } else {
+            abort(403, 'No se puede generar el reporte taller no reconocido');
+        }
+
+        $pdf = PDF::loadView($viewName, $data);
+        return $pdf->stream('ReporteIndividual.pdf');
+    }
+
     public function visualizar_reporte_notas($id_induction_worker, $intento, $modo)
     {
         $induction_worker = InductionWorker::find($id_induction_worker);
@@ -913,6 +957,10 @@ class SupervisorController extends Controller
 
         if ($induction->id_company == 5) {
             return $this->genReportCerv($induction_worker, $worker, $induction, $intento, $modo);
+        }
+
+        if ($induction->id_company == 6) {
+            return $this->genReportYanbal($induction_worker, $worker, $induction, $intento, $modo);
         }
 
         $detail_induction_worker = DetailInductionWorker::where('induction_worker_id', $induction_worker->id)
