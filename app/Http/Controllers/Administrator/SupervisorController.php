@@ -1218,7 +1218,7 @@ class SupervisorController extends Controller
             }
         } else if ($induction->id_company == 3) {
             $pdf = PDF::loadView('ReportesFormatos.LuzDelSurAsistenciaPdf', $data);
-        } else if ($induction->id_company == 5) {
+        } else if ($induction->id_company == 5 || $induction->id_company == 6) {
             $data['header'] = $induction->header();
             $data['newNoteJson'] = $induction->newNoteJson();
             $pdf = PDF::loadView('ReportesFormatos.CervGeneral', $data)
