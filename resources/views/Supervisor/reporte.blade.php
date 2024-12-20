@@ -171,7 +171,7 @@
                                                     onclick="modificarEnlace(this, '{{ route('descargar_asistencia_pdf', ['id_induction' => $induction->id, 'fecha_inicio' => '0000-00-00', 'fecha_fin' => '0000-00-00', 'id_service' => 0]) }}')">
                                                     <i class="fas fa-file-pdf"></i>
                                                 </a>
-                                                @if (session('id_company') != 5)
+                                                @if (session('id_company') != 5 && session('id_company') != 6)
                                                     <a href="#" class="btn btn-custom btn-success  text-white me-0"
                                                         onclick="modificarEnlace(this, '{{ route('descargar_asistencia_excel', ['id_induction' => $induction->id, 'fecha_inicio' => '0000-00-00', 'fecha_fin' => '0000-00-00', 'id_service' => 0]) }}')">
                                                         <i class="fas fa-file-excel"></i>
@@ -183,7 +183,7 @@
                                                         <i class="fas fa-file-archive"></i>
                                                     </a>
                                                 @endif
-                                                @if (session('id_company') == 5)
+                                                @if (session('id_company') == 5 || session('id_company') == 6)
                                                     <a href="{{ route('descargar_constancias', ['id_induction' => $induction->id]) }}"
                                                         class="btn btn-custom btn-warning text-white me-0"
                                                         title="Descargar Constancias">
