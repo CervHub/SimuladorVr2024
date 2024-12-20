@@ -137,7 +137,7 @@
         <p class="bold_sub mt-2">Por haber participado de forma satisfactoria en la capacitación de:</p>
         {{-- <h2 class="uppercase curso mt-05">{{ $taller }}</h2> --}}
 
-        <h2 class="uppercase curso mt-05">Apilador Eléctrico</h2>
+        <h2 class="uppercase curso mt-05">Montacarga Trilateral</h2>
 
         {{-- <p class="mt-2">Como parte de su desarrollo en la Plataforma de Capacitación en Seguridad y Salud.</p> --}}
         {{-- <p class="mt-2" style="margin-bottom: 0">Lima, {{ $fecha }}</p> --}}
