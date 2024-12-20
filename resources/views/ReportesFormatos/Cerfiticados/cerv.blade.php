@@ -149,6 +149,7 @@
                         style="display: block; margin: 0; color: #000; font-weight: bold;">_______________________________</span>
                     <p style="margin: 0; color: #000; font-weight: bold;">Ing. Jorge J. Nayhua Gamarra</p>
                     <p style="margin: 0; color: #000; font-weight: bold;">Instructor</p>
+                    <p style="margin: 0; color: #000; font-weight: bold;">N° Cip 354252</p>
                 </td>
                 <td style="text-align: center;">
                     <p style="margin: 0; font-weight: bold; color: #000;"><strong>Lima, {{ $fecha }}</strong></p>
