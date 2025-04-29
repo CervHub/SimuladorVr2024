@@ -11,10 +11,10 @@ class DepartamentoController extends Controller
 {
     public function departamento(Request $request)
     {
-        $departamentos = Departamento::all();
-        return view('Administrator.Departamento.index', compact('departamentos'));
+        $id_company = Session::get('id_company'); // Obtener solo 'id_company'
+        $departamentos = Departamento::where('company_id', $id_company)->get();
+        return view('Administrator.Departamento.index', compact('departamentos', 'id_company'));
     }
-
 
     public function store(Request $request)
     {

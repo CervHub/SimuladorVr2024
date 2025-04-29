@@ -496,12 +496,15 @@ class SupervisorController extends Controller
 
         return redirect()->back();
     }
+
     public function induccion(Request $request)
     {
-        $workshops = WorkshopCompany::where('id_company', session('id_company'))->get();
+        $workshops = WorkshopCompany::where('id_company', session('id_company'))->where('status', '1')->get();
+
         $inductions = Induction::where('id_company', session('id_company'))
             ->where('status', '1')
-            ->orderBy('id', 'desc')
+            ->select('*', DB::raw("CONCAT(date_start, ' ', time_start, ' - ', date_end, ' ', time_end) as full_schedule"))
+            ->orderByRaw("CONCAT(date_start, ' ', time_start) DESC")
             ->get();
 
         return view('Supervisor.Inducciones.main', compact('workshops', 'inductions'));

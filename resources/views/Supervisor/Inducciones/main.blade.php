@@ -71,8 +71,7 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>Taller</th>
-                                    <th>Fecha - Inicio</th>
-                                    <th>Fecha - Finalización</th>
+                                    <th>Horario Completo</th>
                                     <th>N° de Usuarios</th>
                                     <th>Estado</th>
                                     <th>Acciones</th>
@@ -83,19 +82,15 @@
                                     <tr>
                                         <td>{{ $induction->id }}</td>
                                         <td>{{ $induction->alias }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($induction->date_start)->format('d/m/Y') }}
-                                            {{ $induction->time_start }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($induction->date_end)->format('d/m/Y') }}
-                                            {{ $induction->time_end }}</td>
-                                        <td>{{ $induction->workers->filter(function ($worker) {return $worker->status == 1;})->count() }}
+                                        <td>
+                                            {{ \Carbon\Carbon::parse($induction->date_start)->format('d/m/Y') }} {{ $induction->time_start }} -
+                                            {{ \Carbon\Carbon::parse($induction->date_end)->format('d/m/Y') }} {{ $induction->time_end }}
+                                        </td>
+                                        <td>{{ $induction->workers->filter(function ($worker) { return $worker->status == 1; })->count() }}</td>
                                         <td>
                                             @php
-                                                $startDateTime = \Carbon\Carbon::parse(
-                                                    $induction->date_start . ' ' . $induction->time_start,
-                                                );
-                                                $endDateTime = \Carbon\Carbon::parse(
-                                                    $induction->date_end . ' ' . $induction->time_end,
-                                                );
+                                                $startDateTime = \Carbon\Carbon::parse($induction->date_start . ' ' . $induction->time_start);
+                                                $endDateTime = \Carbon\Carbon::parse($induction->date_end . ' ' . $induction->time_end);
                                             @endphp
                                             @if (now()->lessThan($startDateTime) || now()->greaterThan($endDateTime))
                                                 <label class="badge badge-danger">Inactivo</label>
