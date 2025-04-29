@@ -955,13 +955,15 @@ class SupervisorController extends Controller
         $worker = Worker::find($induction_worker->id_worker);
         $induction = Induction::find($induction_worker->id_induction);
 
-        if ($induction->id_company == 5) {
+        if ($induction->id_company == 5 || $induction->id_company == 7) {
             return $this->genReportCerv($induction_worker, $worker, $induction, $intento, $modo);
         }
 
         if ($induction->id_company == 6) {
             return $this->genReportYanbal($induction_worker, $worker, $induction, $intento, $modo);
         }
+
+
 
         $detail_induction_worker = DetailInductionWorker::where('induction_worker_id', $induction_worker->id)
             ->where('report', $intento);
