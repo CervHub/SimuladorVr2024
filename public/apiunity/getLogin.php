@@ -98,7 +98,7 @@ try {
     } else {
         // No se encontraron resultados, enviar una respuesta apropiada
         header('Content-Type: application/json');
-        http_response_code(404); // Código 404 para "No encontrado".
+        http_response_code(202); // Código 404 para "No encontrado".
         echo json_encode(array('error' => 'No se encontraron datos.'));
     }
 } catch (PDOException $ex) {

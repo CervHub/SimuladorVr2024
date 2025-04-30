@@ -41,6 +41,7 @@ class ApiOffline extends Controller
             $inductions = Induction::where('id_company', $id_company)
                 ->whereRaw("CONCAT(date_end, ' ', time_end) >= ?", [$currentDateTime->toDateTimeString()])
                 ->orderBy('id', 'desc')
+                ->where('status', '1')
                 ->get();
 
             $inductionsArray = [];
