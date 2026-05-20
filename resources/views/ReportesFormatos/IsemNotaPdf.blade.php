@@ -323,18 +323,17 @@
 </head>
 
 <body>
-    <table class="no-border">
+    <table class="no-border" style="width: 100%;">
         <tr style="padding:0; margin:0;">
-            <td style="width: 100px;  padding:0;">
-                <div class="">
-                    <img src="{{ $logo }}" width="64px" alt="Logo">
-                </div>
+            <td style="width: 100px; padding:0; vertical-align: middle;">
+                <img src="{{ $logo }}" width="64px" alt="Logo">
             </td>
-            <td style="  padding:0;">
-                <p class="" style="text-align: left; font-size:18px; font-weight: bold; padding-left:20px;">
+            <td style="padding:0; text-align: center; vertical-align: middle;">
+                <p style="text-align: center; font-size:18px; font-weight: bold; margin: 0;">
                     REPORTE DE EVALUACIÓN
                 </p>
             </td>
+            <td style="width: 100px; padding:0;"></td>
         </tr>
     </table>
 
