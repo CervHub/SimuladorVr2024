@@ -28,7 +28,9 @@ class InductionWorker extends Model
 
     public function notaIsemByIntento($intento)
     {
-        $details = $this->detailsByReport($intento)->get();
+        $details = DetailInductionWorker::deduplicateByCaseName(
+            $this->detailsByReport($intento)->orderBy('id', 'asc')->get()
+        );
 
         if ($details->isEmpty()) {
             return [

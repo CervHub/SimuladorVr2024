@@ -304,6 +304,21 @@
             border: 1px solid black;
             padding: 8px;
         }
+
+        #evaluacion .evaluacion-foto-cell {
+            vertical-align: top;
+            text-align: right;
+            width: 42%;
+        }
+
+        #evaluacion .evaluacion-foto {
+            height: 168px;
+            width: auto;
+            max-width: 200px;
+            border-radius: 25px;
+            display: block;
+            margin-left: auto;
+        }
     </style>
 </head>
 
@@ -317,7 +332,7 @@
             </td>
             <td style="  padding:0;">
                 <p class="" style="text-align: left; font-size:18px; font-weight: bold; padding-left:20px;">
-                    Reporte de evaluación sobre actos y condiciones
+                    REPORTE DE EVALUACIÓN
                 </p>
             </td>
         </tr>
@@ -405,11 +420,11 @@
                             <dd class="dl-definition">{{ $casosTotales }}</dd>
                         </div> -->
                         <div class="dl-row">
-                            <dt class="dl-term-secondary">Casos Asignados:</dt>
+                            <dt class="dl-term-secondary">Pasos:</dt>
                             <dd class="dl-definition">8</dd>
                         </div>
                         <div class="dl-row">
-                            <dt class="dl-term-secondary">Casos Encontrados:</dt>
+                            <dt class="dl-term-secondary">Pasos Encontrados:</dt>
                             <dd class="dl-definition">{{ $casosBuenos }}</dd>
                         </div>
 
@@ -435,12 +450,9 @@
                         </div>
                     </dl>
                 </td>
-                <td class="col-5 align-left align-top" style="text-align: right;">
-                    <dl class="dl-container">
-                        <div class="dl-row">
-                            <img style="border-radius: 25px;" src="{{ $logo_taller }}" width="300px" alt="">
-                        </div>
-                    </dl>
+                <td class="col-5 align-left align-top evaluacion-foto-cell">
+                    <img class="evaluacion-foto" src="{{ $logo_taller }}" alt=""
+                        style="height: 168px; width: auto; max-width: 200px; border-radius: 25px; display: block; margin-left: auto;">
                 </td>
             </tr>
         </table>
@@ -453,16 +465,16 @@
             <tr>
                 <th>Nombre del caso</th>
                 <th>Identificado</th>
-                <th>Nivel de riesgo</th>
-                <th>Medida correcta</th>
+                {{-- <th>Nivel de riesgo</th>
+                <th>Medida correcta</th> --}}
                 <th>Tiempo</th>
             </tr>
             @foreach ($detail_induction_worker as $key => $data)
                 <tr style="height: 20px;"> <!-- Ajusta la altura según tus preferencias -->
                     <td style="text-align: left;">{{ $key + 1 }}. {{ $data->case }}</td>
                     <td>{{ $data->identified }}</td>
-                    <td>{{ $data->risk_level }}</td>
-                    <td>{{ $data->correct_measure }}</td>
+                    {{-- <td>{{ $data->risk_level }}</td>
+                    <td>{{ $data->correct_measure }}</td> --}}
                     <td>{{ date('H:i', strtotime($data->time)) }}</td>
                 </tr>
             @endforeach
@@ -472,8 +484,8 @@
             <tr>
                 <th>TOTAL</th>
                 <th>{{ $extra['identified_sum'] }}</th>
-                <th>{{ $extra['risk_level_sum'] }}</th>
-                <th>{{ $extra['correct_measure_sum'] }}</th>
+                {{-- <th>{{ $extra['risk_level_sum'] }}</th>
+                <th>{{ $extra['correct_measure_sum'] }}</th> --}}
                 <th></th>
             </tr>
         </table>

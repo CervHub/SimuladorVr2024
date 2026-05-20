@@ -28,4 +28,28 @@ class DetailInductionWorker extends Model
     {
         return $this->belongsTo(InductionWorker::class, 'id');
     }
+
+    /**
+     * Puntuación de un detalle según campos con valor (para elegir entre duplicados).
+     */
+    public static function dataScore(self $detail): float
+    {
+        return floatval($detail->identified)
+            + floatval($detail->risk_level)
+            + floatval($detail->correct_measure);
+    }
+
+    /**
+     * Si el mismo nombre de caso aparece más de una vez, conserva el registro con datos.
+     */
+    public static function deduplicateByCaseName($collection)
+    {
+        return $collection
+            ->groupBy(fn ($detail) => trim(mb_strtolower($detail->case ?? '')))
+            ->map(function ($group) {
+                return $group->sortByDesc(fn ($detail) => [self::dataScore($detail), $detail->id])->first();
+            })
+            ->sortBy('id')
+            ->values();
+    }
 }
