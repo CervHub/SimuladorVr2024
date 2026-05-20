@@ -884,7 +884,7 @@ class SupervisorController extends Controller
 
 
         $taller = $data['header']['taller'];
-        $dynamicTalleres = ['Komatsu980E', 'Komatsu930E', 'CAT797', 'PalaPH4100'];
+        $dynamicTalleres = ['Komatsu980E', 'Komatsu930E', 'CAT797', 'PalaPH4100', 'CAT7495'];
 
         $dynamicMatch = false;
         foreach ($dynamicTalleres as $dynamicTaller) {
@@ -960,7 +960,7 @@ class SupervisorController extends Controller
         $worker = Worker::find($induction_worker->id_worker);
         $induction = Induction::find($induction_worker->id_induction);
 
-        if ($induction->id_company == 5 || $induction->id_company == 7) {
+        if ($induction->id_company == 5 || $induction->id_company == 6) {
             return $this->genReportCerv($induction_worker, $worker, $induction, $intento, $modo);
         }
 
@@ -1036,7 +1036,7 @@ class SupervisorController extends Controller
         $data_report = json_decode($induction_worker->data_report, true);
 
         // Configura los márgenes directamente en DOMPDF
-        if ($induction->id_company == 2) {
+        if ($induction->id_company == 2 || $induction->id_company == 7 || $induction->id_company == 8) {
 
             $datas = $induction_worker->notaIsemByIntento($intento);
 
@@ -1214,7 +1214,7 @@ class SupervisorController extends Controller
         ];
 
         // Configura los márgenes directamente en DOMPDF
-        if ($induction->id_company == 2) {
+        if ($induction->id_company == 2 || $induction->id_company == 7) {
             $pdf = PDF::loadView('ReportesFormatos.IsemAsistenciaPdf', $data);
         } else if ($induction->id_company == 4) {
             if ($induction->alias == 'Aislamiento y bloqueo de energías') {
@@ -1483,6 +1483,7 @@ class SupervisorController extends Controller
         $id_company = session('id_company');
 
         switch ($id_company) {
+            case 7:
             case 2:
                 // dd($data, $cabecera, $inductionWorkers[16]->notaIsemByAllIntentos(), $inductionWorkers[16]);
                 $data = [];
