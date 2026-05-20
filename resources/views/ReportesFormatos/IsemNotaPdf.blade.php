@@ -487,7 +487,25 @@
                     <td>{{ $data->identified }}</td>
                     {{-- <td>{{ $data->risk_level }}</td>
                     <td>{{ $data->correct_measure }}</td> --}}
-                    <td>{{ date('H:i', strtotime($data->time)) }}</td>
+                    <td>
+                        @php
+                            $caseTime = trim((string) ($data->time ?? ''));
+                            if ($caseTime === '' && ! empty($data->json)) {
+                                $caseJson = json_decode($data->json, true);
+                                if (is_array($caseJson) && isset($caseJson['time'])) {
+                                    $caseTime = trim((string) $caseJson['time']);
+                                }
+                            }
+                            if ($caseTime === '') {
+                                echo '-';
+                            } elseif (preg_match('/^(\d{1,2}):(\d{1,2})$/', $caseTime, $timeParts)) {
+                                echo sprintf('%02d:%02d', (int) $timeParts[1], (int) $timeParts[2]);
+                            } else {
+                                $parsed = strtotime($caseTime);
+                                echo $parsed ? date('H:i', $parsed) : $caseTime;
+                            }
+                        @endphp
+                    </td>
                 </tr>
             @endforeach
             @php
