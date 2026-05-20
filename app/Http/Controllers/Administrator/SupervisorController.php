@@ -790,7 +790,9 @@ class SupervisorController extends Controller
             $detail_induction_worker = $detail_induction_worker->where('entrenamiento', '<>', 1);
         }
 
-        $detail_induction_worker = $detail_induction_worker->orderBy('id', 'asc')->get();
+        $detail_induction_worker = DetailInductionWorker::deduplicateByCaseName(
+            $detail_induction_worker->orderBy('id', 'asc')->get()
+        );
         $casosTotales = $induction_worker->case_count;
         $casosBuenos = $detail_induction_worker->filter(function ($detail) {
             return floatval($detail->identified) != 0.0;
@@ -977,7 +979,9 @@ class SupervisorController extends Controller
             $detail_induction_worker = $detail_induction_worker->where('entrenamiento', '<>', 1);
         }
 
-        $detail_induction_worker = $detail_induction_worker->orderBy('id', 'asc')->get();
+        $detail_induction_worker = DetailInductionWorker::deduplicateByCaseName(
+            $detail_induction_worker->orderBy('id', 'asc')->get()
+        );
         // Cargar los datos necesarios para el PDF en el arreglo $data
         $casosTotales = $induction_worker->case_count;
         $casosBuenos = $detail_induction_worker->filter(function ($detail) {
