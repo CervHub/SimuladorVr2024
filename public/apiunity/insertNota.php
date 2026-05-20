@@ -123,7 +123,9 @@ try {
                         $stmtInsert->bindParam(':correct_measure', $item['correct_measure']);
                         $stmtInsert->bindParam(':time', $item['time']);
                         $stmtInsert->bindParam(':difficulty', $item['difficulty']);
-                        $stmtInsert->bindParam(':json', json_encode($item['json']));
+                        $jsonPayload = isset($item['json']) ? $item['json'] : $item;
+                        $jsonStored = json_encode($jsonPayload);
+                        $stmtInsert->bindParam(':json', $jsonStored);
                         $stmtInsert->bindParam(':rol', $rol);
                         $stmtInsert->bindParam(':report', $nuevoIntento);
                         $stmtInsert->bindParam(':note', $note, PDO::PARAM_STR);
