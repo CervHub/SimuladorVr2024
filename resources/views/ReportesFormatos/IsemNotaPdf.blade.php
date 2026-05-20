@@ -305,19 +305,32 @@
             padding: 8px;
         }
 
-        #evaluacion .evaluacion-foto-cell {
+        .reporte-columna-derecha {
             vertical-align: top;
             text-align: right;
             width: 42%;
         }
 
-        #evaluacion .evaluacion-foto {
+        .reporte-panel-derecho {
+            width: 200px;
+            margin-left: auto;
+            text-align: center;
+        }
+
+        .reporte-panel-nota {
+            border-radius: 25px;
+            width: 200px;
+            margin: 0;
+            padding: 10px 8px;
+            box-sizing: border-box;
+        }
+
+        .reporte-panel-foto {
+            width: 200px;
             height: 168px;
-            width: auto;
-            max-width: 200px;
             border-radius: 25px;
             display: block;
-            margin-left: auto;
+            margin: 0;
         }
     </style>
 </head>
@@ -330,7 +343,7 @@
             </td>
             <td style="padding:0; text-align: center; vertical-align: middle;">
                 <p style="text-align: center; font-size:18px; font-weight: bold; margin: 0;">
-                    REPORTE DE EVALUACIÓN
+                    REPORTE INDIVIDUAL DE EVALUACIÓN
                 </p>
             </td>
             <td style="width: 100px; padding:0;"></td>
@@ -339,9 +352,9 @@
 
     <hr>
     <section id="usuario">
-        <table class="no-border">
+        <table class="no-border" style="width: 100%;">
             <tr class="col-12">
-                <td class="col-6 align-left align-top">
+                <td class="col-7 align-left align-top">
                     <dl class="dl-container ">
                         <div class="dl-row">
                             <dt class="dl-term title fs-15" style="padding:0; padding-bottom:15px;">Datos del usuario
@@ -365,35 +378,32 @@
                         </div>
                     </dl>
                 </td>
-                <td class="col-4">
-                    <div>
-                        <div style="padding-left: 60px;">
-                            <dl class="dl-container bg-light mt-2 mb-2" style="border-radius: 25px; width: 120px;">
-                                <div class="dl-row">
-                                    @php
-                                        $notaPonderada = $extra['total_sum'];
-                                    @endphp
-                                    <dt class="dl-term fs-20 line-height-12" style="font-weight: bold;">
-                                        {{ number_format($notaPonderada, 0) }}/20</dt>
-                                </div>
-                                <div class="dl-row">
-                                    <dt class="dl-term fs-20 line-height-12" style="font-weight: bold;">
-                                        @if ($notaPonderada > 12)
-                                            Aprobado
-                                        @else
-                                            Desaprobado
-                                        @endif
-                                    </dt>
-                                </div>
-                                <div class="dl-row">
-                                    <dt class="dl-term fs-20 line-height-12" style="font-weight: bold;">
-                                        {{ $extra['categoria'] }}
-                                    </dt>
-                                </div>
-                            </dl>
-                        </div>
+                <td class="col-5 align-top reporte-columna-derecha">
+                    <div class="reporte-panel-derecho">
+                        <dl class="dl-container bg-light mt-2 mb-2 reporte-panel-nota">
+                            <div class="dl-row">
+                                @php
+                                    $notaPonderada = $extra['total_sum'];
+                                @endphp
+                                <dt class="dl-term fs-20 line-height-12" style="font-weight: bold;">
+                                    {{ number_format($notaPonderada, 0) }}/20</dt>
+                            </div>
+                            <div class="dl-row">
+                                <dt class="dl-term fs-20 line-height-12" style="font-weight: bold;">
+                                    @if ($notaPonderada > 12)
+                                        Aprobado
+                                    @else
+                                        Desaprobado
+                                    @endif
+                                </dt>
+                            </div>
+                            <div class="dl-row">
+                                <dt class="dl-term fs-20 line-height-12" style="font-weight: bold;">
+                                    {{ $extra['categoria'] }}
+                                </dt>
+                            </div>
+                        </dl>
                     </div>
-
                 </td>
             </tr>
         </table>
@@ -402,7 +412,7 @@
     <br>
     <hr>
     <section id="evaluacion">
-        <table class="no-border">
+        <table class="no-border" style="width: 100%;">
             <tr class="col-12">
                 <td class="col-7 align-left align-top">
                     <dl class="dl-container">
@@ -423,7 +433,7 @@
                             <dd class="dl-definition">8</dd>
                         </div>
                         <div class="dl-row">
-                            <dt class="dl-term-secondary">Pasos Encontrados:</dt>
+                            <dt class="dl-term-secondary">Pasos Realizados:</dt>
                             <dd class="dl-definition">{{ $casosBuenos }}</dd>
                         </div>
 
@@ -449,9 +459,12 @@
                         </div>
                     </dl>
                 </td>
-                <td class="col-5 align-left align-top evaluacion-foto-cell">
-                    <img class="evaluacion-foto" src="{{ $logo_taller }}" alt=""
-                        style="height: 168px; width: auto; max-width: 200px; border-radius: 25px; display: block; margin-left: auto;">
+                <td class="col-5 align-top reporte-columna-derecha">
+                    <div class="reporte-panel-derecho">
+                        <img class="reporte-panel-foto" src="{{ $logo_taller }}" alt=""
+                            width="200" height="168"
+                            style="width: 200px; height: 168px; border-radius: 25px; display: block;">
+                    </div>
                 </td>
             </tr>
         </table>
@@ -459,7 +472,7 @@
     </section>
     <hr>
     <section id="detalles" style="padding-left: 5px;padding-right: 5px;">
-        <p class="fs-15 title" style="padding:0;">Detalles de evaluación Casos</p>
+        <p class="fs-15 title" style="padding:0;">Detalles de evaluación</p>
         <table class="custom-table">
             <tr>
                 <th>Nombre del caso</th>
