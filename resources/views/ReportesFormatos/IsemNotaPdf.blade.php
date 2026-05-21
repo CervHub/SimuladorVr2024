@@ -501,6 +501,9 @@
                 <th>Medida correcta</th> --}}
                 <th>Tiempo</th>
             </tr>
+            @php
+                $totalTiempoSegundos = 0;
+            @endphp
             @foreach ($detail_induction_worker as $key => $data)
                 <tr style="height: 20px;"> <!-- Ajusta la altura según tus preferencias -->
                     <td style="text-align: left;">{{ $key + 1 }}. {{ $data->case }}</td>
@@ -514,6 +517,15 @@
                                 $caseJson = json_decode($data->json, true);
                                 if (is_array($caseJson) && isset($caseJson['time'])) {
                                     $caseTime = trim((string) $caseJson['time']);
+                                }
+                            }
+                            if ($caseTime !== '') {
+                                if (preg_match('/^(\d{1,2}):(\d{1,2})$/', $caseTime, $timeParts)) {
+                                    $totalTiempoSegundos += ((int) $timeParts[1] * 60) + (int) $timeParts[2];
+                                } elseif ($parsed = strtotime($caseTime)) {
+                                    $totalTiempoSegundos += ((int) date('G', $parsed) * 3600)
+                                        + ((int) date('i', $parsed) * 60)
+                                        + (int) date('s', $parsed);
                                 }
                             }
                             if ($caseTime === '') {
@@ -530,13 +542,16 @@
             @endforeach
             @php
                 $totalSum = round($extra['identified_sum'] + $extra['risk_level_sum'] + $extra['correct_measure_sum']);
+                $totalTiempoFormateado = $totalTiempoSegundos > 0
+                    ? sprintf('%02d:%02d', intdiv($totalTiempoSegundos, 60), $totalTiempoSegundos % 60)
+                    : '-';
             @endphp
             <tr>
                 <th>TOTAL</th>
                 <th>{{ $extra['identified_sum'] }}</th>
                 {{-- <th>{{ $extra['risk_level_sum'] }}</th>
                 <th>{{ $extra['correct_measure_sum'] }}</th> --}}
-                <th></th>
+                <th>{{ $totalTiempoFormateado }}</th>
             </tr>
         </table>
         <br>
