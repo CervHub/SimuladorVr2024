@@ -428,13 +428,33 @@
                             <dt class="dl-term-secondary">Total de Casos:</dt>
                             <dd class="dl-definition">{{ $casosTotales }}</dd>
                         </div> -->
+                        @php
+                            $pasosEscenario = 8;
+                            $aliasEscenario = $induction->alias ?? '';
+                            $imagenGrafico = $imagen;
+                            $pasosRealizadosMostrar = $casosBuenos;
+
+                            if (stripos($aliasEscenario, 'Trabajos en Altura') !== false) {
+                                $pasosEscenario = 7;
+                            } elseif (stripos($aliasEscenario, 'Trabajos en Caliente') !== false) {
+                                $pasosEscenario = 8;
+                            }
+
+                            if (stripos($aliasEscenario, 'Trabajos en Altura') !== false
+                                || stripos($aliasEscenario, 'Trabajos en Caliente') !== false) {
+                                $graficoEncontrados = min((int) $casosBuenos, $pasosEscenario);
+                                $graficoNoEncontrados = $pasosEscenario - $graficoEncontrados;
+                                $pasosRealizadosMostrar = $graficoEncontrados;
+                                $imagenGrafico = "https://quickchart.io/chart?c={type:'doughnut', data:{datasets:[{data:[{$graficoEncontrados},{$graficoNoEncontrados}],backgroundColor:['rgb(32,164,81)','rgb(255,0,0)'],}],labels:['Encontrado', 'No encontrados'],},options:{title:{display:false},plugins: { datalabels: { color: 'white' } },},}";
+                            }
+                        @endphp
                         <div class="dl-row">
                             <dt class="dl-term-secondary">Pasos:</dt>
-                            <dd class="dl-definition">8</dd>
+                            <dd class="dl-definition">{{ $pasosEscenario }}</dd>
                         </div>
                         <div class="dl-row">
                             <dt class="dl-term-secondary">Pasos Realizados:</dt>
-                            <dd class="dl-definition">{{ $casosBuenos }}</dd>
+                            <dd class="dl-definition">{{ $pasosRealizadosMostrar }}</dd>
                         </div>
 
                         @php
@@ -523,7 +543,7 @@
         <table class="no-border">
             <tr>
                 <td style="vertical-align: top; width: 300px; border: none;">
-                    <img src="{{ $imagen }}" width="300px" alt="">
+                    <img src="{{ $imagenGrafico }}" width="300px" alt="">
                 </td>
                 <td>
                     <table style="border-collapse: collapse; border: 1px solid black;">

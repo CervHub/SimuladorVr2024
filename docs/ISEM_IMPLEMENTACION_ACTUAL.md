@@ -332,7 +332,11 @@ cabecera_id, intento, note, note_reference, start_date, end_date, json, entrenam
 
 ---
 
-## 9. Archivos clave (rutas en el repo)
+## 9. Pruebas con Postman / Unity
+
+Ver guía completa de URLs, body y JSON de casos: **[POSTMAN_ISEM_UNITY_ENDPOINTS.md](./POSTMAN_ISEM_UNITY_ENDPOINTS.md)**
+
+## 10. Archivos clave (rutas en el repo)
 
 | Archivo |
 |---------|
