@@ -984,6 +984,32 @@ class SupervisorController extends Controller
         return 'c1';
     }
 
+    private function molibdenoLogoToBase64(?string $logoPath, ?string $fallbackPath = null): ?string
+    {
+        $path = $logoPath;
+
+        if (empty($path) || !file_exists(public_path($path))) {
+            $path = $fallbackPath;
+        }
+
+        if (empty($path) || !file_exists(public_path($path))) {
+            return null;
+        }
+
+        $fullPath = public_path($path);
+        $extension = strtolower(pathinfo($fullPath, PATHINFO_EXTENSION));
+        $mime = match ($extension) {
+            'png' => 'image/png',
+            'jpg', 'jpeg' => 'image/jpeg',
+            'gif' => 'image/gif',
+            'webp' => 'image/webp',
+            'svg' => 'image/svg+xml',
+            default => 'image/png',
+        };
+
+        return 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($fullPath));
+    }
+
     private function molibdenoScenarioImageBase64(string $workshopType): string
     {
         $path = public_path('molibdeno/' . $workshopType . '.jpg');
@@ -1042,23 +1068,21 @@ class SupervisorController extends Controller
             'scenario_image' => $this->molibdenoScenarioImageBase64($workshopType),
         ];
 
-        $logoPath = $data['header']['logo'];
+        $defaultLogoPath = $data['header']['logo_cerv'] ?? 'logo/logo_negro.png';
+        $companyLogoPath = $data['header']['logo'] ?? null;
+        $logoCervBase64 = $this->molibdenoLogoToBase64($defaultLogoPath);
+        $companyLogoBase64 = $this->molibdenoLogoToBase64($companyLogoPath);
+        $hasCompanyLogo = !empty($companyLogoBase64)
+            && !empty($companyLogoPath)
+            && $companyLogoPath !== $defaultLogoPath;
+
         $sinPhoto = 'logo/sin-photo.png';
-        if (empty($logoPath)) {
-            $logoPath = 'logo/logo_negro.png';
-        }
-
-        if (!file_exists(public_path($logoPath))) {
-            $logoPath = 'logo/logo_negro.png';
-        }
-
-        $logoData = file_get_contents(public_path($logoPath));
-        $logoBase64 = 'data:image/png;base64,' . base64_encode($logoData);
-
         $sinPhoto = file_get_contents(public_path($sinPhoto));
         $sinPhotoBase64 = 'data:image/png;base64,' . base64_encode($sinPhoto);
 
-        $data['logo'] = $logoBase64;
+        $data['logo'] = $hasCompanyLogo ? $companyLogoBase64 : ($logoCervBase64 ?? $companyLogoBase64);
+        $data['logo_cerv'] = $logoCervBase64 ?? $companyLogoBase64;
+        $data['has_company_logo'] = $hasCompanyLogo;
         $data['sinPhoto'] = $sinPhotoBase64;
 
         $pdf = PDF::loadView('ReportesFormatos.Molibdeno.c1', $data);

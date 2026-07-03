@@ -36,6 +36,16 @@
             border: none;
         }
 
+        .header-table .header-logo {
+            width: 100px;
+            height: auto;
+            display: block;
+        }
+
+        .header-table .header-logo-right {
+            margin-left: auto;
+        }
+
         .data-row th,
         .data-row td {
             padding: 2px 5px;
@@ -205,6 +215,18 @@
             return false;
         }
 
+        function molibdenoQuizSelectedKey(array $question): string
+        {
+            $value = $question['selected_alternative']
+                ?? $question['selected_aternative']
+                ?? $question['selected']
+                ?? $question['answer']
+                ?? $question['alternative_selected']
+                ?? '';
+
+            return strtoupper(trim((string) $value));
+        }
+
         $totalPasos = $isQuiz ? count($quizQuestions) : ($noteReference ?: '-');
         $pasosRealizados = $isQuiz
             ? collect($quizQuestions)->filter(fn ($q) => molibdenoQuizIsCorrect($q['is_correct'] ?? false))->count()
@@ -217,12 +239,20 @@
         <tbody>
             <tr>
                 <td class="w-20 text-left">
-                    <img src="{{ $logo }}" alt="Logo" style="width: 100px; height: auto;">
+                    @if (!empty($has_company_logo))
+                        <img src="{{ $logo }}" alt="Logo empresa" class="header-logo">
+                    @else
+                        <img src="{{ $logo_cerv ?? $logo }}" alt="Logo CERV" class="header-logo">
+                    @endif
                 </td>
                 <td class="w-60 text-center font-size-24 font-bold">
                     REPORTE DE EVALUACIÓN
                 </td>
-                <td class="w-20"></td>
+                <td class="w-20 text-right">
+                    @if (!empty($has_company_logo))
+                        <img src="{{ $logo_cerv ?? $logo }}" alt="Logo CERV" class="header-logo header-logo-right">
+                    @endif
+                </td>
             </tr>
         </tbody>
     </table>
@@ -283,11 +313,11 @@
                 </tr>
             @endif
             <tr class="data-row">
-                <th class="font-bold w-20">Hora Inicio:</th>
+                <th class="font-bold w-20">Fecha de inicio:</th>
                 <td class="w-30">{{ $startDate ?? 'N/A' }}</td>
             </tr>
             <tr class="data-row">
-                <th class="font-bold w-20">Hora Final:</th>
+                <th class="font-bold w-20">Fecha de finalización:</th>
                 <td class="w-30">{{ $endDate ?? 'N/A' }}</td>
             </tr>
             <tr class="data-row">
@@ -345,7 +375,7 @@
         <table class="w-100">
             <thead>
                 <tr>
-                    <th colspan="3" class="text-center">DETALLE DE PREGUNTAS</th>
+                    <th colspan="2" class="text-center">DETALLE DE PREGUNTAS</th>
                 </tr>
             </thead>
         </table>
@@ -354,7 +384,7 @@
             @php
                 $correctKey = strtoupper(trim($question['alternative_ok'] ?? ''));
                 $answeredCorrectly = molibdenoQuizIsCorrect($question['is_correct'] ?? false);
-                $selectedKey = strtoupper(trim($question['selected'] ?? $question['answer'] ?? $question['alternative_selected'] ?? ''));
+                $selectedKey = molibdenoQuizSelectedKey($question);
                 $alternatives = [
                     'A' => $question['alternative_a'] ?? '',
                     'B' => $question['alternative_b'] ?? '',
@@ -366,18 +396,21 @@
                 <table class="w-100">
                     <tr class="{{ $answeredCorrectly ? 'question-header-ok' : 'question-header-fail' }}">
                         <td class="question-number">{{ $index + 1 }}</td>
-                        <td colspan="2">
+                        <td>
                             <span class="question-text">{{ $question['statement'] ?? 'N/A' }}</span>
                             <br>
                             @if ($answeredCorrectly)
-                                <span class="question-status-ok">ACERTÓ — seleccionó la alternativa correcta ({{ $correctKey }})</span>
+                                <span class="question-status-ok">
+                                    ACERTÓ
+                                    @if ($selectedKey)
+                                        ({{ $selectedKey }})
+                                    @endif
+                                </span>
                             @else
                                 <span class="question-status-fail">
-                                    FALLÓ —
-                                    @if ($selectedKey && $selectedKey !== $correctKey)
-                                        marcó {{ $selectedKey }}, la correcta era {{ $correctKey ?: '-' }}
-                                    @else
-                                        la respuesta correcta era {{ $correctKey ?: '-' }}
+                                    FALLÓ
+                                    @if ($selectedKey)
+                                        — respondió ({{ $selectedKey }}), correcta ({{ $correctKey ?: '-' }})
                                     @endif
                                 </span>
                             @endif
@@ -385,20 +418,14 @@
                     </tr>
                     @foreach ($alternatives as $key => $text)
                         @php
-                            $isCorrectOption = $correctKey === $key;
-                            $isWrongSelection = !$answeredCorrectly && $selectedKey === $key && !$isCorrectOption;
-                            $cellClass = $isCorrectOption ? 'option-correct' : ($isWrongSelection ? 'option-wrong-selected' : '');
+                            $isSelectedOption = $selectedKey !== '' && $selectedKey === $key;
+                            $cellClass = $isSelectedOption
+                                ? ($answeredCorrectly ? 'option-correct' : 'option-wrong-selected')
+                                : '';
                         @endphp
                         <tr>
                             <td class="option-label {{ $cellClass }}">{{ $key }}</td>
                             <td class="{{ $cellClass }}">{{ $text }}</td>
-                            <td style="width: 110px; text-align: center; font-size: 10px;" class="{{ $cellClass }}">
-                                @if ($isCorrectOption)
-                                    Respuesta correcta
-                                @elseif ($isWrongSelection)
-                                    Marcó esta
-                                @endif
-                            </td>
                         </tr>
                     @endforeach
                 </table>
