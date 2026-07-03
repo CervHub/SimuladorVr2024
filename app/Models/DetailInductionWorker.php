@@ -18,10 +18,20 @@ class DetailInductionWorker extends Model
         'note_reference',
         'report',
         'json',
-        'end_date',
         'start_date',
         'end_date',
-        'entrenamiento'
+        'entrenamiento',
+        'rol',
+        'identified',
+        'risk_level',
+        'correct_measure',
+        'time',
+        'difficulty',
+        'num_errors',
+    ];
+
+    protected $casts = [
+        'json' => 'array',
     ];
 
     public function induction_worker()
@@ -51,5 +61,87 @@ class DetailInductionWorker extends Model
             })
             ->sortBy('id')
             ->values();
+    }
+
+    public static function isQuizJson($json): bool
+    {
+        if (is_string($json)) {
+            $json = json_decode($json, true);
+        }
+
+        if (!is_array($json)) {
+            return false;
+        }
+
+        if (($json['format'] ?? null) === 'quiz' && isset($json['questions'])) {
+            return true;
+        }
+
+        return isset($json['questions']) && is_array($json['questions'])
+            && !empty($json['questions'])
+            && isset($json['questions'][0]['question_id']);
+    }
+
+    public static function extractQuizQuestions($json): array
+    {
+        if (is_string($json)) {
+            $json = json_decode($json, true);
+        }
+
+        if (!is_array($json)) {
+            return [];
+        }
+
+        if (isset($json['questions']) && is_array($json['questions'])) {
+            return $json['questions'];
+        }
+
+        if (isset($json['question_id'])) {
+            return [$json];
+        }
+
+        return [];
+    }
+
+    public static function countQuizCorrect(array $questions): int
+    {
+        $correct = 0;
+        foreach ($questions as $question) {
+            if (self::quizAnswerIsCorrect($question['is_correct'] ?? false)) {
+                $correct++;
+            }
+        }
+
+        return $correct;
+    }
+
+    public static function countQuizErrors(array $questions): int
+    {
+        return count($questions) - self::countQuizCorrect($questions);
+    }
+
+    public static function quizAnswerIsCorrect($value): bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        if (is_numeric($value)) {
+            return (int) $value === 1;
+        }
+
+        if (is_string($value)) {
+            return in_array(strtolower(trim($value)), ['1', 'true', 'yes', 'si', 'sí'], true);
+        }
+
+        return false;
+    }
+
+    public static function buildQuizStorageArray(array $questions): array
+    {
+        return [
+            'format' => 'quiz',
+            'questions' => array_values($questions),
+        ];
     }
 }

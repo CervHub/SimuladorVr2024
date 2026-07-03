@@ -12,10 +12,61 @@ use Exception;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
 class ApiController extends Controller
 {
+    private function logApiWorkshop(string $endpoint, string $type, array $data = []): void
+    {
+        Log::info("[$endpoint][$type]", $data);
+    }
+
+    private function buildUploadWorkshopUpdate(array $jsonData): array
+    {
+        $update = [];
+
+        foreach (['start_date', 'end_date', 'note', 'note_reference', 'rol'] as $field) {
+            if (array_key_exists($field, $jsonData) && $jsonData[$field] !== null && $jsonData[$field] !== '') {
+                $update[$field] = $jsonData[$field];
+            }
+        }
+
+        if (empty($update['start_date']) && !empty($jsonData['startDate'])) {
+            $update['start_date'] = $jsonData['startDate'];
+        }
+
+        if (empty($update['end_date']) && !empty($jsonData['endDate'])) {
+            $update['end_date'] = $jsonData['endDate'];
+        }
+
+        if (!isset($update['note']) && isset($jsonData['result']['finalScore'])) {
+            $update['note'] = $jsonData['result']['finalScore'];
+        }
+
+        if (isset($jsonData['json']) && is_array($jsonData['json']) && !empty($jsonData['json'])) {
+            $first = reset($jsonData['json']);
+            if (is_array($first) && isset($first['question_id'])) {
+                $questions = array_values($jsonData['json']);
+
+                return array_merge($update, [
+                    'case' => 'Evaluación teórica',
+                    'identified' => DetailInductionWorker::countQuizCorrect($questions),
+                    'risk_level' => 0,
+                    'correct_measure' => 0,
+                    'time' => '0:0',
+                    'difficulty' => 'Quiz',
+                    'num_errors' => DetailInductionWorker::countQuizErrors($questions),
+                    'json' => DetailInductionWorker::buildQuizStorageArray($questions),
+                ]);
+            }
+        }
+
+        $update['json'] = $jsonData;
+
+        return $update;
+    }
+
     private function authenticate($company_id, $dni, $password, $user_type = '300')
     {
         // Asegurarse de que el company_id tenga 3 dígitos
@@ -203,6 +254,9 @@ class ApiController extends Controller
 
     public function createWorkshop(Request $request)
     {
+        $endpoint = 'createWorkshop';
+        $this->logApiWorkshop($endpoint, 'REQUEST', $request->all());
+
         try {
             $request->validate([
                 'induction_worker_id' => 'required|numeric', // Obligatorio
@@ -217,10 +271,13 @@ class ApiController extends Controller
                 ->exists();
 
             if (!$exists) {
-                return response()->json([
+                $response = [
                     'status' => false,
                     'message' => 'No se encontró el registro de la inducción.'
-                ], 404);
+                ];
+                $this->logApiWorkshop($endpoint, 'RESPONSE', ['status_code' => 404, 'body' => $response]);
+
+                return response()->json($response, 404);
             }
 
             if ($is_training) {
@@ -241,11 +298,14 @@ class ApiController extends Controller
                     'entrenamiento' => 1
                 ]);
 
-                return response()->json([
+                $response = [
                     'status' => true,
                     'message' => 'Entrenamiento creado correctamente.',
                     'data' => $detail_induction_worker
-                ]);
+                ];
+                $this->logApiWorkshop($endpoint, 'RESPONSE', ['status_code' => 200, 'body' => $response]);
+
+                return response()->json($response);
             } else {
                 // Validar si existen intentos
                 $have_current_attempt = DetailInductionWorker::where('induction_worker_id', $request->induction_worker_id)
@@ -254,10 +314,13 @@ class ApiController extends Controller
                     ->exists();
 
                 if ($have_current_attempt) {
-                    return response()->json([
+                    $response = [
                         'status' => false,
                         'message' => 'Ya existe un registro con el intento actual.'
-                    ], 400);
+                    ];
+                    $this->logApiWorkshop($endpoint, 'RESPONSE', ['status_code' => 400, 'body' => $response]);
+
+                    return response()->json($response, 400);
                 }
 
 
@@ -277,23 +340,32 @@ class ApiController extends Controller
                 InductionWorker::where('id', $request->induction_worker_id)
                     ->increment('num_report');
 
-                return response()->json([
+                $response = [
                     'status' => true,
                     'message' => 'Evaluación creada correctamente.',
                     'data' => $detail_induction_worker
-                ]);
+                ];
+                $this->logApiWorkshop($endpoint, 'RESPONSE', ['status_code' => 200, 'body' => $response]);
+
+                return response()->json($response);
             }
         } catch (\Exception $e) {
-            return response()->json([
+            $response = [
                 'status' => false,
                 'message' => 'Ocurrió un error al procesar la solicitud.',
                 'error' => $e->getMessage()
-            ], 500);
+            ];
+            $this->logApiWorkshop($endpoint, 'ERROR', ['status_code' => 500, 'body' => $response, 'trace' => $e->getTraceAsString()]);
+
+            return response()->json($response, 500);
         }
     }
 
     public function uploadWorkshop(Request $request)
     {
+        $endpoint = 'uploadWorkshop';
+        $this->logApiWorkshop($endpoint, 'REQUEST', $request->all());
+
         try {
             $request->validate([
                 'detail_induction_worker_id' => 'required|numeric', // Obligatorio
@@ -309,27 +381,31 @@ class ApiController extends Controller
             // Validar si existe el registro de la detail_induction_worker_id
             $detailInductionWorker = DetailInductionWorker::find($request->detail_induction_worker_id);
             if (!$detailInductionWorker) {
-                return response()->json([
+                $response = [
                     'status' => false,
                     'message' => 'No se encontró el registro de la evaluación.'
-                ], 404);
+                ];
+                $this->logApiWorkshop($endpoint, 'RESPONSE', ['status_code' => 404, 'body' => $response]);
+
+                return response()->json($response, 404);
             }
 
             // Verificar si el campo json ya ha sido actualizado previamente
             if (!is_null($detailInductionWorker->json)) {
-                return response()->json([
+                $response = [
                     'status' => false,
                     'message' => 'El campo JSON ya ha sido actualizado previamente y no se puede actualizar nuevamente. '
-                ], 400);
+                ];
+                $this->logApiWorkshop($endpoint, 'RESPONSE', ['status_code' => 400, 'body' => $response]);
+
+                return response()->json($response, 400);
             }
 
             // Usar transacción para asegurar la consistencia de la base de datos
             DB::beginTransaction();
             try {
-                // Actualizar los datos de la evaluación
-                $detailInductionWorker->update([
-                    'json' => $jsonData
-                ]);
+                $updatePayload = $this->buildUploadWorkshopUpdate($jsonData);
+                $detailInductionWorker->update($updatePayload);
 
                 DB::commit();
             } catch (\Exception $e) {
@@ -337,18 +413,23 @@ class ApiController extends Controller
                 throw $e;
             }
 
-            return response()->json([
+            $response = [
                 'status' => true,
-                'message' => 'Datos recibidos correctamente.'
-            ]);
+                'message' => 'Datos recibidos correctamente.',
+                'data' => $detailInductionWorker->fresh(),
+            ];
+            $this->logApiWorkshop($endpoint, 'RESPONSE', ['status_code' => 200, 'body' => $response]);
+
+            return response()->json($response);
         } catch (\Exception $e) {
-            return response()->json([
+            $response = [
                 'status' => false,
                 'message' => 'Ocurrió un error al procesar la solicitud.',
                 'error' => $e->getMessage()
-            ], 500);
-        } finally {
-            // Aquí puedes agregar cualquier limpieza si es necesario
+            ];
+            $this->logApiWorkshop($endpoint, 'ERROR', ['status_code' => 500, 'body' => $response, 'trace' => $e->getTraceAsString()]);
+
+            return response()->json($response, 500);
         }
     }
 }

@@ -461,30 +461,40 @@ class InductionWorker extends Model
 
     public function jsonNoteFilter($isTraining, $attemptIndex)
     {
-        // Filtrar los detalles directamente en la consulta
-        $detail = $this->detail()->where('entrenamiento', $isTraining)
-            ->where('report', $attemptIndex)
-            ->first();
+        $query = $this->detail()->where('report', $attemptIndex);
 
-        // Verificar si se encontró el detalle
-        if ($detail) {
-            $json = json_decode($detail->json, true);
-
-            $worker = [
-                "nombres" => ($this->worker->nombre ?? '-') . ' ' . ($this->worker->apellido ?? '-'),
-                "doi" => $this->worker->user->doi ?? '-',
-                "license" => $this->worker->license ?? '-',
-                "category" => $this->worker->category ?? '-',
-                "photo" => $this->worker->photo ?? '-'
-            ];
-
-            return [
-                'worker' => $worker,
-                'json' => $json,
-            ];
+        if ($isTraining) {
+            $query->where('entrenamiento', 1);
+        } else {
+            $query->where(function ($q) {
+                $q->where('entrenamiento', 0)
+                    ->orWhere('entrenamiento', '0')
+                    ->orWhereNull('entrenamiento');
+            });
         }
 
-        // Si no se encuentra el intento especificado
-        return null;
+        $detail = $query->first();
+
+        if (!$detail) {
+            return null;
+        }
+
+        $json = $detail->json;
+        if (is_string($json)) {
+            $json = json_decode($json, true);
+        }
+
+        $worker = [
+            'nombres' => ($this->worker->nombre ?? '-') . ' ' . ($this->worker->apellido ?? '-'),
+            'doi' => $this->worker->user->doi ?? '-',
+            'license' => $this->worker->license ?? '-',
+            'category' => $this->worker->category ?? '-',
+            'photo' => $this->worker->photo ?? '-',
+        ];
+
+        return [
+            'worker' => $worker,
+            'json' => $json,
+        ];
     }
 }

@@ -1,5 +1,6 @@
 <?php
 require("conexion.php");
+require("jsonFormat.php");
 
 // Function to log messages with date and time
 function logMessage($message)
@@ -45,10 +46,18 @@ if ($entrenamiento == 1) {
 
 // echo $entrenamiento;
 
-$jsonData = json_decode($jsonData, true); // Convertirlo en un arreglo asociativo si lo deseas
+$jsonData = json_decode($jsonData, true);
+$jsonFormat = is_array($jsonData) ? detectInsertNotaJsonFormat($jsonData) : 'unknown';
 
 // Log para registrar los valores recibidos
-logMessage("cabecera_id: $cabecera_id, nuevoIntento: $nuevoIntento, note: $note, note_reference: $note_reference, start_date: $start_date, end_date: $end_date, rol: $rol, jsonData: " . json_encode($jsonData) . ", entrenamiento: $entrenamiento");
+logMessage("cabecera_id: $cabecera_id, nuevoIntento: $nuevoIntento, note: $note, note_reference: $note_reference, start_date: $start_date, end_date: $end_date, rol: $rol, jsonFormat: $jsonFormat, jsonData: " . json_encode($jsonData) . ", entrenamiento: $entrenamiento");
+
+if ($jsonFormat === 'unknown') {
+    header('Content-Type: application/json');
+    echo json_encode(['error' => 'Formato JSON no reconocido. Use casos VR (case) o preguntas teóricas (question_id).']);
+    logMessage("Error: formato JSON no reconocido");
+    return;
+}
 
 // Imprimir el JSON en formato legible
 try {
@@ -110,40 +119,74 @@ try {
                 $stmtCheck->bindParam(':nuevoIntento', $nuevoIntento);
                 $stmtCheck->execute();
                 $count = $stmtCheck->fetch(PDO::FETCH_ASSOC);
-                // echo "Intento Entrenamiento: " . $nuevoIntento;
-                foreach ($jsonData as $item) {
 
-                    if ($count['count'] == 0 or $intentoEntrenamiento != 0) {
-                        // No existe un registro, puedes insertarlo
-                        $stmtInsert = $db->prepare('INSERT INTO detail_induction_workers (induction_worker_id, "case", identified, risk_level, correct_measure, "time", difficulty, report, note, note_reference, "start_date", end_date, num_errors,"json",rol, created_at, updated_at, entrenamiento) VALUES (:induction_worker_id, :case, :identified, :risk_level, :correct_measure, :time, :difficulty, :report, :note, :note_reference, :start_date, :end_date, :num_errors,:json,:rol, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, :entrenamiento)');
+                $stmtInsert = $db->prepare('INSERT INTO detail_induction_workers (induction_worker_id, "case", identified, risk_level, correct_measure, "time", difficulty, report, note, note_reference, "start_date", end_date, num_errors,"json",rol, created_at, updated_at, entrenamiento) VALUES (:induction_worker_id, :case, :identified, :risk_level, :correct_measure, :time, :difficulty, :report, :note, :note_reference, :start_date, :end_date, :num_errors,:json,:rol, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, :entrenamiento)');
+
+                if ($jsonFormat === 'quiz') {
+                    if ($count['count'] == 0 || $intentoEntrenamiento != 0) {
+                        $quizCase = 'Evaluación teórica';
+                        $quizIdentified = (string) countQuizCorrect($jsonData);
+                        $quizRiskLevel = '0';
+                        $quizCorrectMeasure = '0';
+                        $quizTime = '0:0';
+                        $quizDifficulty = 'Quiz';
+                        $quizNumErrors = (string) countQuizErrors($jsonData);
+                        $quizJsonStored = buildQuizStorageJson($jsonData);
+
                         $stmtInsert->bindParam(':induction_worker_id', $cabecera_id);
-                        $stmtInsert->bindParam(':case', $item['case']);
-                        $stmtInsert->bindParam(':identified', $item['identified']);
-                        $stmtInsert->bindParam(':risk_level', $item['risk_level']);
-                        $stmtInsert->bindParam(':correct_measure', $item['correct_measure']);
-                        $stmtInsert->bindParam(':time', $item['time']);
-                        $stmtInsert->bindParam(':difficulty', $item['difficulty']);
-                        $jsonPayload = isset($item['json']) ? $item['json'] : $item;
-                        $jsonStored = json_encode($jsonPayload);
-                        $stmtInsert->bindParam(':json', $jsonStored);
+                        $stmtInsert->bindParam(':case', $quizCase);
+                        $stmtInsert->bindParam(':identified', $quizIdentified);
+                        $stmtInsert->bindParam(':risk_level', $quizRiskLevel);
+                        $stmtInsert->bindParam(':correct_measure', $quizCorrectMeasure);
+                        $stmtInsert->bindParam(':time', $quizTime);
+                        $stmtInsert->bindParam(':difficulty', $quizDifficulty);
+                        $stmtInsert->bindParam(':json', $quizJsonStored);
                         $stmtInsert->bindParam(':rol', $rol);
                         $stmtInsert->bindParam(':report', $nuevoIntento);
                         $stmtInsert->bindParam(':note', $note, PDO::PARAM_STR);
                         $stmtInsert->bindParam(':note_reference', $note_reference, PDO::PARAM_STR);
-                        $stmtInsert->bindParam(':start_date', $start_date, PDO::PARAM_STR); // Asegúrate de que $start_date sea un string con formato de fecha válido
-                        $stmtInsert->bindParam(':end_date', $end_date, PDO::PARAM_STR); // Asegúrate de que $end_date sea un string con formato de fecha válido
-                        $stmtInsert->bindParam(':num_errors', $item['num_errors']); // Reemplaza $num_errors con el valor que desees insertar
+                        $stmtInsert->bindParam(':start_date', $start_date, PDO::PARAM_STR);
+                        $stmtInsert->bindParam(':end_date', $end_date, PDO::PARAM_STR);
+                        $stmtInsert->bindParam(':num_errors', $quizNumErrors);
                         $stmtInsert->bindParam(':entrenamiento', $entrenamiento, PDO::PARAM_STR);
 
                         if ($stmtInsert->execute()) {
-                            // echo "Inserción exitosa para el caso: " . $item['case'] . "<br>";
+                            $totalCasosInsertados = count($jsonData);
                         } else {
-                            //   Se encontró un error en la inserción
                             $error = true;
-                            // echo "Error en la inserción para el caso: " . $item['case'] . "<br>";
-                            break; // Salir del bucle para evitar más inserciones
                         }
-                        $totalCasosInsertados++;
+                    }
+                } else {
+                    foreach ($jsonData as $item) {
+                        if ($count['count'] == 0 or $intentoEntrenamiento != 0) {
+                            $normalized = normalizeLegacyItem($item);
+                            $jsonStored = json_encode($normalized['json_payload']);
+
+                            $stmtInsert->bindParam(':induction_worker_id', $cabecera_id);
+                            $stmtInsert->bindParam(':case', $normalized['case']);
+                            $stmtInsert->bindParam(':identified', $normalized['identified']);
+                            $stmtInsert->bindParam(':risk_level', $normalized['risk_level']);
+                            $stmtInsert->bindParam(':correct_measure', $normalized['correct_measure']);
+                            $stmtInsert->bindParam(':time', $normalized['time']);
+                            $stmtInsert->bindParam(':difficulty', $normalized['difficulty']);
+                            $stmtInsert->bindParam(':json', $jsonStored);
+                            $stmtInsert->bindParam(':rol', $rol);
+                            $stmtInsert->bindParam(':report', $nuevoIntento);
+                            $stmtInsert->bindParam(':note', $note, PDO::PARAM_STR);
+                            $stmtInsert->bindParam(':note_reference', $note_reference, PDO::PARAM_STR);
+                            $stmtInsert->bindParam(':start_date', $start_date, PDO::PARAM_STR);
+                            $stmtInsert->bindParam(':end_date', $end_date, PDO::PARAM_STR);
+                            $stmtInsert->bindParam(':num_errors', $normalized['num_errors']);
+                            $stmtInsert->bindParam(':entrenamiento', $entrenamiento, PDO::PARAM_STR);
+
+                            if ($stmtInsert->execute()) {
+                                // Inserción exitosa
+                            } else {
+                                $error = true;
+                                break;
+                            }
+                            $totalCasosInsertados++;
+                        }
                     }
                 }
 

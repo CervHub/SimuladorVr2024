@@ -781,6 +781,11 @@ class SupervisorController extends Controller
         $induction_worker = InductionWorker::find($id_induction_worker);
         $worker = Worker::find($induction_worker->id_worker);
         $induction = Induction::find($induction_worker->id_induction);
+
+        if ($induction->id_company == 9) {
+            return $this->genReportMolibdeno($induction_worker, $worker, $induction, $intento, $modo);
+        }
+
         $detail_induction_worker = DetailInductionWorker::where('induction_worker_id', $induction_worker->id)
             ->where('report', $intento);
 
@@ -954,11 +959,122 @@ class SupervisorController extends Controller
         return $pdf->stream('ReporteIndividual.pdf');
     }
 
+    private function resolveMolibdenoWorkshopType($induction, array $quizQuestions = []): string
+    {
+        $taller = strtoupper($induction->header()['taller'] ?? '');
+
+        if (str_contains($taller, 'C2')) {
+            return 'c2';
+        }
+
+        if (str_contains($taller, 'C1')) {
+            return 'c1';
+        }
+
+        foreach ($quizQuestions as $question) {
+            $questionId = strtolower($question['question_id'] ?? '');
+            if (str_starts_with($questionId, 'c2_')) {
+                return 'c2';
+            }
+            if (str_starts_with($questionId, 'c1_')) {
+                return 'c1';
+            }
+        }
+
+        return 'c1';
+    }
+
+    private function molibdenoScenarioImageBase64(string $workshopType): string
+    {
+        $path = public_path('molibdeno/' . $workshopType . '.jpg');
+
+        if (!file_exists($path)) {
+            $path = public_path('molibdeno/c1.jpg');
+        }
+
+        $mime = pathinfo($path, PATHINFO_EXTENSION) === 'png' ? 'image/png' : 'image/jpeg';
+
+        return 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($path));
+    }
+
+    private function genReportMolibdeno($induction_worker, $worker, $induction, $intento, $modo)
+    {
+        $isTraining = $modo == 'Entrenamiento' ? 1 : 0;
+        $noteData = $induction_worker->jsonNoteFilter($isTraining, $intento);
+
+        if (!$noteData) {
+            abort(404, 'No se encontró el detalle del intento solicitado.');
+        }
+
+        $detailQuery = $induction_worker->detail()->where('report', $intento);
+        if ($isTraining) {
+            $detailQuery->where('entrenamiento', 1);
+        } else {
+            $detailQuery->where(function ($query) {
+                $query->where('entrenamiento', 0)
+                    ->orWhere('entrenamiento', '0')
+                    ->orWhereNull('entrenamiento');
+            });
+        }
+        $detail = $detailQuery->first();
+
+        $json = $noteData['json'] ?? [];
+        $isQuizReport = DetailInductionWorker::isQuizJson($json);
+        $noteData['is_quiz'] = $isQuizReport;
+        $noteData['quiz_questions'] = $isQuizReport ? DetailInductionWorker::extractQuizQuestions($json) : [];
+        $noteData['note'] = $detail->note ?? 0;
+        $noteData['note_reference'] = $detail->note_reference ?? 0;
+
+        if ($isQuizReport) {
+            $noteData['json'] = null;
+        }
+
+        $workshopType = $this->resolveMolibdenoWorkshopType($induction, $noteData['quiz_questions']);
+
+        $data = [
+            'header' => $induction->header(),
+            'data' => $noteData,
+            'detail' => $detail,
+            'worker' => $worker,
+            'intento' => $intento,
+            'modo' => $modo,
+            'workshop_type' => strtoupper($workshopType),
+            'scenario_image' => $this->molibdenoScenarioImageBase64($workshopType),
+        ];
+
+        $logoPath = $data['header']['logo'];
+        $sinPhoto = 'logo/sin-photo.png';
+        if (empty($logoPath)) {
+            $logoPath = 'logo/logo_negro.png';
+        }
+
+        if (!file_exists(public_path($logoPath))) {
+            $logoPath = 'logo/logo_negro.png';
+        }
+
+        $logoData = file_get_contents(public_path($logoPath));
+        $logoBase64 = 'data:image/png;base64,' . base64_encode($logoData);
+
+        $sinPhoto = file_get_contents(public_path($sinPhoto));
+        $sinPhotoBase64 = 'data:image/png;base64,' . base64_encode($sinPhoto);
+
+        $data['logo'] = $logoBase64;
+        $data['sinPhoto'] = $sinPhotoBase64;
+
+        $pdf = PDF::loadView('ReportesFormatos.Molibdeno.c1', $data);
+
+        return $pdf->stream('ReporteMolibdeno.pdf');
+    }
+
     public function visualizar_reporte_notas($id_induction_worker, $intento, $modo)
     {
         $induction_worker = InductionWorker::find($id_induction_worker);
         $worker = Worker::find($induction_worker->id_worker);
         $induction = Induction::find($induction_worker->id_induction);
+
+        if ($induction->id_company == 9) {
+            return $this->genReportMolibdeno($induction_worker, $worker, $induction, $intento, $modo);
+        }
 
         if ($induction->id_company == 5 || $induction->id_company == 6) {
             return $this->genReportCerv($induction_worker, $worker, $induction, $intento, $modo);
@@ -967,8 +1083,6 @@ class SupervisorController extends Controller
         if ($induction->id_company == 6) {
             return $this->genReportYanbal($induction_worker, $worker, $induction, $intento, $modo);
         }
-
-
 
         $detail_induction_worker = DetailInductionWorker::where('induction_worker_id', $induction_worker->id)
             ->where('report', $intento);
@@ -1920,10 +2034,15 @@ class SupervisorController extends Controller
                         $start_date = $data->start_date;
                         $end_date = $data->end_date;
 
-                        if (session('id_company') == 5) {
-                            $json = json_decode($data->json, true);
-                            $start_date = $json['startDate'] ?? '-';
-                            $end_date = $json['endDate'] ?? '-';
+                        if (session('id_company') == 5 || session('id_company') == 9) {
+                            if (!empty($data->start_date) && !empty($data->end_date)) {
+                                $start_date = $data->start_date;
+                                $end_date = $data->end_date;
+                            } else {
+                                $json = is_array($data->json) ? $data->json : json_decode($data->json, true);
+                                $start_date = $json['startDate'] ?? $data->start_date ?? '-';
+                                $end_date = $json['endDate'] ?? $data->end_date ?? '-';
+                            }
                         }
 
                         $intentos[] = [
@@ -1940,13 +2059,22 @@ class SupervisorController extends Controller
                 }
                 for ($i = 1; $i <= $nuevoIntento; $i++) {
                     $data = $induction->detailsByReportAndTraining($i, 'entrenamiento')->first();
+                    if (!$data) {
+                        continue;
+                    }
+
                     $start_date = $data->start_date;
                     $end_date = $data->end_date;
 
-                    if (session('id_company') == 5) {
-                        $json = json_decode($data->json, true);
-                        $start_date = $json['startDate'] ?? '-';
-                        $end_date = $json['endDate'] ?? '-';
+                    if (session('id_company') == 5 || session('id_company') == 9) {
+                        if (!empty($data->start_date) && !empty($data->end_date)) {
+                            $start_date = $data->start_date;
+                            $end_date = $data->end_date;
+                        } else {
+                            $json = is_array($data->json) ? $data->json : json_decode($data->json, true);
+                            $start_date = $json['startDate'] ?? $data->start_date ?? '-';
+                            $end_date = $json['endDate'] ?? $data->end_date ?? '-';
+                        }
                     }
                     $intentos[] = [
                         'intento' => $data->report,
