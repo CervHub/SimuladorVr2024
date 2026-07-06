@@ -4,6 +4,51 @@
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     @include('Administrator.partials.image-upload-styles')
+    <style>
+        #createModal,
+        #editModal {
+            overflow: hidden !important;
+        }
+
+        #createModal .modal-dialog,
+        #editModal .modal-dialog {
+            max-height: calc(100vh - 2rem);
+            margin: 1rem auto;
+        }
+
+        .modal-entrenador {
+            max-height: calc(100vh - 2rem);
+            overflow: hidden;
+        }
+
+        .modal-entrenador form {
+            display: flex;
+            flex-direction: column;
+            max-height: calc(100vh - 2rem);
+            overflow: hidden;
+        }
+
+        .modal-entrenador .modal-entrenador-body {
+            overflow-y: auto;
+            flex: 1 1 auto;
+            min-height: 0;
+        }
+
+        .modal-entrenador .modal-header,
+        .modal-entrenador .modal-footer {
+            flex-shrink: 0;
+        }
+
+        .modal-entrenador-loading {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
 @endsection
 
 @section('content')
@@ -136,13 +181,56 @@
     @include('Supervisor.Matricula.create')
     @include('Supervisor.Matricula.edit')
     @include('Supervisor.Matricula.delete')
+    @include('Administrator.partials.image-upload-lightbox')
 @endsection
 
 @section('jscontent')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.26/webcam.min.js"></script>
+    @include('Administrator.partials.image-upload-scripts')
+    @include('Administrator.partials.photo-capture-scripts')
     @include('Administrator.partials.file-upload-scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            initAllPhotoCaptures();
             initAllFileUploads();
+
+            $('#department').on('change', function() {
+                var departmentId = $(this).val();
+                $('#area').empty();
+                if (departmentId) {
+                    $('#loading').show();
+                    $.ajax({
+                        url: '/getAreas/' + departmentId,
+                        type: 'GET',
+                        success: function(data) {
+                            $('#area').append('<option value="">Seleccione una área</option>');
+                            $.each(data, function(key, value) {
+                                $('#area').append('<option value="' + key + '">' + value + '</option>');
+                            });
+                            $('#areaDiv').show();
+                            $('#loading').hide();
+                        },
+                        error: function() {
+                            $('#loading').hide();
+                        }
+                    });
+                } else {
+                    $('#areaDiv').hide();
+                }
+            });
+
+            $('#createModal').on('hidden.bs.modal', function() {
+                var wrapper = document.querySelector('#createModal [data-photo-capture]');
+                resetPhotoCapture(wrapper);
+                $('#department').val('');
+                $('#area').empty();
+                $('#areaDiv').hide();
+            });
+
+            $('#editModal').on('hidden.bs.modal', function() {
+                var wrapper = document.querySelector('#editModal [data-photo-capture]');
+                resetPhotoCapture(wrapper);
+            });
         });
     </script>
     <!-- Activar DataTables -->
@@ -240,16 +328,13 @@
                     $('#employee_code_editar').val(response.employee_code);
                     $('#license_number_editar').val(response.license);
                     $('#license_category_editar').val(response.category);
+
+                    var photoWrapper = document.querySelector('#editModal [data-photo-capture]');
+                    resetPhotoCapture(photoWrapper);
                     if (response.photo) {
-                        $('#canvasEdit').show();
-                        var canvas = document.getElementById('canvasEdit');
-                        var context = canvas.getContext('2d');
-                        var image = new Image();
-                        image.onload = function() {
-                            context.drawImage(image, 0, 0, canvas.width, canvas.height);
-                        };
-                        image.src = response.photo;
+                        setPhotoCapturePreview(photoWrapper, response.photo, 'Foto actual');
                     }
+
                     $('#loading-overlay').hide();
                     $('#form-edit').show();
                 },
@@ -258,69 +343,5 @@
                 }
             });
         }
-
-        $(document).ready(function() {
-            $('#takePhotoBtnEdit').click(function() {
-                $('#cameraEdit').show();
-                $('#canvasEdit').hide();
-                Webcam.set({
-                    width: 320,
-                    height: 240,
-                    image_format: 'jpeg',
-                    jpeg_quality: 90
-                });
-                Webcam.attach('#cameraEdit');
-
-                $(this).text('Capturar Foto').off('click').on('click', function() {
-                    Webcam.snap(function(data_uri) {
-                        $('#cameraEdit').hide();
-                        $('#canvasEdit').show();
-                        var canvas = document.getElementById('canvasEdit');
-                        var context = canvas.getContext('2d');
-                        var img = new Image();
-                        img.onload = function() {
-                            canvas.width = img.width;
-                            canvas.height = img.height;
-                            context.drawImage(img, 0, 0);
-                        };
-                        img.src = data_uri;
-                        $('#photo_base64_editar').val(data_uri);
-
-                        // Cambiar el texto del botón y la funcionalidad para tomar de nuevo
-                        $('#takePhotoBtnEdit').text('Tomar de Nuevo').off('click').on(
-                            'click',
-                            function() {
-                                $('#canvasEdit').hide();
-                                $('#cameraEdit').show();
-                                Webcam.attach('#cameraEdit');
-                                $(this).text('Capturar Foto').off('click').on('click',
-                                    function() {
-                                        Webcam.snap(function(data_uri) {
-                                            $('#cameraEdit').hide();
-                                            $('#canvasEdit').show();
-                                            var canvas = document
-                                                .getElementById(
-                                                    'canvasEdit');
-                                            var context = canvas.getContext(
-                                                '2d');
-                                            var img = new Image();
-                                            img.onload = function() {
-                                                canvas.width = img
-                                                    .width;
-                                                canvas.height = img
-                                                    .height;
-                                                context.drawImage(img,
-                                                    0, 0);
-                                            };
-                                            img.src = data_uri;
-                                            $('#photo_base64_editar').val(
-                                                data_uri);
-                                        });
-                                    });
-                            });
-                    });
-                });
-            });
-        });
     </script>
 @endsection

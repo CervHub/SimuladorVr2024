@@ -203,4 +203,46 @@
     .page-toolbar-row {
         padding-bottom: 1rem;
     }
+
+    .photo-capture-camera {
+        border: 1px dashed #c9cdd3;
+        border-radius: 8px;
+        padding: 0.75rem;
+        background: #fafbfc;
+        text-align: center;
+    }
+
+    .photo-capture-viewport {
+        width: 100%;
+        max-width: 320px;
+        height: 240px;
+        margin: 0 auto 0.75rem;
+        overflow: hidden;
+        border-radius: 6px;
+        background: #000;
+    }
+
+    .photo-capture-viewport video,
+    .photo-capture-viewport canvas {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover;
+    }
+
+    .photo-capture-actions {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .photo-capture-start {
+        text-align: left;
+    }
+
+    .area-loading {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-top: 0.35rem;
+    }
 </style>
