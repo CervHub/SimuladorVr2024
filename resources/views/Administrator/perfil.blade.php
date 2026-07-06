@@ -2,7 +2,7 @@
 
 @section('css')
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.18.0/font/bootstrap-icons.css" rel="stylesheet">
-
+@include('Administrator.partials.image-upload-styles')
 @endsection
 
 @section('content')
@@ -40,8 +40,13 @@
                             <input type="text" class="form-control" id="jobTitle" name="jobTitle" value="{{$foundWorker->position}}" required>
                         </div>
                         <div class="mb-3">
-                            <label for="profilePicture" class="form-label">Foto de Perfil</label>
-                            <input type="file" class="form-control-file" id="profilePicture" name="profilePicture">
+                            <label class="form-label">Foto de Perfil</label>
+                            @include('Administrator.partials.image-upload', [
+                                'inputId' => 'profilePicture',
+                                'inputName' => 'profilePicture',
+                                'uploadTitle' => 'Seleccionar foto de perfil',
+                                'uploadHint' => 'JPG, PNG o WEBP · máx. 1 MB',
+                            ])
                         </div>
                         <input type="hidden" name="id_user" value="{{Auth::user()->id}}">
                         <input type="hidden" name="id_worker" value="{{$foundWorker->id}}">
@@ -128,19 +133,27 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="desktopLogo" class="form-label">Logo de Desktop (Tamaño: 128x64 píxeles, máximo 1MB)</label>
-                                    <input type="file" class="form-control" id="desktopLogo" name="desktopLogo" accept="image/*">
-                                    @if ($url_image_desktop)
-                                    <img class="mt-3" id="desktopLogoPreview" src="{{ asset($url_image_desktop) }}" alt="Vista previa del logo de Desktop" width="120" height="36">
-                                    @endif
+                                    <label class="form-label">Logo de Desktop</label>
+                                    @include('Administrator.partials.image-upload', [
+                                        'inputId' => 'desktopLogo',
+                                        'inputName' => 'desktopLogo',
+                                        'uploadTitle' => 'Seleccionar logo de desktop',
+                                        'uploadHint' => '128×64 px · máx. 1 MB',
+                                        'existingUrl' => $url_image_desktop ? asset($url_image_desktop) : null,
+                                        'existingLabel' => 'Logo desktop actual',
+                                    ])
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="mobileLogo" class="form-label">Logo de Mobile (Tamaño: 32x32 píxeles, máximo 1MB)</label>
-                                    <input type="file" class="form-control" id="mobileLogo" name="mobileLogo" accept="image/*">
-                                    @if ($url_image_mobile)
-                                    <img class="mt-3" id="mobileLogoPreview" src="{{ asset($url_image_mobile) }}" alt="Vista previa del logo de Mobile" width="32" height="32">
-                                    @endif
+                                    <label class="form-label">Logo de Mobile</label>
+                                    @include('Administrator.partials.image-upload', [
+                                        'inputId' => 'mobileLogo',
+                                        'inputName' => 'mobileLogo',
+                                        'uploadTitle' => 'Seleccionar logo mobile',
+                                        'uploadHint' => '32×32 px · máx. 1 MB',
+                                        'existingUrl' => $url_image_mobile ? asset($url_image_mobile) : null,
+                                        'existingLabel' => 'Logo mobile actual',
+                                    ])
                                 </div>
                                 <input type="hidden" name="id_company" value="{{ Auth::user()->id }}">
                                 <button type="submit" class="btn btn-primary">Actualizar</button>
@@ -154,6 +167,8 @@
 
 
 </div>
+
+@include('Administrator.partials.image-upload-lightbox')
 
 @endsection
 
@@ -187,34 +202,10 @@
         }
     }
 </script>
+@include('Administrator.partials.image-upload-scripts')
 <script>
-    // JavaScript para previsualizar imágenes cuando se seleccionan archivos
-    document.getElementById('desktopLogo').addEventListener('change', function(e) {
-        var file = e.target.files[0];
-        var desktopLogoPreview = document.getElementById('desktopLogoPreview');
-        if (file) {
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                desktopLogoPreview.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        } else {
-            desktopLogoPreview.src = '';
-        }
-    });
-
-    document.getElementById('mobileLogo').addEventListener('change', function(e) {
-        var file = e.target.files[0];
-        var mobileLogoPreview = document.getElementById('mobileLogoPreview');
-        if (file) {
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                mobileLogoPreview.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        } else {
-            mobileLogoPreview.src = '';
-        }
+    document.addEventListener('DOMContentLoaded', function() {
+        initAllSignatureUploads();
     });
 </script>
 

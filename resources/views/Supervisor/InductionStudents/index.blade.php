@@ -4,6 +4,7 @@
 
 <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+@include('Administrator.partials.image-upload-styles')
 
 <style>
     .table th,
@@ -23,7 +24,7 @@
 <div class="row">
     <div class="col-sm-12">
         <div class="home-tab">
-            <div class="d-sm-flex align-items-center justify-content-between border-bottom">
+            <div class="d-sm-flex align-items-center justify-content-between border-bottom page-toolbar-row">
                 <div>
                     <div class="btn-wrapper">
                         <a href="#" class="btn btn-primary text-white p-3 btn-sm" data-toggle="modal" data-target="#createModal">
@@ -38,11 +39,20 @@
                 </div>
 
                 <div class="">
-                    <form action="{{route('induction.cargamasiva')}}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('induction.cargamasiva') }}" method="POST" enctype="multipart/form-data"
+                        class="import-workers-form">
                         @csrf
-                        <input type="hidden" value="{{$id_induction}}" name="id_induction" id="id_induction">
-                        <input type="file" name="archivo_trabajadores" class="form-control-file btn btn-sm mt-2" accept=".xlsx" required>
-                        <button type="submit" class="btn btn-success btn-sm mt-2 "><i class="fas fa-upload"></i> Importar trabajadores</button>
+                        <input type="hidden" value="{{ $id_induction }}" name="id_induction" id="id_induction">
+                        @include('Administrator.partials.file-upload', [
+                            'inputId' => 'archivo_trabajadores_induction',
+                            'inputName' => 'archivo_trabajadores',
+                            'uploadTitle' => 'Seleccionar archivo Excel',
+                            'uploadHint' => 'Solo archivos .xlsx',
+                            'submitButtonId' => 'btn_import_workers_induction',
+                        ])
+                        <button type="submit" class="btn btn-success btn-sm" id="btn_import_workers_induction" disabled>
+                            <i class="fas fa-upload"></i> Importar trabajadores
+                        </button>
                     </form>
                 </div>
             </div>
@@ -123,6 +133,12 @@
 @endsection
 
 @section('js')
+@include('Administrator.partials.file-upload-scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        initAllFileUploads();
+    });
+</script>
 
 <!-- Activar DataTables -->
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>

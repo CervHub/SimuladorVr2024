@@ -429,7 +429,7 @@ class InductionWorker extends Model
 
     public function jsonNote()
     {
-        $details = $this->detail()->get();
+        $details = $this->detail()->orderBy('report')->orderBy('id')->get();
         $notes = [];
 
         foreach ($details as $detail) {

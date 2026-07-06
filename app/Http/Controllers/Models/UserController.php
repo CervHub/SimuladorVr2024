@@ -100,6 +100,11 @@ class UserController extends Controller
             $filename = "";
             if ($request->hasFile('signature')) {
                 $signatureImage = $request->file('signature');
+                if (!$signatureImage->isValid() || !in_array(strtolower($signatureImage->extension()), ['jpg', 'jpeg', 'png', 'webp', 'gif'])) {
+                    Session::flash('error', 'La firma debe ser una imagen válida (JPG, PNG, WEBP o GIF).');
+                    return false;
+                }
+
                 $uniqueFileName = time() . '_' . uniqid() . '.' . $signatureImage->getClientOriginalExtension();
                 $destinationPath = public_path('signatures');
                 $signatureImage->move($destinationPath, $uniqueFileName);
@@ -159,6 +164,12 @@ class UserController extends Controller
             $worker->save();
 
             if ($request->hasFile('signature')) {
+                $signatureImage = $request->file('signature');
+                if (!$signatureImage->isValid() || !in_array(strtolower($signatureImage->extension()), ['jpg', 'jpeg', 'png', 'webp', 'gif'])) {
+                    Session::flash('error', 'La firma debe ser una imagen válida (JPG, PNG, WEBP o GIF).');
+                    return false;
+                }
+
                 // Eliminar la imagen anterior si existe
                 $oldSignature = $worker->user->signature;
                 if ($oldSignature && File::exists(public_path($oldSignature))) {
@@ -166,7 +177,6 @@ class UserController extends Controller
                 }
 
                 // Guardar la nueva imagen
-                $signatureImage = $request->file('signature');
                 $uniqueFileName = time() . '_' . uniqid() . '.' . $signatureImage->getClientOriginalExtension();
                 $destinationPath = public_path('signatures');
                 $signatureImage->move($destinationPath, $uniqueFileName);

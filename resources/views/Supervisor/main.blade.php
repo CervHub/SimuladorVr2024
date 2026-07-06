@@ -20,7 +20,7 @@
         <li class="nav-item" id="servicio-supervisor">
             <a class="nav-link" href="{{ route('entrenador.servicio') }}">
                 <i class="mdi mdi-office-building menu-icon"></i>
-                <span class="menu-title">Servicios</span>
+                <span class="menu-title">Áreas</span>
             </a>
         </li>
         <li class="nav-item" id="taller-supervisor">

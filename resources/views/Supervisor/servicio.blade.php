@@ -16,7 +16,7 @@
             <div class="d-sm-flex align-items-center justify-content-between border-bottom">
                 <div>
                     <div class="btn-wrapper">
-                        <a href="#" class="btn btn-primary text-white p-3 btn-sm" data-toggle="modal" data-target="#createModal"><i class="icon-plus"></i> Crear Servicio</a>
+                        <a href="#" class="btn btn-primary text-white p-3 btn-sm" data-toggle="modal" data-target="#createModal"><i class="icon-plus"></i> Crear Área</a>
                     </div>
                 </div>
 
@@ -117,6 +117,72 @@
 
 @section('js')
 <script>
+    function initRequiredFormValidation(formSelector, fieldSelectors, submitSelector) {
+        var form = document.querySelector(formSelector);
+        if (!form) {
+            return null;
+        }
+
+        var submitBtn = form.querySelector(submitSelector);
+        var fields = fieldSelectors.map(function(selector) {
+            return form.querySelector(selector);
+        }).filter(Boolean);
+
+        function validate() {
+            var valid = fields.every(function(field) {
+                return field.value.trim() !== '';
+            });
+
+            if (submitBtn) {
+                submitBtn.disabled = !valid;
+            }
+
+            return valid;
+        }
+
+        fields.forEach(function(field) {
+            field.addEventListener('input', validate);
+            field.addEventListener('change', validate);
+        });
+
+        validate();
+        return validate;
+    }
+
+    var validateCreateServicio;
+    var validateEditServicio;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        validateCreateServicio = initRequiredFormValidation('#createModal form', [
+            '#create_service_name',
+            '#create_service_description',
+            '#create_service_ruc'
+        ], '#btn_guardar_servicio');
+
+        validateEditServicio = initRequiredFormValidation('#form-edit', [
+            '#name_editar',
+            '#description_editar'
+        ], '#btn_guardar_servicio_edit');
+
+        $('#createModal').on('shown.bs.modal', function() {
+            if (validateCreateServicio) {
+                validateCreateServicio();
+            }
+        });
+
+        $('#createModal').on('hidden.bs.modal', function() {
+            var form = $(this).find('form')[0];
+            if (form) {
+                form.reset();
+            }
+            if (validateCreateServicio) {
+                validateCreateServicio();
+            }
+        });
+    });
+</script>
+
+<script>
     const iconSuperAdmin = document.querySelector('#servicio-supervisor');
     iconSuperAdmin.classList.add('active');
 </script>
@@ -183,6 +249,9 @@
                 $('#ruc_editar').val(response.ruc);
                 $('#loading-overlay').hide();
                 $('#form-edit').show();
+                if (validateEditServicio) {
+                    validateEditServicio();
+                }
             },
             error: function(xhr, ajaxOptions, thrownError) {
                 console.log("Error en la conexión:", xhr.status, thrownError);

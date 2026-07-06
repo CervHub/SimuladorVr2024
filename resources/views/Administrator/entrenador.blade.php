@@ -3,6 +3,52 @@
 @section('css')
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    @include('Administrator.partials.image-upload-styles')
+    <style>
+        #createModal,
+        #editModal {
+            overflow: hidden !important;
+        }
+
+        #createModal .modal-dialog,
+        #editModal .modal-dialog {
+            max-height: calc(100vh - 2rem);
+            margin: 1rem auto;
+        }
+
+        .modal-entrenador {
+            max-height: calc(100vh - 2rem);
+            overflow: hidden;
+        }
+
+        .modal-entrenador form {
+            display: flex;
+            flex-direction: column;
+            max-height: calc(100vh - 2rem);
+            overflow: hidden;
+        }
+
+        .modal-entrenador .modal-entrenador-body {
+            overflow-y: auto;
+            flex: 1 1 auto;
+            min-height: 0;
+        }
+
+        .modal-entrenador .modal-header,
+        .modal-entrenador .modal-footer {
+            flex-shrink: 0;
+        }
+
+        .modal-entrenador-loading {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
 @endsection
 
 @section('content')
@@ -114,6 +160,8 @@
     @include('Administrator.eliminar')
     <!-- Modal Detalle -->
     @include('Administrator.detalle')
+
+    @include('Administrator.partials.image-upload-lightbox')
 @endsection
 
 @section('js')
@@ -138,39 +186,87 @@
         });
     </script>
 
-    {{-- para la imagen de crear y editar --}}
-
+    {{-- Subida y vista previa de firma --}}
+    @include('Administrator.partials.image-upload-scripts')
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var signatureInput = document.getElementById('signature_edit');
-            var previewImage = document.getElementById('preview');
+        var signatureUploadCreate;
+        var signatureUploadEdit;
+        var validateCreateForm;
+        var validateEditForm;
 
-            if (signatureInput && previewImage) {
-                signatureInput.addEventListener('change', function(e) {
-                    console.log("Cambiando");
-                    var reader = new FileReader();
-                    reader.onload = function(e) {
-                        previewImage.src = e.target.result;
-                    }
-                    reader.readAsDataURL(this.files[0]);
-                });
+        function initRequiredFormValidation(formSelector, fieldSelectors, submitSelector) {
+            var form = document.querySelector(formSelector);
+            if (!form) {
+                return null;
             }
-        });
+
+            var submitBtn = form.querySelector(submitSelector);
+            var fields = fieldSelectors.map(function(selector) {
+                return form.querySelector(selector);
+            }).filter(Boolean);
+
+            function validate() {
+                var valid = fields.every(function(field) {
+                    return field.value.trim() !== '';
+                });
+
+                if (submitBtn) {
+                    submitBtn.disabled = !valid;
+                }
+
+                return valid;
+            }
+
+            fields.forEach(function(field) {
+                field.addEventListener('input', validate);
+                field.addEventListener('change', validate);
+            });
+
+            validate();
+            return validate;
+        }
 
         document.addEventListener('DOMContentLoaded', function() {
-            var signatureInput = document.getElementById('signature');
-            var previewImage = document.getElementById('preview_create');
+            var createWrapper = document.querySelector('#createModal [data-signature-upload]');
+            var editWrapper = document.querySelector('#editModal [data-signature-upload]');
 
-            if (signatureInput && previewImage) {
-                signatureInput.addEventListener('change', function(e) {
-                    console.log("Cambiando");
-                    var reader = new FileReader();
-                    reader.onload = function(e) {
-                        previewImage.src = e.target.result;
-                    }
-                    reader.readAsDataURL(this.files[0]);
-                });
+            if (createWrapper) {
+                signatureUploadCreate = initSignatureUpload(createWrapper);
             }
+
+            if (editWrapper) {
+                signatureUploadEdit = initSignatureUpload(editWrapper);
+            }
+
+            validateCreateForm = initRequiredFormValidation('#createModal form', [
+                '#create_name',
+                '#create_last_name',
+                '#create_doi'
+            ], '#btn_guardar_create');
+
+            validateEditForm = initRequiredFormValidation('#form_entrenador', [
+                '#name_editar',
+                '#last_name_editar'
+            ], '#btn_guardar_edit');
+
+            $('#createModal').on('shown.bs.modal', function() {
+                if (validateCreateForm) {
+                    validateCreateForm();
+                }
+            });
+
+            $('#createModal').on('hidden.bs.modal', function() {
+                var form = $(this).find('form')[0];
+                if (form) {
+                    form.reset();
+                }
+                if (signatureUploadCreate) {
+                    signatureUploadCreate.reset();
+                }
+                if (validateCreateForm) {
+                    validateCreateForm();
+                }
+            });
         });
     </script>
 
@@ -203,6 +299,9 @@
 
             $('#loading-overlay').show();
             $('#form_entrenador').hide();
+            if (signatureUploadEdit) {
+                signatureUploadEdit.reset();
+            }
             console.log(id);
             $.ajaxSetup({
                 headers: {
@@ -224,9 +323,19 @@
                     $('#name_editar').val(response.name);
                     $('#doi_editar').val(response.doi);
                     $('#department_editar').val(response.worker.department);
-                    $('#preview').attr('src', url + response.worker.user.signature);
+                    if (response.worker.user.signature && signatureUploadEdit) {
+                        signatureUploadEdit.showFromUrl(
+                            url + response.worker.user.signature,
+                            'Firma actual'
+                        );
+                    } else if (signatureUploadEdit) {
+                        signatureUploadEdit.reset();
+                    }
                     $('#loading-overlay').hide();
                     $('#form_entrenador').show();
+                    if (validateEditForm) {
+                        validateEditForm();
+                    }
                 },
                 error: function(xhr, ajaxOptions, thrownError) {
                     console.log("Error en la conexión:", xhr.status, thrownError);

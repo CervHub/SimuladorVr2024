@@ -44,6 +44,17 @@ class AdminController extends Controller
     }
     public function crearentrenador(Request $request)
     {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'doi' => 'required|string|max:255',
+            'signature' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:1024',
+        ], [
+            'signature.image' => 'La firma debe ser un archivo de imagen.',
+            'signature.mimes' => 'Solo se permiten imágenes JPG, PNG, WEBP o GIF.',
+            'signature.max' => 'La imagen de firma no debe superar 1 MB.',
+        ]);
+
         $id_company = session('id_company');
         $id_service = session('id_service');
 
@@ -56,6 +67,17 @@ class AdminController extends Controller
     }
     public function editarentrenador(Request $request)
     {
+        $request->validate([
+            'id_worker' => 'required|integer',
+            'name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'signature' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:1024',
+        ], [
+            'signature.image' => 'La firma debe ser un archivo de imagen.',
+            'signature.mimes' => 'Solo se permiten imágenes JPG, PNG, WEBP o GIF.',
+            'signature.max' => 'La imagen de firma no debe superar 1 MB.',
+        ]);
+
         $estado = $this->userController->editar($request);
         if ($estado) {
             // Creación exitosa

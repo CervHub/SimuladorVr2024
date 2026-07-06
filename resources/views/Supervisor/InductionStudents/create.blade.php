@@ -12,9 +12,9 @@
                 @csrf
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="service">Servicio:</label>
+                        <label for="service">Área:</label>
                         <select class="form-control" id="service" name="service">
-                            <option value="">Seleccionar Servicio</option>
+                            <option value="">Seleccionar Área</option>
                             @foreach($services as $service)
                             <option value="{{ $service->id }}">{{ $service->name }}</option>
                             @endforeach

@@ -14,7 +14,7 @@
                                     <h5 class="card-subtitle card-subtitle-dash">Análisis del número de trabajadores por cada servicio</h5>
                                 </div>
                             </div>
-                            <div class="chartjs-wrapper mt-5">
+                            <div class="chartjs-wrapper mt-5 highcharts-light">
                                 <div id="container"></div>
                             </div>
                         </div>
@@ -33,7 +33,7 @@
                                     <h5 class="card-subtitle card-subtitle-dash">Análisis del número de trabajadores por cada servicio</h5>
                                 </div>
                             </div>
-                            <div class="chartjs-wrapper mt-5">
+                            <div class="chartjs-wrapper mt-5 highcharts-light">
                                 <div id="container-talleres-inducciones"></div>
                             </div>
                         </div>
@@ -52,7 +52,7 @@
                                     <h5 class="card-subtitle card-subtitle-dash">Análisis del número de trabajadores por cada servicio</h5>
                                 </div>
                             </div>
-                            <div class="chartjs-wrapper mt-5">
+                            <div class="chartjs-wrapper mt-5 highcharts-light">
                                 <div id="container-talleres-trabajadores"></div>
                             </div>
                         </div>
@@ -72,7 +72,7 @@
                                     <h5 class="card-subtitle card-subtitle-dash">Análisis del número de trabajadores por cada servicio</h5>
                                 </div>
                             </div>
-                            <div class="chartjs-wrapper mt-5">
+                            <div class="chartjs-wrapper mt-5 highcharts-light">
                                 <div id="containertalleresyear"></div>
                             </div>
                         </div>
@@ -93,12 +93,84 @@
         iconSuperAdmin.classList.add('active');
     </script>
 
-<script src="https://code.highcharts.com/highcharts.js"></script>
-<script src="https://code.highcharts.com/modules/exporting.js"></script>
-<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/11/highcharts.js"></script>
+<script src="https://code.highcharts.com/11/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/11/modules/export-data.js"></script>
 
 
 <script>
+    Highcharts.setOptions({
+        lang: {
+            viewFullscreen: 'Ver en pantalla completa',
+            exitFullscreen: 'Salir de pantalla completa',
+            printChart: 'Imprimir gráfico',
+            downloadPNG: 'Descargar imagen PNG',
+            downloadJPEG: 'Descargar imagen JPEG',
+            downloadPDF: 'Descargar documento PDF',
+            downloadSVG: 'Descargar imagen SVG',
+            downloadCSV: 'Descargar CSV',
+            downloadXLS: 'Descargar XLS',
+            viewData: 'Ver tabla de datos',
+            hideData: 'Ocultar tabla de datos',
+            exportInProgress: 'Exportando...',
+            loading: 'Cargando...',
+            noData: 'No hay datos para mostrar',
+            resetZoom: 'Restablecer zoom',
+            resetZoomTitle: 'Restablecer nivel de zoom 1:1',
+            thousandsSep: '.',
+            decimalPoint: ',',
+            months: [
+                'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+            ],
+            shortMonths: [
+                'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
+                'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'
+            ],
+            weekdays: [
+                'Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'
+            ]
+        },
+        chart: {
+            backgroundColor: '#ffffff',
+            plotBackgroundColor: '#ffffff'
+        },
+        title: {
+            style: {
+                color: '#343a40'
+            }
+        },
+        xAxis: {
+            labels: {
+                style: {
+                    color: '#6c757d'
+                }
+            },
+            title: {
+                style: {
+                    color: '#6c757d'
+                }
+            }
+        },
+        yAxis: {
+            labels: {
+                style: {
+                    color: '#6c757d'
+                }
+            },
+            title: {
+                style: {
+                    color: '#6c757d'
+                }
+            }
+        },
+        legend: {
+            itemStyle: {
+                color: '#343a40'
+            }
+        }
+    });
+
     // Para mostrar los servicios
     let data = @json($data);
     console.log(data);
