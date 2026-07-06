@@ -433,13 +433,14 @@ class InductionWorker extends Model
         $notes = [];
 
         foreach ($details as $detail) {
-            $json = json_decode($detail->json, true);
+            $json = is_array($detail->json) ? $detail->json : json_decode($detail->json, true);
+            $json = is_array($json) ? $json : [];
             $notes[] = [
                 'attempt' => $detail->report ?? '-',
                 'is_training' => $detail->entrenamiento ?? '-',
-                'start_date' => $json['startDate'] ?? '-',
-                'end_date' => $json['endDate'] ?? '-',
-                'note' => $json['note'] ?? '-',
+                'start_date' => $detail->start_date ?? ($json['startDate'] ?? '-'),
+                'end_date' => $detail->end_date ?? ($json['endDate'] ?? '-'),
+                'note' => $detail->note ?? ($json['note'] ?? '-'),
                 'json' => $json,
             ];
         }

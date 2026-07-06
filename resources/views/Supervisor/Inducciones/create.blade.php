@@ -12,7 +12,7 @@
                 @csrf
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="course">Teller:</label>
+                        <label for="course">Taller:</label>
                         <input type="hidden" value="" name="alias" id="alias">
                         <select class="form-control" name="course" id="course">
                             @foreach($workshops as $workshop)

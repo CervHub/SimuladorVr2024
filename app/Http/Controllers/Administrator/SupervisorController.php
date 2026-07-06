@@ -31,6 +31,7 @@ use ZipArchive;
 use Illuminate\Support\Facades\Storage;
 
 use App\Exports\ExportDataCervExcel;
+use App\Exports\ExportDataMolibdenoExcel;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class SupervisorController extends Controller
@@ -1365,7 +1366,7 @@ class SupervisorController extends Controller
             }
         } else if ($induction->id_company == 3) {
             $pdf = PDF::loadView('ReportesFormatos.LuzDelSurAsistenciaPdf', $data);
-        } else if ($induction->id_company == 5 || $induction->id_company == 6) {
+        } else if ($induction->id_company == 5 || $induction->id_company == 6 || $induction->id_company == 9) {
             $data['header'] = $induction->header();
             $data['newNoteJson'] = $induction->newNoteJson();
             $pdf = PDF::loadView('ReportesFormatos.CervGeneral', $data)
@@ -1376,6 +1377,46 @@ class SupervisorController extends Controller
 
         return $pdf->stream('reporte.pdf');
     }
+
+    private function buildMolibdenoExcelData($inductionWorkers): array
+    {
+        $data = [];
+
+        foreach ($inductionWorkers as $worker) {
+            if ($worker->status != 1) {
+                continue;
+            }
+
+            if ($worker->worker->user->name == $worker->worker->user->last_name) {
+                $name = $worker->worker->user->name;
+            } else {
+                $name = $worker->worker->user->name . ' ' . $worker->worker->user->last_name;
+            }
+
+            foreach ($worker->detail()->orderBy('report')->orderBy('id')->get() as $detail) {
+                if (in_array($detail->entrenamiento, [1, '1'], true)) {
+                    continue;
+                }
+
+                $json = is_array($detail->json) ? $detail->json : json_decode($detail->json, true);
+                $json = is_array($json) ? $json : [];
+
+                $data[] = [
+                    'doi' => $worker->worker->user->doi,
+                    'name' => $name,
+                    'intento' => $detail->report,
+                    'start_date' => $detail->start_date ?? ($json['startDate'] ?? '-'),
+                    'end_date' => $detail->end_date ?? ($json['endDate'] ?? '-'),
+                    'nota' => $detail->note ?? ($json['note'] ?? '-'),
+                    'nota_referencial' => $detail->note_reference ?? ($json['noteReference'] ?? '-'),
+                    'modo' => 'Evaluación',
+                ];
+            }
+        }
+
+        return $data;
+    }
+
     private function generarDataGeneral($ids_induction, $id_induction, $fecha_inicio, $fecha_fin, $path)
     {
         // Si id_service es null o 0, obtén todos los registros sin filtrar por id_service
@@ -1718,8 +1759,12 @@ class SupervisorController extends Controller
                 $data = $this->notaConfipetrolExcel($inductionWorkers, $headerKeys, $detailKeys, $induction->alias, $fecha_inicio, $fecha_fin);
                 $export = new ExcelGeneralConfipetrol(collect($data), collect($cabecera), collect($headerMap), collect($detailMap));
                 break;
-            default:
+            case 9:
+                $data = $this->buildMolibdenoExcelData($inductionWorkers);
+                $export = new ExportDataMolibdenoExcel(collect($data), collect($cabecera));
                 break;
+            default:
+                abort(403, 'Usted no tiene un reporte asignado');
         }
 
         $filename = $cabecera['simulador'] . '_' . date('Y-m-d_H-i-s') . '.xlsx';
