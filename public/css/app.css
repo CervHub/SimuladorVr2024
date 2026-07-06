@@ -20,6 +20,14 @@ body{
     background-color: black !important;
 }
 
+@media (min-width: 992px) {
+    body.sidebar-fixed .sidebar {
+        top: 97px;
+        height: calc(100vh - 97px);
+        min-height: calc(100vh - 97px);
+    }
+}
+
 .btn-custom {
     height: 30px;
     line-height: 30px;
