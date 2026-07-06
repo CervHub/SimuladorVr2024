@@ -1369,7 +1369,7 @@ class SupervisorController extends Controller
         } else if ($induction->id_company == 5 || $induction->id_company == 6 || $induction->id_company == 9) {
             $data['header'] = $induction->header();
             $data['newNoteJson'] = $induction->newNoteJson();
-            $pdf = PDF::loadView('ReportesFormatos.CervGeneral', $data)
+            $pdf = PDF::loadView('ReportesFormatos.MolibdenoAsistenciaPdf', $data)
                 ->setPaper('a4', 'landscape');
         } else {
             abort(403, 'Usted no tiene un reporte asignado');

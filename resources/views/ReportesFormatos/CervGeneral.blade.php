@@ -167,7 +167,7 @@
                             $start_dates[] = $i['start_date'] ?? '';
                             $end_dates[] = $i['end_date'] ?? '';
                             $notes[] = $i['note'] ?? '';
-                            $attempts[] = $i['attempt'] ?? ''; // Assuming 'attempt' is the key for the attempt data
+                            $attempts[] = $i['attempt'] ?? '';
                         }
                     }
                 @endphp
