@@ -49,6 +49,32 @@ class SuperAdminController extends Controller
         return view('SuperAdmin.empresas', compact('companies'));
     }
 
+    public function creditos(Request $request)
+    {
+        $companies = Company::orderBy('id')->get();
+        return view('SuperAdmin.creditos', compact('companies'));
+    }
+
+    public function updateCreditos(Request $request)
+    {
+        $request->validate([
+            'id_company' => 'required|numeric',
+            'creditos' => 'nullable|string|max:255',
+        ]);
+
+        $company = Company::find($request->id_company);
+        if (!$company) {
+            Session::flash('error', 'Empresa no encontrada.');
+            return redirect()->back();
+        }
+
+        $company->creditos = $request->creditos;
+        $company->save();
+
+        Session::flash('success', 'Créditos actualizados correctamente.');
+        return redirect()->back();
+    }
+
     public function reporte(Request $request)
     {
         return view('SuperAdmin.reporte');

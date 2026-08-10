@@ -45,6 +45,8 @@ Route::get('logout', [AuthenticationController::class, 'logout'])->name('logout'
 Route::middleware(['superadmin', 'auth'])->group(function () {
     Route::get('superadmin/dashboard', [SuperAdminController::class, 'index'])->name('superadministrador');
     Route::get('superadmin/empresa', [SuperAdminController::class, 'empresa'])->name('superadministrador.empresa');
+    Route::get('superadmin/creditos', [SuperAdminController::class, 'creditos'])->name('superadministrador.creditos');
+    Route::post('superadmin/creditos/update', [SuperAdminController::class, 'updateCreditos'])->name('superadministrador.creditos.update');
     Route::get('superadmin/reporte', [SuperAdminController::class, 'reporte'])->name('superadministrador.reporte');
     Route::post('superadmin/createcompany', [SuperAdminController::class, 'createcompany'])->name('createcompany');
     Route::post('superadmin/editarcompany', [SuperAdminController::class, 'editarcompany'])->name('editarcompany');

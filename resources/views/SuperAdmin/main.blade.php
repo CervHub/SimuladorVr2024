@@ -22,6 +22,12 @@ Panel - Super Administrador
             <span class="menu-title">Empresas</span>
         </a>
     </li>
+    <li class="nav-item" id="creditos-superadmin">
+        <a class="nav-link" href="{{route('superadministrador.creditos')}}">
+            <i class="mdi mdi-coin menu-icon"></i>
+            <span class="menu-title">Créditos</span>
+        </a>
+    </li>
     <li class="nav-item" id="taller-superadmin">
         <a class="nav-link" href="{{route('superadministrador.taller.dashboard')}}">
             <i class="mdi mdi-account-box-multiple menu-icon"></i>

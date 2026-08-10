@@ -72,6 +72,17 @@ WHERE inductions.intentos >= (induction_workers.num_report + 1)
 
     header('Content-Type: application/json');
 
+    // Créditos de la empresa (numérico o alfanumérico)
+    $creditos = null;
+    if (!empty($query_params_login[':id_company'])) {
+        $stmtCreditos = $db->prepare('SELECT creditos FROM companies WHERE id = :id_company LIMIT 1');
+        $stmtCreditos->execute([':id_company' => $query_params_login[':id_company']]);
+        $creditos = $stmtCreditos->fetchColumn();
+        if ($creditos === false) {
+            $creditos = null;
+        }
+    }
+
     if ($stmt1->rowCount() > 0) {
         $inductions = $stmt1->fetchAll(PDO::FETCH_ASSOC);
 
@@ -86,6 +97,7 @@ WHERE inductions.intentos >= (induction_workers.num_report + 1)
 
         $responseData = [
             'dni' => $query_params_login[':dni'],
+            'creditos' => $creditos,
             'inducciones' => $inductions,
         ];
 
