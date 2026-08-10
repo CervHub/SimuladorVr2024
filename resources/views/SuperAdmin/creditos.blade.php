@@ -50,18 +50,27 @@
                                 <th class="text-center">ID</th>
                                 <th class="text-center">Nombre</th>
                                 <th class="text-center">RUC</th>
-                                <th class="text-center">Créditos</th>
+                                <th class="text-center">Originales</th>
+                                <th class="text-center">Disponibles</th>
+                                <th class="text-center">Consumidos</th>
                                 <th class="text-center">Estado</th>
                                 <th class="text-center">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($companies as $company)
+                            @php
+                                $originales = (int) ($company->creditos_originales ?? 0);
+                                $disponibles = (int) ($company->creditos ?? 0);
+                                $consumidos = max(0, $originales - $disponibles);
+                            @endphp
                             <tr>
                                 <td>{{$company->id}}</td>
                                 <td>{{$company->name}}</td>
                                 <td>{{$company->ruc}}</td>
-                                <td>{{$company->creditos ?? '—'}}</td>
+                                <td>{{ $originales }}</td>
+                                <td>{{ $disponibles }}</td>
+                                <td>{{ $consumidos }}</td>
                                 <td>
                                     @if($company->status == '0')
                                     <label class="badge badge-danger">No Activo</label>
@@ -71,8 +80,12 @@
                                 </td>
                                 <td>
                                     <button class="btn btn-custom btn-warning text-white me-0" data-toggle="modal" data-target="#creditoModal"
-                                        onclick="gestionarCredito({{$company->id}}, '{{ addslashes($company->name) }}', '{{ addslashes($company->creditos ?? '') }}')">
+                                        onclick="gestionarCredito({{$company->id}}, '{{ addslashes($company->name) }}', {{ $originales }}, {{ $disponibles }})">
                                         <span class="icon icon-pencil"></span> Gestionar
+                                    </button>
+                                    <button class="btn btn-custom btn-success text-white me-0" data-toggle="modal" data-target="#historialModal"
+                                        onclick="verHistorial({{$company->id}})">
+                                        <span class="fas fa-history"></span> Historial
                                     </button>
                                 </td>
                             </tr>
@@ -103,9 +116,18 @@
                         <input type="text" class="form-control" id="empresa_credito" disabled>
                     </div>
                     <div class="form-group">
-                        <label for="creditos">Créditos:</label>
-                        <input type="text" class="form-control" id="creditos" name="creditos" placeholder="Numérico o alfanumérico" maxlength="255">
-                        <small class="form-text text-muted">Puede ser numérico o alfanumérico.</small>
+                        <label for="creditos_originales">Créditos originales:</label>
+                        <input type="number" class="form-control" id="creditos_originales" name="creditos_originales" min="0" step="1" required>
+                        <small class="form-text text-muted">Total asignado / paquete de la empresa.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="creditos">Créditos disponibles:</label>
+                        <input type="number" class="form-control" id="creditos" name="creditos" min="0" step="1" required>
+                        <small class="form-text text-muted">Saldo actual. No puede ser mayor a los originales.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="observacion">Observación (opcional):</label>
+                        <input type="text" class="form-control" id="observacion" name="observacion" maxlength="255" placeholder="Ej. Recarga mensual">
                     </div>
                     <input type="hidden" name="id_company" id="id_company_credito" value="">
                 </div>
@@ -114,6 +136,47 @@
                     <button type="submit" class="btn btn-primary">Guardar</button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal historial -->
+<div class="modal fade" id="historialModal" tabindex="-1" role="dialog" aria-labelledby="historialModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="historialModalLabel">Historial de créditos</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-1"><strong>Empresa:</strong> <span id="historial_empresa"></span></p>
+                <p class="mb-1"><strong>Originales:</strong> <span id="historial_originales"></span></p>
+                <p class="mb-1"><strong>Disponibles:</strong> <span id="historial_saldo"></span></p>
+                <p class="mb-3"><strong>Consumidos:</strong> <span id="historial_consumidos"></span></p>
+                <div class="table-responsive">
+                    <table class="table table-striped table-sm text-center">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Anterior</th>
+                                <th>Nuevo</th>
+                                <th>Diferencia</th>
+                                <th>Tipo</th>
+                                <th>Origen</th>
+                                <th>Observación</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historial_body">
+                            <tr><td colspan="7">Cargando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
         </div>
     </div>
 </div>
@@ -140,10 +203,50 @@
     const iconCreditos = document.querySelector('#creditos-superadmin');
     iconCreditos.classList.add('active');
 
-    function gestionarCredito(id, nombre, creditos) {
+    function gestionarCredito(id, nombre, originales, disponibles) {
         $('#id_company_credito').val(id);
         $('#empresa_credito').val(nombre);
-        $('#creditos').val(creditos);
+        $('#creditos_originales').val(originales);
+        $('#creditos').val(disponibles);
+        $('#observacion').val('');
+    }
+
+    function verHistorial(id) {
+        $('#historial_body').html('<tr><td colspan="7">Cargando...</td></tr>');
+        $.ajaxSetup({
+            headers: { 'X-CSRF-TOKEN': "{{ csrf_token() }}" }
+        });
+        $.ajax({
+            url: '{{ route("superadministrador.creditos.historial") }}',
+            type: 'POST',
+            data: { id_company: id },
+            success: function(response) {
+                $('#historial_empresa').text(response.empresa);
+                $('#historial_originales').text(response.creditos_originales);
+                $('#historial_saldo').text(response.creditos);
+                $('#historial_consumidos').text(response.consumidos);
+                if (!response.historial || response.historial.length === 0) {
+                    $('#historial_body').html('<tr><td colspan="7">Sin movimientos</td></tr>');
+                    return;
+                }
+                let rows = '';
+                response.historial.forEach(function(item) {
+                    rows += '<tr>' +
+                        '<td>' + (item.created_at || '') + '</td>' +
+                        '<td>' + item.creditos_anteriores + '</td>' +
+                        '<td>' + item.creditos_nuevos + '</td>' +
+                        '<td>' + item.diferencia + '</td>' +
+                        '<td>' + item.tipo + '</td>' +
+                        '<td>' + (item.origen || '') + '</td>' +
+                        '<td>' + (item.observacion || '') + '</td>' +
+                        '</tr>';
+                });
+                $('#historial_body').html(rows);
+            },
+            error: function() {
+                $('#historial_body').html('<tr><td colspan="7">Error al cargar historial</td></tr>');
+            }
+        });
     }
 </script>
 @endsection

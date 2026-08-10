@@ -5,6 +5,7 @@ namespace App\Http\Controllers\SuperAdmin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Company;
+use App\Models\CompanyCreditoHistorial;
 use App\Http\Controllers\Models\CompanyController;
 use App\Http\Controllers\Models\WorkshopController;
 use App\Http\Controllers\Models\WorshopCompanyController;
@@ -59,7 +60,9 @@ class SuperAdminController extends Controller
     {
         $request->validate([
             'id_company' => 'required|numeric',
-            'creditos' => 'nullable|string|max:255',
+            'creditos_originales' => 'required|integer|min:0',
+            'creditos' => 'required|integer|min:0',
+            'observacion' => 'nullable|string|max:255',
         ]);
 
         $company = Company::find($request->id_company);
@@ -68,11 +71,62 @@ class SuperAdminController extends Controller
             return redirect()->back();
         }
 
-        $company->creditos = $request->creditos;
+        $originalesNuevos = (int) $request->creditos_originales;
+        $disponiblesNuevos = (int) $request->creditos;
+
+        if ($disponiblesNuevos > $originalesNuevos) {
+            Session::flash('error', 'El saldo disponible no puede ser mayor a los créditos originales.');
+            return redirect()->back();
+        }
+
+        $anteriores = (int) ($company->creditos ?? 0);
+        $diferencia = $disponiblesNuevos - $anteriores;
+
+        $company->creditos_originales = $originalesNuevos;
+        $company->creditos = $disponiblesNuevos;
         $company->save();
+
+        CompanyCreditoHistorial::create([
+            'id_company' => $company->id,
+            'creditos_anteriores' => $anteriores,
+            'creditos_nuevos' => $disponiblesNuevos,
+            'diferencia' => $diferencia,
+            'tipo' => $diferencia >= 0 ? 'asignacion' : 'ajuste',
+            'origen' => 'admin',
+            'observacion' => $request->observacion
+                ?: ('Originales: ' . $originalesNuevos . ' | Disponibles: ' . $disponiblesNuevos),
+        ]);
 
         Session::flash('success', 'Créditos actualizados correctamente.');
         return redirect()->back();
+    }
+
+    public function historialCreditos(Request $request)
+    {
+        $request->validate([
+            'id_company' => 'required|numeric',
+        ]);
+
+        $company = Company::find($request->id_company);
+        if (!$company) {
+            return response()->json(['error' => 'Empresa no encontrada.'], 404);
+        }
+
+        $historial = CompanyCreditoHistorial::where('id_company', $company->id)
+            ->orderByDesc('id')
+            ->get();
+
+        $originales = (int) ($company->creditos_originales ?? 0);
+        $disponibles = (int) ($company->creditos ?? 0);
+
+        return response()->json([
+            'id_company' => $company->id,
+            'empresa' => $company->name,
+            'creditos_originales' => $originales,
+            'creditos' => $disponibles,
+            'consumidos' => max(0, $originales - $disponibles),
+            'historial' => $historial,
+        ]);
     }
 
     public function reporte(Request $request)

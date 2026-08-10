@@ -20,4 +20,9 @@ class Company extends Model
     {
         return $this->hasMany(Service::class, 'id_company');
     }
+
+    public function creditosHistorial()
+    {
+        return $this->hasMany(CompanyCreditoHistorial::class, 'id_company');
+    }
 }
