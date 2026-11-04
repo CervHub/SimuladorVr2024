@@ -405,11 +405,6 @@ class ApiController extends Controller
             DB::beginTransaction();
             try {
                 $updatePayload = $this->buildUploadWorkshopUpdate($jsonData);
-                $registration = InductionWorker::find($detailInductionWorker->induction_worker_id);
-                if ($registration && $registration->induction->id_company == 12) {
-                    $updatePayload['note'] = DetailInductionWorker::palaMineraNota($jsonData);
-                    $updatePayload['note_reference'] = 20;
-                }
                 $detailInductionWorker->update($updatePayload);
 
                 DB::commit();
