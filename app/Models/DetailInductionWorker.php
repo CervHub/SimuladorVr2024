@@ -34,6 +34,17 @@ class DetailInductionWorker extends Model
         'json' => 'array',
     ];
 
+    public static function palaMineraNota(array $payload)
+    {
+        foreach (['nota', 'note'] as $key) {
+            if (isset($payload[$key]) && is_numeric($payload[$key])) {
+                return $payload[$key] + 0;
+            }
+        }
+
+        return 20;
+    }
+
     public function induction_worker()
     {
         return $this->belongsTo(InductionWorker::class, 'id');
