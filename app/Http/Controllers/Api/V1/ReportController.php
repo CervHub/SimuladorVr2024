@@ -11,6 +11,9 @@ class ReportController extends Controller
 {
     public function submit(Request $request)
     {
+        if ($request->has('cabecera_id')) {
+            return app(FlavisurReportController::class)->submit($request);
+        }
         try {
             $request->validate([
                 'detail_induction_worker_id' => 'required|numeric',

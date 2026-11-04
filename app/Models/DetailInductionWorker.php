@@ -9,6 +9,16 @@ class DetailInductionWorker extends Model
 {
     use HasFactory;
 
+    public static function palaMineraNota(array $payload)
+    {
+        foreach (['nota', 'note'] as $key) {
+            if (isset($payload[$key]) && is_numeric($payload[$key])) {
+                return $payload[$key] + 0;
+            }
+        }
+        return 20;
+    }
+
     protected $table = 'detail_induction_workers';
 
     protected $fillable = [

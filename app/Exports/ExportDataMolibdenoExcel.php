@@ -68,7 +68,7 @@ class ExportDataMolibdenoExcel implements FromCollection, WithHeadings, WithTitl
                         $item['nota'],
                         $item['nota_referencial'],
                         $item['modo'],
-                    ], null, 'A' . $row);
+                    ], null, 'A' . $row, true);
                     $row++;
                 }
 

@@ -1097,6 +1097,17 @@ class SupervisorController extends Controller
         $worker = Worker::find($induction_worker->id_worker);
         $induction = Induction::find($induction_worker->id_induction);
 
+        if ($induction->id_company == 12 && $induction->id_workshop == 40) {
+            $detail = $induction_worker->detail()->where('report', $intento)
+                ->where('entrenamiento', $modo == 'Entrenamiento' ? 1 : 0)
+                ->whereNotNull('json')->orderByDesc('id')->first();
+            abort_unless($detail && is_array($detail->json), 404, 'No hay resultados para este intento.');
+            return PDF::loadView('ReportesFormatos.PalaMineraPdf', [
+                'payload' => $detail->json, 'detail' => $detail, 'worker' => $worker,
+                'induction' => $induction, 'modo' => $modo,
+            ])->setPaper('a4')->stream('ReportePalaMinera.pdf');
+        }
+
         if ($induction->id_company == 9) {
             return $this->genReportMolibdeno($induction_worker, $worker, $induction, $intento, $modo);
         }
@@ -1758,6 +1769,34 @@ class SupervisorController extends Controller
                 }
                 $data = $this->notaConfipetrolExcel($inductionWorkers, $headerKeys, $detailKeys, $induction->alias, $fecha_inicio, $fecha_fin);
                 $export = new ExcelGeneralConfipetrol(collect($data), collect($cabecera), collect($headerMap), collect($detailMap));
+                break;
+            case 12:
+                abort_unless($induction->id_workshop == 40, 403, 'No tiene un reporte asignado para este taller.');
+                $data = [];
+                foreach ($inductionWorkers as $registration) {
+                    if ($registration->status != 1) {
+                        continue;
+                    }
+                    $details = $registration->detail()->whereNotNull('json');
+                    if ($fecha_inicio && $fecha_fin) {
+                        $details->whereBetween('created_at', [$fecha_inicio, $fecha_fin]);
+                    }
+                    foreach ($details->orderBy('report')->get() as $detail) {
+                        $payload = $detail->json;
+                        if (!is_array($payload)) {
+                            continue;
+                        }
+                        $user = $registration->worker->user;
+                        $data[] = [
+                            'doi' => $user->doi, 'name' => trim($user->name.' '.$user->last_name),
+                            'intento' => $detail->report, 'start_date' => $payload['date'] ?? $detail->start_date,
+                            'end_date' => $detail->end_date,
+                            'nota' => DetailInductionWorker::palaMineraNota($payload), 'nota_referencial' => 20,
+                            'modo' => $detail->entrenamiento == 1 ? 'Entrenamiento' : 'Evaluación',
+                        ];
+                    }
+                }
+                $export = new ExportDataMolibdenoExcel(collect($data), collect($cabecera));
                 break;
             case 9:
                 $data = $this->buildMolibdenoExcelData($inductionWorkers);
