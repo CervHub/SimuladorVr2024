@@ -140,11 +140,11 @@
 <tr><th>Inducción</th><td>{{ $induction->alias }}</td></tr>
 <tr><th>Modalidad / intento</th><td>{{ $modo }} / {{ $detail->report }}</td></tr>
 <tr><th>Fecha del simulador</th><td>{{ $payload['date'] ?? '—' }}</td></tr>
-<tr><th>Código del simulador</th><td>{{ $payload['code'] ?? '—' }}</td></tr>
+{{-- <tr><th>Código del simulador</th><td>{{ $payload['code'] ?? '—' }}</td></tr> --}}
 <tr><th>Nota</th><td>{{ \App\Models\DetailInductionWorker::palaMineraNota($payload) }}</td></tr>
 </table>
 @foreach ([
-'condition' => ['CONDICIONES', ['dayTime'=>'Momento del día','weather'=>'Clima','display'=>'Modalidad','shovelModel'=>'Modelo de pala']],
+'condition' => ['CONDICIONES', ['dayTime'=>'Momento del día','weather'=>'Clima','display'=>'Modo','shovelModel'=>'Modelo de pala']],
 'collisions' => ['COLISIONES', ['shovelTracks'=>'Orugas de la pala','truck'=>'Camión','bucketDoor'=>'Compuerta del balde']],
 'buckets' => ['CARGAS DE BALDE', ['averageLoad'=>'Carga promedio (valor enviado)','successLoads'=>'Cargas exitosas','failLoads'=>'Cargas fallidas','totalLoads'=>'Total de cargas']],
 'trucks' => ['CAMIONES', ['overloadedTrucks'=>'Camiones sobrecargados','underloadedTrucks'=>'Camiones con carga insuficiente','totalTrucks'=>'Total de camiones']],
@@ -152,7 +152,7 @@
 ] as $section => [$title, $fields])
 <table><tr><th colspan="2" class="text-center">{{ $title }}</th></tr>
 @foreach ($fields as $key => $label)
-<tr><td style="width:65%;">{{ $label }}</td><td>{{ data_get($payload, $section.'.'.$key, '—') }}</td></tr>
+<tr><td style="width:65%;">{{ $label }}</td><td>{{ $section === 'condition' && $key === 'display' ? 'Pantalla' : data_get($payload, $section.'.'.$key, '—') }}</td></tr>
 @endforeach
 </table>
 @endforeach
