@@ -141,7 +141,7 @@
 <tr><th>Modalidad / intento</th><td>{{ $modo }} / {{ $detail->report }}</td></tr>
 <tr><th>Fecha del simulador</th><td>{{ $payload['date'] ?? '—' }}</td></tr>
 {{-- <tr><th>Código del simulador</th><td>{{ $payload['code'] ?? '—' }}</td></tr> --}}
-<tr><th>Nota</th><td>{{ \App\Models\DetailInductionWorker::palaMineraNota($payload) }}</td></tr>
+<tr><th>Nota final / 20</th><td>{{ \App\Models\DetailInductionWorker::palaMineraNota($payload) }}</td></tr>
 </table>
 @foreach ([
 'condition' => ['CONDICIONES', ['dayTime'=>'Momento del día','weather'=>'Clima','display'=>'Modo','shovelModel'=>'Modelo de pala']],
@@ -154,6 +154,13 @@
 @foreach ($fields as $key => $label)
 <tr><td style="width:65%;">{{ $label }}</td><td>{{ $section === 'condition' && $key === 'display' ? 'Pantalla' : data_get($payload, $section.'.'.$key, '—') }}</td></tr>
 @endforeach
+@if ($section === 'collisions')
+<tr><th>Nota de colisiones / 20</th><td>{{ \App\Models\DetailInductionWorker::palaMineraNotaColisiones($payload) }}</td></tr>
+@endif
+@if ($section === 'trucks')
+<tr><th>Objetivo de camiones</th><td>5</td></tr>
+<tr><th>Nota de camiones / 20</th><td>{{ \App\Models\DetailInductionWorker::palaMineraNotaCamiones($payload) }}</td></tr>
+@endif
 </table>
 @endforeach
 </body></html>

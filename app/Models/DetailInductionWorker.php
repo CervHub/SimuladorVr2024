@@ -9,14 +9,27 @@ class DetailInductionWorker extends Model
 {
     use HasFactory;
 
-    public static function palaMineraNota(array $payload)
+    public static function palaMineraNotaCamiones(array $payload): float
     {
-        foreach (['nota', 'note'] as $key) {
-            if (isset($payload[$key]) && is_numeric($payload[$key])) {
-                return $payload[$key] + 0;
-            }
+        $camiones = max(0, (float) ($payload['trucks']['totalTrucks'] ?? 0));
+
+        return round(min(20, $camiones * 20 / 5), 2);
+    }
+
+    public static function palaMineraNotaColisiones(array $payload): float
+    {
+        $colisiones = 0;
+        foreach (['shovelTracks', 'truck', 'bucketDoor'] as $key) {
+            $colisiones += max(0, (float) ($payload['collisions'][$key] ?? 0));
         }
-        return 20;
+
+        return round(max(0, 20 - $colisiones), 2);
+    }
+
+    public static function palaMineraNota(array $payload): float
+    {
+        return round((self::palaMineraNotaCamiones($payload)
+            + self::palaMineraNotaColisiones($payload)) / 2, 2);
     }
 
     protected $table = 'detail_induction_workers';
