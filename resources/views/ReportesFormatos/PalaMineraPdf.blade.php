@@ -278,7 +278,7 @@
                             {{ $title }}
                         </th>
                         <th style="text-align:right;">
-                            Objetivo: {{ $section === 'collisions' ? '0 colisiones' : '5 camiones cargados correctamente' }}
+                            Objetivo: {{ $section === 'collisions' ? '0 colisiones' : '5 camiones cargados' }}
                         </th>
                     @else
                         <th colspan="2">
