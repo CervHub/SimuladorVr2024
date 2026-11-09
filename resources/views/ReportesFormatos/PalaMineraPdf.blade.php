@@ -133,7 +133,7 @@
 <td class="text-center font-bold" style="width:50%;vertical-align:middle;font-size:16px;">REPORTE DE EVALUACIÓN<br>PALA MINERA</td>
 <td class="text-center font-bold" style="width:25%;vertical-align:middle;">FLAVISUR E.I.R.L.</td></tr></table>
 <table>
-<tr><th colspan="2" class="text-center">DATOS DEL EVALUADO</th></tr>
+<tr><th colspan="2">DATOS DEL EVALUADO</th></tr>
 <tr><th>Nombres y apellidos</th><td>{{ $worker->nombre }} {{ $worker->apellido }}</td></tr>
 <tr><th>DNI</th><td>{{ $worker->user->doi ?? '—' }}</td></tr>
 <tr><th>Cargo</th><td>{{ $worker->position ?? '—' }}</td></tr>
@@ -151,32 +151,35 @@
 'times' => ['TIEMPOS', ['averageLoad'=>'Promedio por carga','averageTruckLoad'=>'Promedio por camión','Total'=>'Tiempo total']]
 ] as $section => [$title, $fields])
 @php($hasObjective = in_array($section, ['collisions', 'trucks'], true))
-<table><tr><th colspan="{{ $hasObjective ? 3 : 2 }}" class="text-center">{{ $title }}</th></tr>
+<table><tr>
 @if ($hasObjective)
-<tr><th style="width:55%;">Indicador</th><th style="width:25%;">Resultado</th><th style="width:20%;">Objetivo</th></tr>
+<th>{{ $title }}</th><th style="text-align:right;">Objetivo: {{ $section === 'collisions' ? '0 colisiones' : '5 camiones cargados' }}</th>
+@else
+<th colspan="2">{{ $title }}</th>
+@endif
+</tr>
+@if ($hasObjective)
+<tr><th style="width:65%;">Indicador</th><th style="width:35%;">Resultado</th></tr>
 @endif
 @foreach ($fields as $key => $label)
-<tr><td style="width:{{ $hasObjective ? 55 : 65 }}%;">{{ $label }}</td><td>{{ $section === 'condition' && $key === 'display' ? 'Pantalla' : data_get($payload, $section.'.'.$key, '—') }}</td>
-@if ($hasObjective)
-<td>{{ $section === 'collisions' ? '0' : ($key === 'totalTrucks' ? '5' : '—') }}</td>
-@endif
+<tr><td style="width:65%;">{{ $label }}</td><td>{{ $section === 'condition' && $key === 'display' ? 'Pantalla' : data_get($payload, $section.'.'.$key, '—') }}</td>
 </tr>
 @endforeach
 @if ($section === 'collisions')
-<tr><th>Nota de colisiones / 20</th><td>{{ \App\Models\DetailInductionWorker::palaMineraNotaColisiones($payload) }}</td><td>20</td></tr>
+<tr><th>Nota de colisiones / 20</th><td>{{ \App\Models\DetailInductionWorker::palaMineraNotaColisiones($payload) }}</td></tr>
 @endif
 @if ($section === 'trucks')
-<tr><th>Nota de camiones / 20</th><td>{{ \App\Models\DetailInductionWorker::palaMineraNotaCamiones($payload) }}</td><td>20</td></tr>
+<tr><th>Nota de camiones / 20</th><td>{{ \App\Models\DetailInductionWorker::palaMineraNotaCamiones($payload) }}</td></tr>
 @endif
 </table>
 @endforeach
 <table>
-<tr><th colspan="3" class="text-center">OBSERVACIONES DE GIRO (SIN EFECTO EN LA NOTA)</th></tr>
-<tr><th style="width:55%;">Indicador</th><th style="width:25%;">Resultado</th><th style="width:20%;">Objetivo</th></tr>
-@foreach (['truck' => 'Camión', 'shovel' => 'Pala'] as $equipment => $equipmentLabel)
-<tr><td>Giros del {{ $equipmentLabel }}</td><td>{{ data_get($payload, 'rotations.'.$equipment.'.totalTurns', 'No informado') }}</td><td>—</td></tr>
-<tr><td>Giros del {{ $equipmentLabel }} que superaron 180°</td><td>{{ data_get($payload, 'rotations.'.$equipment.'.over180Turns', 'No informado') }}</td><td>0</td></tr>
+<tr><th>OBSERVACIONES DE GIRO (SIN EFECTO EN LA NOTA)</th><th style="text-align:right;">Objetivo: 0 giros mayores de 180°</th></tr>
+<tr><th style="width:65%;">Indicador</th><th style="width:35%;">Resultado</th></tr>
+@foreach (['truck' => 'del camión', 'shovel' => 'de la pala'] as $equipment => $equipmentLabel)
+<tr><td>Giros {{ $equipmentLabel }}</td><td>{{ data_get($payload, 'rotations.'.$equipment.'.totalTurns', 'No informado') }}</td></tr>
+<tr><td>Giros {{ $equipmentLabel }} que superaron 180°</td><td>{{ data_get($payload, 'rotations.'.$equipment.'.over180Turns', 'No informado') }}</td></tr>
 @endforeach
-<tr><td colspan="3">Límite de giro respecto al eje de referencia: 180°. Unity debe registrar los giros y las veces que se supera ese límite.</td></tr>
+<tr><td colspan="2">Límite de giro respecto al eje de referencia: 180°.</td></tr>
 </table>
 </body></html>
