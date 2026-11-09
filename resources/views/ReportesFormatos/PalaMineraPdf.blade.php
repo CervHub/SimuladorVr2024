@@ -178,6 +178,7 @@
                                 {{ $worker->user->doi ?? '—' }}
                             </td>
                         </tr>
+                        {{--
                         <tr>
                             <th>
                                 Cargo
@@ -186,6 +187,7 @@
                                 {{ $worker->position ?? '—' }}
                             </td>
                         </tr>
+                        --}}
                         <tr>
                             <th>
                                 Inducción
@@ -194,6 +196,7 @@
                                 {{ $induction->alias }}
                             </td>
                         </tr>
+                        {{--
                         <tr>
                             <th>
                                 Modalidad / intento
@@ -202,6 +205,7 @@
                                 {{ $modo }} / {{ $detail->report }}
                             </td>
                         </tr>
+                        --}}
                         <tr>
                             <th>
                                 Fecha del simulador
@@ -258,14 +262,6 @@
                             </td>
                             <td>
                                 {{ data_get($payload, 'condition.shovelModel', '—') }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                Giros de la pala
-                            </td>
-                            <td>
-                                {{ data_get($payload, 'rotations.shovel.totalTurns', 'No informado') }}
                             </td>
                         </tr>
                     </table>
@@ -331,5 +327,18 @@
                 @endif
             </table>
         @endforeach
+        <table>
+            <tr>
+                <th colspan="2">OBSERVACIONES DE GIRO</th>
+            </tr>
+            <tr>
+                <th style="width:65%;">Indicador</th>
+                <th style="width:35%;">Resultado</th>
+            </tr>
+            <tr>
+                <td>Giros de la pala en los que pisó el cable</td>
+                <td>{{ data_get($payload, 'rotations.shovel.cableContactTurns', 'No informado') }}</td>
+            </tr>
+        </table>
     </body>
 </html>
