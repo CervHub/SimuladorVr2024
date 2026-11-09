@@ -128,10 +128,10 @@
             padding-left: 2px !important;
         }
     </style></head><body>
-<table class="header-table"><tr>
-<td style="width:20%;"><img style="width:100px;height:auto;" src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('logo/logo_negro.png'))) }}" alt="CERV"></td>
-<td class="text-center font-bold" style="font-size:16px;">REPORTE DE EVALUACIÓN<br>PALA MINERA</td>
-<td class="text-center font-bold">FLAVISUR E.I.R.L.</td></tr></table>
+<table class="header-table" style="table-layout:fixed;"><tr>
+<td style="width:25%;vertical-align:middle;"><img style="width:100px;height:auto;" src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('logo/logo_negro.png'))) }}" alt="CERV"></td>
+<td class="text-center font-bold" style="width:50%;vertical-align:middle;font-size:16px;">REPORTE DE EVALUACIÓN<br>PALA MINERA</td>
+<td class="text-center font-bold" style="width:25%;vertical-align:middle;">FLAVISUR E.I.R.L.</td></tr></table>
 <table>
 <tr><th colspan="2" class="text-center">DATOS DEL EVALUADO</th></tr>
 <tr><th>Nombres y apellidos</th><td>{{ $worker->nombre }} {{ $worker->apellido }}</td></tr>
@@ -145,7 +145,7 @@
 </table>
 @foreach ([
 'collisions' => ['COLISIONES', ['shovelTracks'=>'Orugas de la pala','truck'=>'Camión','bucketDoor'=>'Compuerta del balde']],
-'trucks' => ['CAMIONES', ['overloadedTrucks'=>'Camiones sobrecargados','underloadedTrucks'=>'Camiones con carga insuficiente','totalTrucks'=>'Total de camiones']],
+'trucks' => ['CAMIONES', ['overloadedTrucks'=>'Camiones sobrecargados','underloadedTrucks'=>'Camiones con carga insuficiente','totalTrucks'=>'Total de camiones cargados']],
 'condition' => ['CONDICIONES', ['dayTime'=>'Momento del día','weather'=>'Clima','display'=>'Modo','shovelModel'=>'Modelo de pala']],
 'buckets' => ['CARGAS DE BALDE', ['averageLoad'=>'Carga promedio (valor enviado)','successLoads'=>'Cargas exitosas','failLoads'=>'Cargas fallidas','totalLoads'=>'Total de cargas']],
 'times' => ['TIEMPOS', ['averageLoad'=>'Promedio por carga','averageTruckLoad'=>'Promedio por camión','Total'=>'Tiempo total']]
@@ -158,7 +158,7 @@
 @foreach ($fields as $key => $label)
 <tr><td style="width:{{ $hasObjective ? 55 : 65 }}%;">{{ $label }}</td><td>{{ $section === 'condition' && $key === 'display' ? 'Pantalla' : data_get($payload, $section.'.'.$key, '—') }}</td>
 @if ($hasObjective)
-<td>{{ $section === 'collisions' ? '0' : ($key === 'totalTrucks' ? '5 o más' : '—') }}</td>
+<td>{{ $section === 'collisions' ? '0' : ($key === 'totalTrucks' ? '5' : '—') }}</td>
 @endif
 </tr>
 @endforeach
@@ -170,4 +170,13 @@
 @endif
 </table>
 @endforeach
+<table>
+<tr><th colspan="3" class="text-center">OBSERVACIONES DE GIRO (SIN EFECTO EN LA NOTA)</th></tr>
+<tr><th style="width:55%;">Indicador</th><th style="width:25%;">Resultado</th><th style="width:20%;">Objetivo</th></tr>
+@foreach (['truck' => 'Camión', 'shovel' => 'Pala'] as $equipment => $equipmentLabel)
+<tr><td>Giros del {{ $equipmentLabel }}</td><td>{{ data_get($payload, 'rotations.'.$equipment.'.totalTurns', 'No informado') }}</td><td>—</td></tr>
+<tr><td>Giros del {{ $equipmentLabel }} que superaron 180°</td><td>{{ data_get($payload, 'rotations.'.$equipment.'.over180Turns', 'No informado') }}</td><td>0</td></tr>
+@endforeach
+<tr><td colspan="3">Límite de giro respecto al eje de referencia: 180°. Unity debe registrar los giros y las veces que se supera ese límite.</td></tr>
+</table>
 </body></html>
