@@ -144,22 +144,29 @@
 <tr><th>Nota final / 20</th><td>{{ \App\Models\DetailInductionWorker::palaMineraNota($payload) }}</td></tr>
 </table>
 @foreach ([
-'condition' => ['CONDICIONES', ['dayTime'=>'Momento del día','weather'=>'Clima','display'=>'Modo','shovelModel'=>'Modelo de pala']],
 'collisions' => ['COLISIONES', ['shovelTracks'=>'Orugas de la pala','truck'=>'Camión','bucketDoor'=>'Compuerta del balde']],
-'buckets' => ['CARGAS DE BALDE', ['averageLoad'=>'Carga promedio (valor enviado)','successLoads'=>'Cargas exitosas','failLoads'=>'Cargas fallidas','totalLoads'=>'Total de cargas']],
 'trucks' => ['CAMIONES', ['overloadedTrucks'=>'Camiones sobrecargados','underloadedTrucks'=>'Camiones con carga insuficiente','totalTrucks'=>'Total de camiones']],
+'condition' => ['CONDICIONES', ['dayTime'=>'Momento del día','weather'=>'Clima','display'=>'Modo','shovelModel'=>'Modelo de pala']],
+'buckets' => ['CARGAS DE BALDE', ['averageLoad'=>'Carga promedio (valor enviado)','successLoads'=>'Cargas exitosas','failLoads'=>'Cargas fallidas','totalLoads'=>'Total de cargas']],
 'times' => ['TIEMPOS', ['averageLoad'=>'Promedio por carga','averageTruckLoad'=>'Promedio por camión','Total'=>'Tiempo total']]
 ] as $section => [$title, $fields])
-<table><tr><th colspan="2" class="text-center">{{ $title }}</th></tr>
+@php($hasObjective = in_array($section, ['collisions', 'trucks'], true))
+<table><tr><th colspan="{{ $hasObjective ? 3 : 2 }}" class="text-center">{{ $title }}</th></tr>
+@if ($hasObjective)
+<tr><th style="width:55%;">Indicador</th><th style="width:25%;">Resultado</th><th style="width:20%;">Objetivo</th></tr>
+@endif
 @foreach ($fields as $key => $label)
-<tr><td style="width:65%;">{{ $label }}</td><td>{{ $section === 'condition' && $key === 'display' ? 'Pantalla' : data_get($payload, $section.'.'.$key, '—') }}</td></tr>
+<tr><td style="width:{{ $hasObjective ? 55 : 65 }}%;">{{ $label }}</td><td>{{ $section === 'condition' && $key === 'display' ? 'Pantalla' : data_get($payload, $section.'.'.$key, '—') }}</td>
+@if ($hasObjective)
+<td>{{ $section === 'collisions' ? '0' : ($key === 'totalTrucks' ? '5 o más' : '—') }}</td>
+@endif
+</tr>
 @endforeach
 @if ($section === 'collisions')
-<tr><th>Nota de colisiones / 20</th><td>{{ \App\Models\DetailInductionWorker::palaMineraNotaColisiones($payload) }}</td></tr>
+<tr><th>Nota de colisiones / 20</th><td>{{ \App\Models\DetailInductionWorker::palaMineraNotaColisiones($payload) }}</td><td>20</td></tr>
 @endif
 @if ($section === 'trucks')
-<tr><th>Objetivo de camiones</th><td>5</td></tr>
-<tr><th>Nota de camiones / 20</th><td>{{ \App\Models\DetailInductionWorker::palaMineraNotaCamiones($payload) }}</td></tr>
+<tr><th>Nota de camiones / 20</th><td>{{ \App\Models\DetailInductionWorker::palaMineraNotaCamiones($payload) }}</td><td>20</td></tr>
 @endif
 </table>
 @endforeach
