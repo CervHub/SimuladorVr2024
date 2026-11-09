@@ -1,19 +1,26 @@
-# Giros de la pala con contacto con el cable
+# Datos de camiones y contacto con el cable
 
-Agregar dentro de json_data, junto a trucks, collisions y times:
+Fragmento que se agrega al objeto json_data existente:
 
 ```json
 {
-  "rotations": {
-    "shovel": {
-      "cableContactTurns": 2
-    }
+  "collisions": {
+    "shovelTracks": 2,
+    "truck": 1,
+    "bucketDoor": 0,
+    "supplyCable": true
+  },
+  "trucks": {
+    "overloadedTrucks": 1,
+    "underloadedTrucks": 2,
+    "correctLoads": 6,
+    "totalTrucks": 9
   }
 }
 ```
 
-cableContactTurns cuenta los giros de la pala que superan 180° y durante los cuales pisa su cable. Deben cumplirse ambas condiciones; exactamente 180° no cuenta. Enviar un entero no negativo y contar una sola vez cada giro con contacto, no por frame. El valor 2 es ilustrativo.
+supplyCable es booleano: true = pisó el cable, false = no lo pisó. Si no llega, el PDF muestra «No informado». Es informativo y no afecta la nota. No indica cantidad de giros ni permite comprobar que el ángulo fue mayor de 180°. Reemplaza la propuesta rotations.shovel.cableContactTurns para los nuevos envíos.
 
-El reporte muestra este único valor al final, sin objetivo ni efecto en la nota. Si no llega, muestra «No informado»; cero significa que se midió y no hubo contactos.
+correctLoads es la cantidad de camiones cargados correctamente y determina la nota: mínimo(20, correctLoads × 20 / 5). Si falta el campo, los reportes antiguos conservan el cálculo sobre totalTrucks. Cero cargas correctas es nota cero aunque el total sea mayor.
 
-Reemplaza la propuesta anterior de totalTurns y over180Turns: esas mediciones no indican contactos con el cable y no se reutilizan como tales. Se guarda dentro del JSON existente, sin columnas nuevas.
+La nota de colisiones suma solo shovelTracks, truck y bucketDoor y descuenta un punto por evento desde 20, con mínimo cero. La nota final es el promedio de camiones y colisiones. El ejemplo da 20 y 17 respectivamente: nota final 18.5.

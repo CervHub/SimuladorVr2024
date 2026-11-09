@@ -11,7 +11,9 @@ class DetailInductionWorker extends Model
 
     public static function palaMineraNotaCamiones(array $payload): float
     {
-        $camiones = max(0, (float) ($payload['trucks']['totalTrucks'] ?? 0));
+        // Los reportes anteriores solo enviaban totalTrucks.
+        $camiones = max(0, (float) ($payload['trucks']['correctLoads']
+            ?? $payload['trucks']['totalTrucks'] ?? 0));
 
         return round(min(20, $camiones * 20 / 5), 2);
     }

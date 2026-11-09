@@ -14,6 +14,7 @@
         'trucks' => ['CAMIONES', [
             'overloadedTrucks' => 'Camiones sobrecargados',
             'underloadedTrucks' => 'Camiones con carga insuficiente',
+            'correctLoads' => 'Camiones cargados correctamente',
             'totalTrucks' => 'Total de camiones cargados',
         ]],
         'buckets' => ['CARGAS DE BALDE', [
@@ -277,7 +278,7 @@
                             {{ $title }}
                         </th>
                         <th style="text-align:right;">
-                            Objetivo: {{ $section === 'collisions' ? '0 colisiones' : '5 camiones cargados' }}
+                            Objetivo: {{ $section === 'collisions' ? '0 colisiones' : '5 camiones cargados correctamente' }}
                         </th>
                     @else
                         <th colspan="2">
@@ -336,11 +337,16 @@
                 <th style="width:35%;">Resultado</th>
             </tr>
             <tr>
-                <td>Giros de la pala</td>
-                <td>{{ data_get($payload, 'rotations.shovel.cableContactTurns', 'No informado') }}</td>
-            </tr>
-            <tr>
-                <td colspan="2">Se considera un giro cuando la pala gira más de 180° y llega a pisar su cable.</td>
+                <td>Pisó el cable de alimentación de la pala</td>
+                <td>
+                    @if (data_get($payload, 'collisions.supplyCable') === true)
+                        Sí
+                    @elseif (data_get($payload, 'collisions.supplyCable') === false)
+                        No
+                    @else
+                        No informado
+                    @endif
+                </td>
             </tr>
         </table>
     </body>
