@@ -336,8 +336,11 @@
                 <th style="width:35%;">Resultado</th>
             </tr>
             <tr>
-                <td>Giros de la pala en los que pisó el cable</td>
+                <td>Giros de la pala</td>
                 <td>{{ data_get($payload, 'rotations.shovel.cableContactTurns', 'No informado') }}</td>
+            </tr>
+            <tr>
+                <td colspan="2">Se considera un giro cuando la pala gira más de 180° y llega a pisar su cable.</td>
             </tr>
         </table>
     </body>

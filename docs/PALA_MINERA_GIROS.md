@@ -12,7 +12,7 @@ Agregar dentro de json_data, junto a trucks, collisions y times:
 }
 ```
 
-cableContactTurns cuenta los giros de la pala durante los cuales pisó el cable. Enviar un entero no negativo y contar una sola vez cada giro con contacto, no por frame. El valor 2 es ilustrativo.
+cableContactTurns cuenta los giros de la pala que superan 180° y durante los cuales pisa su cable. Deben cumplirse ambas condiciones; exactamente 180° no cuenta. Enviar un entero no negativo y contar una sola vez cada giro con contacto, no por frame. El valor 2 es ilustrativo.
 
 El reporte muestra este único valor al final, sin objetivo ni efecto en la nota. Si no llega, muestra «No informado»; cero significa que se midió y no hubo contactos.
 
